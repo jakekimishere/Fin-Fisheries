@@ -19,21 +19,15 @@ Offline-capable web app for Northeast fisheries and Atlantic HMS compliance asse
 
 Use that exact path (repo name is case-sensitive: `Fin-Fisheries`).
 
-### If you see a 404 or a failed Actions deploy
+### If you see a 404
 
-**First-time setup (do this once):**
-
-1. Repo must be **Public** — **Settings → General → Change repository visibility** (private repos need GitHub Pro for Pages).
-2. Open **Settings → Pages** → under **Build and deployment**, set **Source** to **GitHub Actions**.
-3. **Actions** tab → **Deploy to GitHub Pages** → **Re-run all jobs** (after the latest push).
-
-If **Setup Pages** still fails with “Get Pages site failed”:
-
-1. **Settings → Pages** → confirm **Source** is **GitHub Actions** (not “None”).
-2. Approve any **Environment** prompt for `github-pages` (first deploy may ask for approval under **Settings → Environments**).
-3. Re-run the workflow.
-
-When green, the site URL is shown on the completed run and under **Settings → Pages**.
+1. Repo must be **Public** (**Settings → General**).
+2. **Actions** tab → wait for **Deploy to GitHub Pages** to finish (green check). This creates/updates the `gh-pages` branch.
+3. **Settings → Pages** → **Build and deployment**:
+   - **Source:** Deploy from a branch
+   - **Branch:** `gh-pages` → **/ (root)** → **Save**
+4. Wait 2–5 minutes, then open **https://jakekimishere.github.io/Fin-Fisheries/** (use Incognito if you previously used a custom domain).
+5. Leave **Custom domain** empty until you own the domain and DNS is configured.
 
 Local testing: open `index.html` directly or use any static file server.
 
