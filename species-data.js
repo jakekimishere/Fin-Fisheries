@@ -2531,13 +2531,13 @@ SPECIES_DATA['swordfish'] = {
                     'commercial-purse-seine': null, // No limit
                     'commercial-charter-headboat': null, // No limit
                     'recreational': { count: 1, unit: 'fish per person per day' },
-                    'recreational-charter-headboat': { count: 1, unit: 'fish per person per day' }
+                    'recreational-charter-headboat': { count: 6, unit: 'fish per vessel per trip' }
                 },
                 violation: {
-                    ifExceeds: 'VIOLATION: Possession amount exceeds permit limit (50 CFR 635.23)',
+                    ifExceeds: 'VIOLATION: Possession amount exceeds permit limit (50 CFR 635.22)',
                     ifProhibited: 'VIOLATION: Swordfish retention is PROHIBITED with trap gear (50 CFR 635.23)'
                 },
-                cfr: '50 CFR 635.23'
+                cfr: '50 CFR 635.22'
             },
             authorizedGear: {
                 question: 'What gear is being used? (Verify it matches the permit type)',
