@@ -1,0 +1,34 @@
+{
+  "lastUpdate": "2025-01-16",
+  "version": "1.0.0",
+  "region": "Northeast",
+  "dataSource": {
+    "primary": "NOAA Fisheries Greater Atlantic Regional Fisheries Office",
+    "summerFlounder": "NOAA 2025 Summer Flounder, Scup, Black Sea Bass, and Bluefish Specifications",
+    "scallop": "NOAA Framework Adjustment 39 to the Atlantic Sea Scallop Fishery Management Plan",
+    "cfr": "50 CFR Part 648 - Fisheries of the Northeastern United States"
+  },
+  "changes": [
+    {
+      "date": "2025-01-07",
+      "title": "Updated with current NOAA 2025 specifications",
+      "description": "Summer Flounder and Atlantic Sea Scallop regulations updated with latest NOAA specifications and Framework 39",
+      "affectedSpecies": ["summer-flounder", "atlantic-sea-scallop"],
+      "sources": [
+        "https://www.fisheries.noaa.gov/bulletin/2025-specifications-summer-flounder-scup-black-sea-bass-and-bluefish-fisheries",
+        "https://www.fisheries.noaa.gov/bulletin/2025-fishing-year-limited-access-allocations-atlantic-sea-scallop-fishery"
+      ]
+    }
+  ],
+  "verification": {
+    "note": "All data sourced directly from official NOAA publications and CFR regulations",
+    "lastVerified": "2025-01-07",
+    "verificationSources": [
+      "NOAA Greater Atlantic Regional Fisheries Office",
+      "50 CFR Part 648",
+      "Federal Register publications"
+    ]
+  },
+  "notes": "This file should be hosted and updated whenever NOAA publishes new regulations. All data is sourced from official NOAA publications and verified against current CFR regulations."
+}
+

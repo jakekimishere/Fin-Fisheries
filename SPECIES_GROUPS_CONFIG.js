@@ -1,0 +1,143 @@
+// Species Groups Configuration
+// Defines which species share combined possession limits
+
+const SPECIES_GROUPS = {
+    // Large Coastal Sharks (LCS) - Recreational: 1 shark total from this group
+    'lcs-recreational': {
+        name: 'Large Coastal Sharks (LCS)',
+        description: 'Recreational limit: 1 shark per vessel per trip from this group',
+        species: [
+            'blacktip-shark',
+            'bull-shark',
+            'lemon-shark',
+            'nurse-shark',
+            'spinner-shark',
+            'tiger-shark'
+        ],
+        limits: {
+            'recreational': {
+                limit: { count: 1, unit: 'fish' },
+                cfr: '50 CFR 635.23',
+                notes: '1 shark per vessel per trip from Atlantic aggregated large coastal shark (LCS) management group'
+            }
+        }
+    },
+    
+    // Hammerhead Sharks - Recreational: 1 shark total from this group
+    'hammerhead-recreational': {
+        name: 'Hammerhead Sharks',
+        description: 'Recreational limit: 1 shark per vessel per trip from this group',
+        species: [
+            'great-hammerhead-shark',
+            'scalloped-hammerhead-shark',
+            'smooth-hammerhead-shark'
+        ],
+        limits: {
+            'recreational': {
+                limit: { count: 1, unit: 'fish' },
+                cfr: '50 CFR 635.23',
+                notes: '1 shark per vessel per trip from hammerhead shark management group'
+            }
+        }
+    },
+    
+    // Small Coastal Sharks (SCS) - Non-blacknose - may have combined limits
+    'scs-non-blacknose': {
+        name: 'Small Coastal Sharks (Non-Blacknose)',
+        description: 'Combined limits may apply',
+        species: [
+            'atlantic-sharpnose-shark',
+            'bonnethead-shark',
+            'finetooth-shark'
+        ],
+        limits: {
+            'recreational': {
+                limit: null, // Check current regulations
+                cfr: '50 CFR 635.23',
+                notes: 'Check current non-blacknose SCS retention limits'
+            }
+        }
+    },
+    
+    // Add more groups as needed
+    // Example format:
+    // 'group-id': {
+    //     name: 'Group Name',
+    //     description: 'Description of combined limit',
+    //     species: ['species-id-1', 'species-id-2'],
+    //     limits: {
+    //         'permit-type': {
+    //             limit: { count: X, unit: 'fish' },
+    //             cfr: '50 CFR XXX.XX',
+    //             notes: 'Combined limit description'
+    //         }
+    //     }
+    // }
+};
+
+// Helper function to get all groups a species belongs to
+function getSpeciesGroups(speciesId) {
+    const groups = [];
+    for (const groupId in SPECIES_GROUPS) {
+        if (SPECIES_GROUPS[groupId].species.includes(speciesId)) {
+            groups.push({
+                id: groupId,
+                ...SPECIES_GROUPS[groupId]
+            });
+        }
+    }
+    return groups;
+}
+
+// Helper function to get combined limit for a group
+function getCombinedLimit(groupId, permitType) {
+    const group = SPECIES_GROUPS[groupId];
+    if (!group || !group.limits) return null;
+    return group.limits[permitType] || null;
+}
+
+// Helper function to check if species share a combined limit
+function shareCombinedLimit(speciesIds, permitType) {
+    // Find all groups that contain any of the selected species
+    const relevantGroups = {};
+    
+    speciesIds.forEach(speciesId => {
+        const groups = getSpeciesGroups(speciesId);
+        groups.forEach(group => {
+            if (!relevantGroups[group.id]) {
+                relevantGroups[group.id] = {
+                    group: group,
+                    species: []
+                };
+            }
+            if (!relevantGroups[group.id].species.includes(speciesId)) {
+                relevantGroups[group.id].species.push(speciesId);
+            }
+        });
+    });
+    
+    // Check if any group has multiple selected species (meaning combined limit applies)
+    const combinedLimitGroups = [];
+    for (const groupId in relevantGroups) {
+        const groupData = relevantGroups[groupId];
+        // Only include if multiple species from this group are selected
+        if (groupData.species.length > 1) {
+            const limit = getCombinedLimit(groupId, permitType);
+            if (limit) {
+                combinedLimitGroups.push({
+                    groupId: groupId,
+                    group: groupData.group,
+                    species: groupData.species,
+                    limit: limit
+                });
+            }
+        }
+    }
+    
+    return combinedLimitGroups;
+}
+
+// Export
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { SPECIES_GROUPS, getSpeciesGroups, getCombinedLimit, shareCombinedLimit };
+}
