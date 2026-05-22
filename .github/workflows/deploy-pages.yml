@@ -27,6 +27,9 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          # Creates/enables Pages for this repo on first deploy (repo must be public on free plan)
+          enablement: true
 
       - name: Upload site
         uses: actions/upload-pages-artifact@v3

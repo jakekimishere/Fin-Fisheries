@@ -19,13 +19,21 @@ Offline-capable web app for Northeast fisheries and Atlantic HMS compliance asse
 
 Use that exact path (repo name is case-sensitive: `Fin-Fisheries`).
 
-### If you see a 404
+### If you see a 404 or a failed Actions deploy
 
-1. Open repo **Settings → Pages**.
-2. Under **Build and deployment**, set **Source** to **GitHub Actions** (not “Deploy from branch” unless you prefer that).
-3. After pushing `main`, open the **Actions** tab → **Deploy to GitHub Pages** → wait for green check.
-4. Confirm the repo is **Public** (private repos need GitHub Pro for Pages on personal accounts).
-5. Wait 1–2 minutes, then hard-refresh the live URL (Ctrl+F5).
+**First-time setup (do this once):**
+
+1. Repo must be **Public** — **Settings → General → Change repository visibility** (private repos need GitHub Pro for Pages).
+2. Open **Settings → Pages** → under **Build and deployment**, set **Source** to **GitHub Actions**.
+3. **Actions** tab → **Deploy to GitHub Pages** → **Re-run all jobs** (after the latest push).
+
+If **Setup Pages** still fails with “Get Pages site failed”:
+
+1. **Settings → Pages** → confirm **Source** is **GitHub Actions** (not “None”).
+2. Approve any **Environment** prompt for `github-pages` (first deploy may ask for approval under **Settings → Environments**).
+3. Re-run the workflow.
+
+When green, the site URL is shown on the completed run and under **Settings → Pages**.
 
 Local testing: open `index.html` directly or use any static file server.
 
