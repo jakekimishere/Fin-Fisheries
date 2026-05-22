@@ -12,6 +12,32 @@
   "changes": [
     {
       "date": "2026-05-21",
+      "title": "Tier E: quota status, placeholder species data, HMS/648 limits",
+      "description": "FISHERY_QUOTA_STATUS_CONFIG for BFT seasonal limits, herring area 2,000 lb adjustments, skate wing trips, silver hake mesh limits, salmon EEZ prohibition, king/Spanish mackerel bag limits, tautog conservation equivalency notes. Wired into AssessmentViolations.",
+      "affectedSpecies": [
+        "bluefin-tuna",
+        "atlantic-salmon",
+        "atlantic-herring",
+        "silver-hake",
+        "longhorn-sculpin",
+        "skate",
+        "thorny-skate",
+        "smooth-skate",
+        "barndoor-skate",
+        "tigerfish",
+        "king-mackerel",
+        "spanish-mackerel",
+        "tautog"
+      ],
+      "sources": [
+        "https://www.fisheries.noaa.gov/bulletin/2026-atlantic-herring-management-area-1b-possession-limit-adjustment",
+        "https://www.law.cornell.edu/cfr/text/50/648.40",
+        "https://www.law.cornell.edu/cfr/text/50/648.322",
+        "https://www.law.cornell.edu/cfr/text/50/622.382"
+      ]
+    },
+    {
+      "date": "2026-05-21",
       "title": "UX, violations, and assessment flow improvements",
       "description": "Shared AssessmentViolations module; skip empty vessel-requirements and unnecessary vessel-classification steps; dynamic report fields; summer flounder limit keys; simplified groundfish assessment questions; npm run validate.",
       "affectedSpecies": ["american-plaice", "summer-flounder"],

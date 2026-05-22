@@ -3472,44 +3472,22 @@ function showPreReportSummary() {
 
     const allViolations = checkAllViolations();
     const speciesIds = getSelectedSpeciesIds();
+    const speciesSummaries = speciesIds.map(speciesId => {
+        const species = SPECIES_DATA[speciesId];
+        if (!species) return { name: speciesId, violations: [] };
+        const rawData = (window.assessmentData || assessmentData).species[speciesId] || {};
+        const data = normalizeSpeciesAssessmentData(speciesId, species, rawData);
+        return {
+            name: species.name || speciesId,
+            violations: checkSpeciesViolations(speciesId, species, data)
+        };
+    });
 
-    let html = '';
-    if (allViolations.length === 0) {
-        html = `
-            <div class="pre-report-status compliant">
-                <p><strong>No potential violations identified</strong> from the information entered.</p>
-                <p class="pre-report-note">You can still generate the full report for documentation. Always verify against current NOAA regulations.</p>
-            </div>
-        `;
-    } else {
-        html = `
-            <div class="pre-report-status violation">
-                <p><strong>${allViolations.length} potential issue(s) identified</strong></p>
-                <ul class="violation-list pre-report-violation-list">
-                    ${allViolations.map(v => `<li>${v}</li>`).join('')}
-                </ul>
-            </div>
-            <div class="pre-report-by-species">
-                <h3>By species</h3>
-                ${speciesIds.map(speciesId => {
-                    const species = SPECIES_DATA[speciesId];
-                    if (!species) return '';
-                    const rawData = (window.assessmentData || assessmentData).species[speciesId] || {};
-                    const data = normalizeSpeciesAssessmentData(speciesId, species, rawData);
-                    const violations = checkSpeciesViolations(speciesId, species, data);
-                    if (violations.length === 0) return `<p class="pre-report-species-ok">✓ ${species.name || speciesId}</p>`;
-                    return `
-                        <div class="pre-report-species-block">
-                            <strong>${species.name || speciesId}</strong>
-                            <ul class="violation-list-small">${violations.map(v => `<li>${v}</li>`).join('')}</ul>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
-        `;
-    }
+    const html = typeof ReportBuilder !== 'undefined'
+        ? ReportBuilder.buildPreReportBody({ allViolations, speciesSummaries })
+        : '';
 
-    body.innerHTML = html;
+    body.innerHTML = html || '<p>Report builder unavailable. Refresh the page.</p>';
     overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
@@ -3574,27 +3552,15 @@ function generateReport() {
         }
 
         const now = new Date();
-    
-    let html = `
-        <div class="report-header">
-            <h2>FIN - FISHERIES INSPECTION NAVIGATOR</h2>
-            <h3>NORTHEAST FISHERIES COMPLIANCE REPORT</h3>
-            <p class="report-date">Generated: ${now.toLocaleString()}</p>
-        </div>
-        <div class="report-body">
-    `;
-    
-    // Check all violations including combined limits (centralized check)
-    const allViolations = checkAllViolations();
+        const allViolations = checkAllViolations();
 
-    html += `
-        <div class="report-summary-banner ${allViolations.length > 0 ? 'violation' : 'compliant'}">
-            <p><strong>${allViolations.length > 0
-                ? `⚠️ ${allViolations.length} potential violation(s) identified`
-                : '✓ No potential violations identified from entered data'}</strong></p>
-            ${allViolations.length > 0 ? '<p>Review species sections and the final verdict below.</p>' : ''}
-        </div>
-    `;
+        let html = typeof ReportBuilder !== 'undefined'
+            ? ReportBuilder.buildReportHeader(now) + '<div class="report-body">'
+            : `<div class="report-body"><p>Generated: ${now.toLocaleString()}</p>`;
+
+        if (typeof ReportBuilder !== 'undefined') {
+            html += ReportBuilder.buildSummaryBanner(allViolations.length);
+        }
     
     // Generate report for each species
     currentSelectedSpecies.forEach(speciesId => {
@@ -3618,16 +3584,9 @@ function generateReport() {
         const violations = checkSpeciesViolations(speciesId, species, speciesData);
         const hasViolations = violations.length > 0;
         
-        html += `
-            <div class="report-section">
-                <h3>${species.name ? species.name.toUpperCase() : speciesId.toUpperCase()} ASSESSMENT</h3>
-                <div class="report-row">
-                    <span class="report-label">Compliance Status:</span>
-                    <span class="report-value report-species-status ${hasViolations ? 'violation' : 'compliant'}">
-                        ${hasViolations ? '⚠️ POTENTIAL VIOLATION(S)' : '✓ NO ISSUES IDENTIFIED'}
-                    </span>
-                </div>
-        `;
+        html += typeof ReportBuilder !== 'undefined'
+            ? ReportBuilder.buildSpeciesSectionOpen(species, speciesId, hasViolations)
+            : `<div class="report-section"><h3>${species.name || speciesId}</h3>`;
         
         const permitTypeKey = speciesData['permit-type'] || speciesData.permitType;
         const usesDynamicQuestions = !!(species.regulations?.assessmentQuestions);
@@ -3800,35 +3759,15 @@ function generateReport() {
             });
         }
 
-        html += `
-            <div class="report-row">
-                <span class="report-label">Potential Issues:</span>
-                <span class="report-value ${hasViolations ? 'violation' : 'compliant'}">
-                    ${hasViolations
-                        ? `<ul class="violation-list-small">${violations.map(v => `<li>${v}</li>`).join('')}</ul>`
-                        : 'None identified for this species based on entered data.'}
-                </span>
-            </div>
-        `;
-        
-        html += `</div>`;
+        html += typeof ReportBuilder !== 'undefined'
+            ? ReportBuilder.buildPotentialIssuesBlock(violations)
+            : '';
+        html += typeof ReportBuilder !== 'undefined' ? ReportBuilder.closeReportSection() : '</div>';
     });
-    
-    // Final verdict
-    html += `
-            <div class="verdict-box ${allViolations.length > 0 ? 'violation' : 'compliant'}">
-                <h3>${allViolations.length > 0 ? '⚠️ POTENTIAL VIOLATION(S) IDENTIFIED' : '✓ NO VIOLATIONS IDENTIFIED'}</h3>
-                ${allViolations.length > 0 ? `
-                <p>Possible violation(s) of <strong>50 USC 648</strong> - Magnuson-Stevens Fishery Conservation and Management Act</p>
-                <ul class="violation-list">
-                    ${allViolations.map(v => `<li>${v}</li>`).join('')}
-                </ul>
-                ` : `
-                <p>Based on the information provided, the vessel appears to be in compliance with Northeast fisheries regulations.</p>
-                `}
-            </div>
-        </div>
-    `;
+
+    html += typeof ReportBuilder !== 'undefined'
+        ? ReportBuilder.buildVerdictBox(allViolations) + '</div>'
+        : '</div>';
     
     if (reportContent) {
         reportContent.innerHTML = html;

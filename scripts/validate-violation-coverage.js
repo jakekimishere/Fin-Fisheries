@@ -21,6 +21,8 @@ function main() {
     const speciesCode = fs.readFileSync(speciesPath, 'utf8');
     const speciesWrapped = `(function() {\n${speciesCode}\nreturn SPECIES_DATA;\n})()`;
     const sandbox = { console };
+    vm.runInNewContext(loadFile('REGULATION_DATES_CONFIG.js'), sandbox, { filename: 'REGULATION_DATES_CONFIG.js' });
+    vm.runInNewContext(loadFile('FISHERY_QUOTA_STATUS_CONFIG.js'), sandbox, { filename: 'FISHERY_QUOTA_STATUS_CONFIG.js' });
     const SPECIES_DATA = vm.runInNewContext(speciesWrapped, sandbox, { filename: speciesPath });
     vm.runInNewContext(loadFile('js/validation/assessmentViolations.js'), sandbox, { filename: 'assessmentViolations.js' });
     const AV = sandbox.AssessmentViolations;
@@ -68,6 +70,10 @@ function main() {
     const sampleOverLimit = [
         ['swordfish', { permitType: 'recreational', numberOfFish: 5 }],
         ['summer-flounder', { 'permit-type': 'recreational', possessionAmount: 50 }],
+        ['atlantic-salmon', { permitType: 'recreational', numberOfFish: 1 }],
+        ['king-mackerel', { permitType: 'recreational', numberOfFish: 5 }],
+        ['atlantic-herring', { permitType: 'commercial', fishingArea: 'area-1b', possessionAmount: 3000, dateOfCatch: '2026-05-21' }],
+        ['thorny-skate', { permitType: 'commercial', possessionAmount: 7000, dateOfCatch: '2026-05-21' }],
     ];
     for (const [id, data] of sampleOverLimit) {
         const entry = SPECIES_DATA[id];

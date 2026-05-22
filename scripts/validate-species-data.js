@@ -57,6 +57,17 @@ function main() {
         var getGroundfishTripLimit = gfExports.getGroundfishTripLimit;
     }
 
+    const quotaPath = path.join(root, 'FISHERY_QUOTA_STATUS_CONFIG.js');
+    let getCommercialPossessionLimit;
+    let getHerringAreaLimitLb;
+    if (fs.existsSync(quotaPath)) {
+        const quotaCode = fs.readFileSync(quotaPath, 'utf8');
+        const quotaWrapped = `(function() {\n${quotaCode}\nreturn { getCommercialPossessionLimit, getHerringAreaLimitLb, getBFTCommercialDailyLimit };\n})()`;
+        const quotaExports = vm.runInNewContext(quotaWrapped, { console }, { filename: quotaPath });
+        getCommercialPossessionLimit = quotaExports.getCommercialPossessionLimit;
+        getHerringAreaLimitLb = quotaExports.getHerringAreaLimitLb;
+    }
+
     const ids = collectSpeciesIds(SPECIES_DATA);
     console.log(`Validating ${ids.length} species...`);
 
@@ -139,6 +150,29 @@ function main() {
         if (!gomCod || gomCod.perTrip !== 50) {
             errors.push('GROUND_FISH_TRIP_LIMITS: GOM cod category-a trip should be 50 lb');
         }
+    }
+
+    const salmonRec = SPECIES_DATA['atlantic-salmon']?.regulations?.possession?.recreational;
+    if (!salmonRec?.prohibited) {
+        errors.push('atlantic-salmon: EEZ possession must be prohibited');
+    }
+
+    const kingRec = SPECIES_DATA['king-mackerel']?.regulations?.possession?.recreational?.limit?.count;
+    if (kingRec !== 3) errors.push(`king-mackerel: recreational limit should be 3, got ${kingRec}`);
+
+    const spanRec = SPECIES_DATA['spanish-mackerel']?.regulations?.possession?.recreational?.limit?.count;
+    if (spanRec !== 15) errors.push(`spanish-mackerel: recreational limit should be 15, got ${spanRec}`);
+
+    if (typeof getHerringAreaLimitLb === 'function') {
+        const h1b = getHerringAreaLimitLb('area-1b', new Date('2026-05-21'));
+        if (h1b !== 2000) errors.push(`herring area-1b limit should be 2000 lb, got ${h1b}`);
+    }
+
+    if (typeof getCommercialPossessionLimit === 'function') {
+        const salmonLim = getCommercialPossessionLimit('atlantic-salmon', 'commercial', {});
+        if (!salmonLim.prohibited) errors.push('atlantic-salmon: commercial possession should be prohibited in EEZ');
+        const bftJun = getCommercialPossessionLimit('bluefin-tuna', 'commercial-general', { dateOfCatch: '2026-06-15' });
+        if (bftJun.count !== 3) errors.push(`bluefin-tuna June general limit should be 3, got ${bftJun.count}`);
     }
 
     console.log('\n--- Results ---');

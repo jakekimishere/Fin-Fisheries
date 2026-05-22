@@ -124,6 +124,18 @@ The format we've implemented matches NOAA's public regulatory charts:
 
 All information can be independently verified by accessing the public sources listed above.
 
+## Data tiers — last verified (2026-05-21)
+
+| Tier | Scope | Config / data files | Notes |
+|------|--------|---------------------|--------|
+| A | Summer flounder, scallop, bluefin, swordfish, key sharks | `species-data.js`, `REGULATION_DATES_CONFIG.js` | Bulletin-driven seasonal limits |
+| B | BAYS tunas, hammerheads, 2026 flounder specs | `species-data.js`, `docs/TIER_B_SOURCES.md` | |
+| C | Scup, black sea bass, bluefish 2026 | `species-data.js`, `docs/TIER_C_SOURCES.md` | Conservation equivalency where noted |
+| D | HMS sharks, cod/haddock common pool | `GROUND_FISH_TRIP_LIMITS_CONFIG.js`, `docs/TIER_D_SOURCES.md` | Trip limits Mar 9, 2026 table |
+| E | Quota/placeholder species (12) | `FISHERY_QUOTA_STATUS_CONFIG.js`, `regulation-updates.json` | Salmon EEZ ban, herring 2k lb areas, skate wings, mackerel bags |
+
+Changelog: `regulation-updates.json`. Pre-deploy: `npm run test` (validate + smoke). Ops: `docs/OPS.md`.
+
 ## Additional Compliance Requirements (Section 6.2 HMS Regulations)
 
 ### BFT Measurements
