@@ -49,6 +49,14 @@ function main() {
     const groupsWrapped = `(function() {\n${groupsCode}\nreturn SPECIES_GROUPS;\n})()`;
     const SPECIES_GROUPS = vm.runInNewContext(groupsWrapped, { console }, { filename: groupsPath });
 
+    const gfPath = path.join(root, 'GROUND_FISH_TRIP_LIMITS_CONFIG.js');
+    if (fs.existsSync(gfPath)) {
+        const gfCode = fs.readFileSync(gfPath, 'utf8');
+        const gfWrapped = `(function() {\n${gfCode}\nreturn { getGroundfishTripLimit, GROUND_FISH_TRIP_LIMITS };\n})()`;
+        const gfExports = vm.runInNewContext(gfWrapped, { console }, { filename: gfPath });
+        var getGroundfishTripLimit = gfExports.getGroundfishTripLimit;
+    }
+
     const ids = collectSpeciesIds(SPECIES_DATA);
     console.log(`Validating ${ids.length} species...`);
 
@@ -113,6 +121,22 @@ function main() {
     const bluefishHire = SPECIES_DATA['bluefish']?.regulations?.possession?.['recreational-for-hire']?.limit?.count;
     if (bluefishPrivate !== 5) errors.push(`bluefish: private limit should be 5, got ${bluefishPrivate}`);
     if (bluefishHire !== 7) errors.push(`bluefish: for-hire limit should be 7, got ${bluefishHire}`);
+
+    const makoRec = SPECIES_DATA['shortfin-mako-shark']?.regulations?.possession?.recreational;
+    if (!makoRec?.prohibited && makoRec?.limit?.count !== 0) {
+        errors.push('shortfin-mako-shark: recreational retention must be prohibited');
+    }
+    const owRec = SPECIES_DATA['oceanic-whitetip-shark']?.regulations?.possession?.recreational;
+    if (!owRec?.prohibited && owRec?.limit?.count !== 0) {
+        errors.push('oceanic-whitetip-shark: recreational retention must be prohibited');
+    }
+
+    if (typeof getGroundfishTripLimit === 'function') {
+        const gomCod = getGroundfishTripLimit('atlantic-cod', 'gulf-of-maine', 'category-a');
+        if (!gomCod || gomCod.perTrip !== 50) {
+            errors.push('GROUND_FISH_TRIP_LIMITS: GOM cod category-a trip should be 50 lb');
+        }
+    }
 
     console.log('\n--- Results ---');
     if (warnings.length) {

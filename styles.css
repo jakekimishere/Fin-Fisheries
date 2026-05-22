@@ -1400,6 +1400,84 @@ h2 {
     padding-left: 5px;
 }
 
+/* Pre-report summary overlay */
+.pre-report-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(26, 39, 68, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.pre-report-panel {
+    background: var(--white, #fff);
+    border-radius: 12px;
+    max-width: 640px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.pre-report-panel h2 {
+    margin: 0 0 8px;
+    color: var(--navy, #1a2744);
+}
+
+.pre-report-subtitle {
+    color: #555;
+    margin-bottom: 16px;
+    font-size: 0.95rem;
+}
+
+.pre-report-status {
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.pre-report-status.compliant {
+    background: var(--green-light, #e8f5e9);
+    border: 2px solid var(--green, #2e7d32);
+}
+
+.pre-report-status.violation {
+    background: var(--red-light, #ffebee);
+    border: 2px solid var(--red, #c62828);
+}
+
+.pre-report-violation-list {
+    margin-top: 12px;
+}
+
+.pre-report-by-species h3 {
+    font-size: 1rem;
+    margin: 16px 0 8px;
+}
+
+.pre-report-species-block {
+    margin-bottom: 12px;
+    padding: 10px;
+    background: #f5f7fa;
+    border-radius: 6px;
+}
+
+.pre-report-species-ok {
+    color: var(--green, #2e7d32);
+    margin: 4px 0;
+}
+
+.pre-report-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
 .report-actions {
     display: flex;
     gap: 15px;

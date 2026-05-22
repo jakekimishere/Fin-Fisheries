@@ -85,15 +85,17 @@ class Navigation {
             }
             
             // Generate and show report
-            if (typeof window.reportGenerator !== 'undefined' && window.reportGenerator.generate) {
+            if (typeof showPreReportSummary === 'function') {
+                showPreReportSummary();
+            } else if (typeof window.reportGenerator !== 'undefined' && window.reportGenerator.generate) {
                 window.reportGenerator.generate();
             } else if (typeof generateReport === 'function') {
                 generateReport();
-            }
-            const resultsSection = document.getElementById('results-section');
-            if (resultsSection) {
-                resultsSection.classList.add('active');
-                resultsSection.style.display = 'block';
+                const resultsSection = document.getElementById('results-section');
+                if (resultsSection) {
+                    resultsSection.classList.add('active');
+                    resultsSection.style.display = 'block';
+                }
             }
         }
 

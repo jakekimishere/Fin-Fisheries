@@ -29,7 +29,9 @@ class ReportGenerator {
 
             // Delegate to existing function if available (it's very large and complex)
             // TODO: Migrate fully later
-            if (typeof generateReport === 'function') {
+            if (typeof showPreReportSummary === 'function') {
+                showPreReportSummary();
+            } else if (typeof generateReport === 'function') {
                 generateReport();
                 if (typeof StateBridge !== 'undefined') {
                     StateBridge.syncFromWindow(this.state);

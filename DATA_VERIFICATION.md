@@ -51,6 +51,11 @@ All HMS species data (tunas, swordfish, billfish, sharks) is sourced from:
 - **Bluefish (2026)**: Private 5 fish/person/day; for-hire 7 fish/person/day (50 CFR 648.160)
 - **Scup / black sea bass recreational**: Conservation equivalency and status quo measures per Apr 30, 2026 recreational rule — verify state bag/size/season
 
+### Tier D — Additional HMS sharks & groundfish
+- **Pelagic/LCS recreational sharks**: 54" fork length; 1 per vessel per trip (50 CFR 635.22)
+- **Shortfin mako / oceanic whitetip**: Retention prohibited (zero limit)
+- **Atlantic cod / haddock common pool**: Trip limits per `GROUND_FISH_TRIP_LIMITS_CONFIG.js` (Mar 9, 2026 NOAA table)
+
 ### Hammerhead Sharks (great, scalloped, smooth)
 - **Recreational**: 78" fork length; 1 shark per vessel per trip from allowable species list (50 CFR 635.22)
 - **U.S. Caribbean**: Retention prohibited (Feb 2, 2024 rule)

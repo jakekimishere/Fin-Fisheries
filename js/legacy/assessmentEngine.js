@@ -698,13 +698,8 @@ function showStep(step) {
             assessmentSections.style.display = 'none';
         }
         
-        // Generate and show report
-        generateReport();
-        const resultsSection = document.getElementById('results-section');
-        if (resultsSection) {
-            resultsSection.classList.add('active');
-            resultsSection.style.display = 'block';
-        }
+        // Pre-report summary (full report after user confirms)
+        showPreReportSummary();
     }
     
     currentStep = step;
@@ -3202,7 +3197,7 @@ function handleSpecialChoiceLogic(speciesId, field, value) {
         if (nextSpecies) {
             showSpeciesAssessment(selectedSpecies.indexOf(nextSpecies));
         } else {
-            generateReport();
+            showPreReportSummary();
             showStep(2 + selectedSpecies.length);
         }
     } else if (field === 'possession-type' && speciesId === 'atlantic-sea-scallop') {
@@ -3452,6 +3447,89 @@ function prevStep(fromStep) {
 
 // Legacy functions - keeping for compatibility but not used in grouped approach
 // These can be removed in future refactoring
+
+/**
+ * Show violation summary before generating the full report.
+ */
+function showPreReportSummary() {
+    if (typeof StateBridge !== 'undefined') {
+        StateBridge.flushAssessmentInputs();
+    } else if (typeof saveGroupedStepData === 'function') {
+        saveGroupedStepData('possession');
+        saveGroupedStepData('dynamic-assessment');
+    }
+
+    const overlay = document.getElementById('pre-report-overlay');
+    const body = document.getElementById('pre-report-body');
+    if (!overlay || !body) {
+        generateReport();
+        return;
+    }
+
+    const allViolations = checkAllViolations();
+    const speciesIds = (window.appState && window.appState.selectedSpecies.length)
+        ? window.appState.selectedSpecies
+        : (window.selectedSpecies || selectedSpecies || []);
+
+    let html = '';
+    if (allViolations.length === 0) {
+        html = `
+            <div class="pre-report-status compliant">
+                <p><strong>No potential violations identified</strong> from the information entered.</p>
+                <p class="pre-report-note">You can still generate the full report for documentation. Always verify against current NOAA regulations.</p>
+            </div>
+        `;
+    } else {
+        html = `
+            <div class="pre-report-status violation">
+                <p><strong>${allViolations.length} potential issue(s) identified</strong></p>
+                <ul class="violation-list pre-report-violation-list">
+                    ${allViolations.map(v => `<li>${v}</li>`).join('')}
+                </ul>
+            </div>
+            <div class="pre-report-by-species">
+                <h3>By species</h3>
+                ${speciesIds.map(speciesId => {
+                    const species = SPECIES_DATA[speciesId];
+                    if (!species) return '';
+                    const data = (window.assessmentData || assessmentData).species[speciesId] || {};
+                    const violations = checkSpeciesViolations(speciesId, species, data);
+                    if (violations.length === 0) return `<p class="pre-report-species-ok">✓ ${species.name || speciesId}</p>`;
+                    return `
+                        <div class="pre-report-species-block">
+                            <strong>${species.name || speciesId}</strong>
+                            <ul class="violation-list-small">${violations.map(v => `<li>${v}</li>`).join('')}</ul>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
+
+    body.innerHTML = html;
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closePreReportSummary() {
+    const overlay = document.getElementById('pre-report-overlay');
+    if (overlay) overlay.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function confirmGenerateReport() {
+    closePreReportSummary();
+    generateReport();
+    const resultsSection = document.getElementById('results-section');
+    if (resultsSection) {
+        resultsSection.classList.add('active');
+        resultsSection.style.display = 'block';
+    }
+    document.querySelectorAll('.grouped-assessment').forEach(el => { el.style.display = 'none'; });
+    const assessmentSections = document.getElementById('assessment-sections');
+    if (assessmentSections) assessmentSections.style.display = 'none';
+}
+
 // Generate comprehensive report
 function generateReport() {
     try {
@@ -3738,11 +3816,18 @@ function checkAllViolations() {
 // Check if species is prohibited
 function isProhibitedSpecies(speciesId) {
     const prohibitedSpecies = [
-        'atlantic-wolffish',  // Prohibited in Northeast Multispecies
-        'windowpane-flounder', // Prohibited in Northeast Multispecies
-        'ocean-pout'          // Prohibited in Northeast Multispecies
+        'atlantic-wolffish',
+        'windowpane-flounder',
+        'ocean-pout',
+        'oceanic-whitetip-shark',
+        'shortfin-mako-shark',
+        'sandbar-shark',
+        'silky-shark',
+        'dusky-shark'
     ];
-    return prohibitedSpecies.includes(speciesId);
+    if (prohibitedSpecies.includes(speciesId)) return true;
+    const entry = typeof SPECIES_DATA !== 'undefined' && SPECIES_DATA[speciesId];
+    return !!(entry && (entry.prohibited || entry.regulations?.possession?.recreational?.prohibited));
 }
 
 // Check violations for a species
@@ -3835,13 +3920,11 @@ function checkPossessionViolations(speciesId, species, speciesData) {
             violations.push(...checkScallopPossession(species, speciesData));
         } else if (speciesId === 'bluefin-tuna') {
             violations.push(...checkBluefinTunaPossession(species, speciesData));
+        } else if (speciesId === 'atlantic-cod' || speciesId === 'haddock') {
+            violations.push(...checkGroundfishPossession(speciesId, species, speciesData));
         } else if (isMultispecies(speciesId)) {
-            // For multispecies, possession is checked via ACE allocation or trip limits
-            // These are complex and require sector/common pool determination
-            // For now, just note that possession limits apply but require manual verification
             if (speciesData.possessionAmount && speciesData.possessionAmount > 0) {
-                // Add a note that limits must be verified manually for multispecies
-                // This doesn't count as a violation, just informational
+                // Other groundfish: manual ACE/trip verification
             }
         }
     } catch (error) {
@@ -4088,6 +4171,37 @@ function checkBluefinTunaPossession(species, speciesData) {
         }
     }
     
+    return violations;
+}
+
+// Check Northeast multispecies common pool trip limits (cod, haddock)
+function checkGroundfishPossession(speciesId, species, speciesData) {
+    const violations = [];
+    const amount = Number(speciesData.possessionAmount || speciesData['possession-amount'] || 0);
+    if (!amount || amount <= 0) return violations;
+
+    const vesselCategory = speciesData.vesselCategory || speciesData['vessel-category'];
+    if (vesselCategory !== 'common-pool') return violations;
+
+    const stockArea = speciesData.fishingArea || speciesData['fishing-area'];
+    const dasCategory = speciesData.dasCategory || speciesData['das-category'];
+    if (!stockArea) return violations;
+
+    if (typeof getGroundfishTripLimit !== 'function') return violations;
+
+    const limitInfo = getGroundfishTripLimit(speciesId, stockArea, dasCategory);
+    if (!limitInfo) return violations;
+
+    if (limitInfo.prohibited) {
+        violations.push(`${species.name}: possession prohibited in ${limitInfo.label || stockArea} (50 CFR 648.86)`);
+        return violations;
+    }
+
+    const tripMax = limitInfo.perTrip;
+    if (tripMax != null && amount > tripMax) {
+        violations.push(`${species.name} possession exceeds trip limit: ${amount} lbs vs ${tripMax} lbs (${stockArea}, ${dasCategory || 'DAS category'}) (50 CFR 648.86)`);
+    }
+
     return violations;
 }
 
