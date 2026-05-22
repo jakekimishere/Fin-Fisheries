@@ -137,14 +137,15 @@ const SPECIES_DATA = {
                     autoCheck: true,
                     useAssessmentDate: true,
                     limits: {
-                        'commercial-large-mesh': null, // No limit with compliant mesh
+                        commercial: null,
+                        recreational: { count: 4, unit: 'fish' },
+                        'commercial-large-mesh': null,
                         'commercial-small-mesh': {
                             seasonal: {
-                                'may-oct': { limit: 100, months: [5,6,7,8,9,10] },
-                                'nov-apr': { limit: 200, months: [11,12,1,2,3,4] }
+                                'may-oct': { limit: 100, months: [5, 6, 7, 8, 9, 10] },
+                                'nov-apr': { limit: 200, months: [11, 12, 1, 2, 3, 4] }
                             }
-                        },
-                        'recreational': { count: 4, unit: 'fish' }
+                        }
                     },
                     violation: {
                         ifExceeds: 'VIOLATION: Possession amount exceeds permit limit (50 CFR 648.106)'
@@ -14286,6 +14287,28 @@ const speciesImageMap = {
                     unit: 'varies by species',
                     cfr: '50 CFR 648.83',
                     notes: 'Check species-specific size requirements'
+                },
+                assessmentQuestions: {
+                    possessionAmount: {
+                        question: 'What is the possession amount on board (lbs)?',
+                        field: 'possessionAmount',
+                        required: true,
+                        type: 'number',
+                        unit: 'lbs',
+                        notes: 'Common pool trip limits vary by stock — verify NOAA common pool table. Sector vessels use ACE.',
+                        cfr: '50 CFR 648.82'
+                    },
+                    sizeCompliance: {
+                        question: 'Do fish meet minimum size for this species?',
+                        field: 'size-compliant',
+                        required: true,
+                        type: 'choice',
+                        violation: {
+                            ifEquals: 'no',
+                            message: 'VIOLATION: Undersized fish must be returned (50 CFR 648.83)'
+                        },
+                        cfr: '50 CFR 648.83'
+                    }
                 }
             }
         };

@@ -26,13 +26,45 @@ class Navigation {
         const hasMultispecies = multispeciesSelected.length > 0;
 
         if (step === -1) {
-            // Homepage
+            if (typeof hideAssessmentAndResultsUI === 'function') {
+                hideAssessmentAndResultsUI();
+            } else {
+                document.querySelectorAll('.grouped-assessment').forEach(el => {
+                    el.classList.remove('active');
+                    el.style.display = 'none';
+                });
+                const resultsSection = document.getElementById('results-section');
+                if (resultsSection) {
+                    resultsSection.classList.remove('active');
+                    resultsSection.style.display = 'none';
+                }
+                const step0 = document.getElementById('step-0');
+                if (step0) {
+                    step0.classList.remove('active');
+                    step0.style.display = 'none';
+                }
+            }
             const homepage = document.getElementById('step-homepage');
             if (homepage) homepage.classList.add('active');
         } else if (step === 0) {
-            // Species selection
             const speciesStep = document.getElementById('step-0');
-            if (speciesStep) speciesStep.classList.add('active');
+            if (speciesStep) {
+                speciesStep.classList.add('active');
+                speciesStep.style.display = 'block';
+            }
+            document.querySelectorAll('.grouped-assessment').forEach(el => {
+                el.classList.remove('active');
+                el.style.display = 'none';
+            });
+            const assessmentSections = document.getElementById('assessment-sections');
+            if (assessmentSections) {
+                assessmentSections.style.display = 'none';
+            }
+            const resultsSection = document.getElementById('results-section');
+            if (resultsSection) {
+                resultsSection.classList.remove('active');
+                resultsSection.style.display = 'none';
+            }
         } else if (step === 1) {
             // Step 1 (vessel info) removed - skip directly to assessment
             // Generate grouped assessment steps
@@ -48,31 +80,32 @@ class Navigation {
                     typeof window.assessmentSteps.shouldUseDynamicQuestions === 'function' &&
                     window.assessmentSteps.shouldUseDynamicQuestions();
                 
-                if (hasMultispecies) {
+                if (hasMultispecies && (typeof MultispeciesFlow === 'undefined' || MultispeciesFlow.vesselClassificationStepNeeded())) {
                     this.showGroupedStep('vessel-classification');
+                } else if (hasMultispecies && typeof MultispeciesFlow !== 'undefined') {
+                    MultispeciesFlow.applyDefaultVesselClassification();
+                    this.showGroupedStep('permits');
                 } else if (useDynamicQuestions) {
                     this.showGroupedStep('dynamic-assessment');
                 } else {
                     this.showGroupedStep('permits');
                 }
             }
-        } else if (hasMultispecies && step >= 2 && step <= 6) {
-            // Show specific grouped assessment step (with vessel classification)
-            const stepNames = ['vessel-classification', 'permits', 'possession', 'size-gear', 'vessel-requirements'];
-            const stepIndex = step - 2;
-            const stepName = stepNames[stepIndex];
+        } else if (typeof getReportStepNumber === 'function' && step >= 2 && step < getReportStepNumber()) {
+            const stepOrder = typeof getAssessmentStepOrder === 'function'
+                ? getAssessmentStepOrder()
+                : (hasMultispecies
+                    ? ['vessel-classification', 'permits', 'possession', 'size-gear', 'vessel-requirements']
+                    : ['permits', 'possession', 'size-gear', 'vessel-requirements']);
+            const stepName = stepOrder[step - 2];
             if (stepName) {
                 this.showGroupedStep(stepName);
             }
-        } else if (!hasMultispecies && step >= 2 && step <= 5) {
-            // Show specific grouped assessment step (without vessel classification)
-            const stepNames = ['permits', 'possession', 'size-gear', 'vessel-requirements'];
-            const stepIndex = step - 2;
-            const stepName = stepNames[stepIndex];
-            if (stepName) {
-                this.showGroupedStep(stepName);
-            }
-        } else if ((hasMultispecies && step === 7) || (!hasMultispecies && step === 6)) {
+        } else if (
+            (typeof getReportStepNumber === 'function' && step === getReportStepNumber()) ||
+            (hasMultispecies && step === 7) ||
+            (!hasMultispecies && step === 6)
+        ) {
             // Results - hide all grouped assessment steps first
             document.querySelectorAll('.grouped-assessment').forEach(groupedStep => {
                 groupedStep.style.display = 'none';
@@ -84,7 +117,9 @@ class Navigation {
                 assessmentSections.style.display = 'none';
             }
             
-            // Generate and show report
+            if (!window.lastGroupedStepName && typeof rememberGroupedStep === 'function' && typeof getLastAssessmentStepBeforeReport === 'function') {
+                rememberGroupedStep(getLastAssessmentStepBeforeReport());
+            }
             if (typeof showPreReportSummary === 'function') {
                 showPreReportSummary();
             } else if (typeof window.reportGenerator !== 'undefined' && window.reportGenerator.generate) {
@@ -105,6 +140,10 @@ class Navigation {
 
     // Show a specific grouped assessment step
     showGroupedStep(stepName) {
+        if (stepName === 'vessel-requirements' && typeof vesselRequirementsStepNeeded === 'function' && !vesselRequirementsStepNeeded()) {
+            this.showStep(typeof getReportStepNumber === 'function' ? getReportStepNumber() : 6);
+            return;
+        }
         // Hide results section if it's visible
         const resultsSection = document.getElementById('results-section');
         if (resultsSection) {
@@ -124,7 +163,10 @@ class Navigation {
             step.style.display = 'none';
         });
 
-        // Show the requested step
+        if (typeof rememberGroupedStep === 'function') {
+            rememberGroupedStep(stepName);
+        }
+
         const stepElement = document.getElementById(`grouped-${stepName}`);
         if (stepElement) {
             stepElement.style.display = 'block';
@@ -192,26 +234,9 @@ class Navigation {
                 StateBridge.flushAssessmentInputs();
             }
 
-            const multispeciesSelected = this.state.selectedSpecies.filter(id => this.isMultispecies(id));
-            const hasMultispecies = multispeciesSelected.length > 0;
-            
-            // Check if we should use dynamic questions
-            const useDynamicQuestions = window.assessmentSteps && 
-                typeof window.assessmentSteps.shouldUseDynamicQuestions === 'function' &&
-                window.assessmentSteps.shouldUseDynamicQuestions();
-            
-            // Define step order based on whether we have multispecies and use dynamic questions
-            let stepOrder;
-            if (useDynamicQuestions) {
-                stepOrder = hasMultispecies ? 
-                    ['vessel-classification', 'dynamic-assessment'] :
-                    ['dynamic-assessment'];
-            } else {
-                stepOrder = hasMultispecies ? 
-                    ['vessel-classification', 'permits', 'possession', 'size-gear', 'vessel-requirements'] :
-                    ['permits', 'possession', 'size-gear', 'vessel-requirements'];
-            }
-            
+            const stepOrder = typeof getAssessmentStepOrder === 'function'
+                ? getAssessmentStepOrder()
+                : ['permits', 'possession', 'size-gear', 'vessel-requirements'];
             const currentIndex = stepOrder.indexOf(currentStepName);
             
             if (currentIndex === -1) {
@@ -219,20 +244,23 @@ class Navigation {
                 return;
             }
             
-            // Save any input data before moving
             if (typeof saveGroupedStepData === 'function') {
                 saveGroupedStepData(currentStepName);
+            }
+            if (typeof rememberGroupedStep === 'function') {
+                rememberGroupedStep(currentStepName);
             }
             
             if (currentIndex < stepOrder.length - 1) {
                 const nextStep = stepOrder[currentIndex + 1];
-                const nextIndex = currentIndex + 1;
-                const stepNumber = hasMultispecies ? 2 + nextIndex : 2 + nextIndex;
-                this.showStep(stepNumber);
+                const stepNumber = typeof groupedStepNameToStepNumber === 'function'
+                    ? groupedStepNameToStepNumber(nextStep)
+                    : 2 + currentIndex + 1;
+                if (stepNumber != null) {
+                    this.showStep(stepNumber);
+                }
             } else {
-                // Generate report
-                const reportStep = hasMultispecies ? 7 : 6;
-                this.showStep(reportStep);
+                this.showStep(typeof getReportStepNumber === 'function' ? getReportStepNumber() : 6);
             }
         } catch (error) {
             console.error('Error in nextGroupedStep:', error);
@@ -251,56 +279,27 @@ class Navigation {
                 StateBridge.flushAssessmentInputs();
             }
 
-            const multispeciesSelected = this.state.selectedSpecies.filter(id => this.isMultispecies(id));
-            const hasMultispecies = multispeciesSelected.length > 0;
-            
-            // Check if we should use dynamic questions
-            const useDynamicQuestions = window.assessmentSteps && 
-                typeof window.assessmentSteps.shouldUseDynamicQuestions === 'function' &&
-                window.assessmentSteps.shouldUseDynamicQuestions();
-            
-            // Define step order based on whether we have multispecies and use dynamic questions
-            let stepOrder;
-            if (useDynamicQuestions) {
-                stepOrder = hasMultispecies ? 
-                    ['vessel-classification', 'dynamic-assessment'] :
-                    ['dynamic-assessment'];
-            } else {
-                stepOrder = hasMultispecies ? 
-                    ['vessel-classification', 'permits', 'possession', 'size-gear', 'vessel-requirements'] :
-                    ['permits', 'possession', 'size-gear', 'vessel-requirements'];
-            }
-            
+            const stepOrder = typeof getAssessmentStepOrder === 'function'
+                ? getAssessmentStepOrder()
+                : ['permits', 'possession', 'size-gear', 'vessel-requirements'];
             const currentIndex = stepOrder.indexOf(currentStepName);
             
             if (currentIndex === -1) {
                 console.error('Current step not found in step order:', currentStepName);
-                // Fallback: go back to species selection
-                if (typeof window !== 'undefined' && typeof window.showStep === 'function') {
-                    window.showStep(0);
-                } else {
-                    this.showStep(0);
-                }
+                this.showStep(0);
                 return;
             }
             
             if (currentIndex > 0) {
-                const prevStep = stepOrder[currentIndex - 1];
-                const prevIndex = currentIndex - 1;
-                const stepNumber = hasMultispecies ? 2 + prevIndex : 2 + prevIndex;
-                // Use global showStep if available (from orchestrator), otherwise use this.showStep
-                if (typeof window !== 'undefined' && typeof window.showStep === 'function') {
-                    window.showStep(stepNumber);
-                } else {
+                const prevStepName = stepOrder[currentIndex - 1];
+                const stepNumber = typeof groupedStepNameToStepNumber === 'function'
+                    ? groupedStepNameToStepNumber(prevStepName)
+                    : 2 + currentIndex - 1;
+                if (stepNumber != null) {
                     this.showStep(stepNumber);
                 }
             } else {
-                // Go back to species selection (step 0)
-                if (typeof window !== 'undefined' && typeof window.showStep === 'function') {
-                    window.showStep(0);
-                } else {
-                    this.showStep(0);
-                }
+                this.showStep(0);
             }
         } catch (error) {
             console.error('Error in prevGroupedStep:', error);

@@ -20,7 +20,7 @@
 <body>
     <div class="container">
         <header>
-            <div class="header-badge">FIN</div>
+            <button type="button" class="header-badge" id="fin-home-btn" onclick="goHome()" title="Return to home" aria-label="Return to home">FIN</button>
             <h1>Fisheries Inspection Navigator</h1>
             <p class="subtitle">Personal Project - Not Affiliated with USCG</p>
         </header>
@@ -70,6 +70,9 @@
 
             <!-- Step 1: Species Selection -->
             <section class="step-section" id="step-0">
+                <div class="nav-buttons" style="margin-bottom: 16px;">
+                    <button type="button" class="btn-secondary" onclick="goHome()">← Back to Home</button>
+                </div>
                 <h2>Select Species to Inspect</h2>
                 <p class="info-note">Select one or more species that are on board the vessel. You can select multiple species and assess them together.</p>
                 
@@ -143,7 +146,7 @@
                     <p class="pre-report-subtitle">Review potential compliance issues before generating the full report.</p>
                     <div id="pre-report-body"></div>
                     <div class="pre-report-actions">
-                        <button type="button" class="btn-secondary" onclick="closePreReportSummary()">← Back to Assessment</button>
+                        <button type="button" class="btn-secondary" onclick="backFromPreReport()">← Back to Assessment</button>
                         <button type="button" class="btn-primary" id="pre-report-confirm-btn" onclick="confirmGenerateReport()">Generate Full Report →</button>
                     </div>
                 </div>
@@ -189,6 +192,9 @@
     <script src="js/core/stateBridge.js"></script>
     <script src="js/state/stateManager.js"></script>
     <script src="js/utils/navigation.js"></script>
+    <script src="js/config/multispeciesFlow.js"></script>
+    <script src="js/validation/assessmentViolations.js"></script>
+    <script src="js/validation/violationChecker.js"></script>
     <script src="js/validation/validators.js"></script>
 
     <!-- UI modules -->

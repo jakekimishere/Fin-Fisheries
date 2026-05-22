@@ -563,10 +563,17 @@ class QuestionRenderer {
                 const limit = questionData.limits[permitType];
                 
                 if (limit !== null && limit !== undefined) {
-                    if (numberOfFish > limit) {
-                        return `EXCEEDS LIMIT: ${numberOfFish} > ${limit}`;
-                    } else {
-                        return `WITHIN LIMIT: ${numberOfFish} ≤ ${limit}`;
+                    const maxCount = (limit && typeof limit === 'object' && limit.count != null)
+                        ? limit.count
+                        : (typeof limit === 'number' ? limit : null);
+                    if (maxCount != null) {
+                        if (numberOfFish > maxCount) {
+                            return `EXCEEDS LIMIT: ${numberOfFish} > ${maxCount}`;
+                        }
+                        return `WITHIN LIMIT: ${numberOfFish} ≤ ${maxCount}`;
+                    }
+                    if (limit.prohibited && numberOfFish > 0) {
+                        return 'PROHIBITED: retention not allowed for this permit category';
                     }
                 }
             }
@@ -597,31 +604,67 @@ class QuestionRenderer {
     checkViolations(speciesId, questionKey, questionData, answer) {
         if (!questionData.violation) return;
 
-        let violationMessage = null;
+        let violationMessages = [];
+        const species = typeof SPECIES_DATA !== 'undefined' && SPECIES_DATA[speciesId];
+        const speciesData = { ...(this.getAnswer ? {} : {}) };
+        if (this.state && this.state.assessmentData?.species?.[speciesId]) {
+            Object.assign(speciesData, this.state.assessmentData.species[speciesId]);
+        } else if (window.assessmentData?.species?.[speciesId]) {
+            Object.assign(speciesData, window.assessmentData.species[speciesId]);
+        }
+        if (questionData.field) {
+            speciesData[questionData.field] = answer;
+        }
 
-        // Check violation conditions
-        if (questionData.violation.ifExceeds && typeof answer === 'number') {
-            const limit = this.getLimitForPermit(speciesId, questionData);
-            if (limit !== null && answer > limit) {
-                violationMessage = questionData.violation.ifExceeds;
+        if (typeof AssessmentViolations !== 'undefined' && species) {
+            const ctx = {
+                speciesId,
+                species,
+                speciesData,
+                questions: species.regulations?.assessmentQuestions || {},
+                speciesName: species.name || speciesId,
+                permitType: speciesData.permitType || speciesData['permit-type']
+            };
+            violationMessages = AssessmentViolations.evaluateViolationRule(
+                questionData.violation,
+                typeof AssessmentViolations.coerceAnswerValue === 'function'
+                    ? AssessmentViolations.coerceAnswerValue(answer)
+                    : answer,
+                questionData,
+                ctx
+            );
+            if (AssessmentViolations.COUNT_FIELDS?.has(questionData.field)) {
+                violationMessages.push(
+                    ...AssessmentViolations.checkCountFieldViolations(
+                        speciesData,
+                        ctx.questions,
+                        ctx
+                    )
+                );
             }
+            violationMessages = [...new Set(violationMessages)];
+        } else {
+            let violationMessage = null;
+            if (questionData.violation.ifExceeds && typeof answer === 'number') {
+                const limit = this.getLimitForPermit(speciesId, questionData);
+                if (limit !== null && answer > limit) {
+                    violationMessage = questionData.violation.ifExceeds;
+                }
+            }
+            if (questionData.violation.ifFalse && answer === false) {
+                violationMessage = questionData.violation.ifFalse;
+            }
+            if (questionData.violation.ifTrue && answer === true) {
+                violationMessage = questionData.violation.ifTrue;
+            }
+            if (questionData.violation.ifGreaterThan !== undefined && typeof answer === 'number' && answer > questionData.violation.ifGreaterThan) {
+                violationMessage = questionData.violation.message || questionData.violation.ifExceeds || 'VIOLATION DETECTED';
+            }
+            if (violationMessage) violationMessages = [violationMessage];
         }
 
-        if (questionData.violation.ifFalse && answer === false) {
-            violationMessage = questionData.violation.ifFalse;
-        }
-
-        if (questionData.violation.ifTrue && answer === true) {
-            violationMessage = questionData.violation.ifTrue;
-        }
-
-        if (questionData.violation.ifEquals && answer === questionData.violation.ifEquals) {
-            violationMessage = questionData.violation.message || 'VIOLATION DETECTED';
-        }
-
-        // Store violation
-        if (violationMessage) {
-            this.addViolation(speciesId, questionKey, violationMessage);
+        if (violationMessages.length > 0) {
+            this.addViolation(speciesId, questionKey, violationMessages[0]);
         } else {
             this.removeViolation(speciesId, questionKey);
         }
@@ -810,6 +853,29 @@ class QuestionRenderer {
         if (typeof StateBridge !== 'undefined') {
             StateBridge.syncToWindow();
         }
+
+        this.recheckAllQuestionViolations();
+    }
+
+    /**
+     * Re-run violation rules for all rendered dynamic questions (e.g. before report).
+     */
+    recheckAllQuestionViolations() {
+        const container = document.getElementById('dynamic-questions-container');
+        if (!container) return;
+
+        const speciesIds = (this.state && this.state.selectedSpecies) || window.selectedSpecies || [];
+        speciesIds.forEach(speciesId => {
+            const species = typeof SPECIES_DATA !== 'undefined' && SPECIES_DATA[speciesId];
+            const questions = species?.regulations?.assessmentQuestions;
+            if (!questions) return;
+            Object.entries(questions).forEach(([questionKey, questionData]) => {
+                const answer = this.getAnswer(speciesId, questionData.field);
+                if (answer !== null && answer !== undefined && answer !== '') {
+                    this.checkViolations(speciesId, questionKey, questionData, answer);
+                }
+            });
+        });
     }
 }
 
