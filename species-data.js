@@ -5371,13 +5371,14 @@ SPECIES_DATA['shortfin-mako-shark'] = {
     image: null,
     imagePath: 'images/fish/Shortfin_Mako_Shark.webp',
     color: '#64748b',
+    prohibited: true,
     regulations: {
         permits: {
             'commercial-general': {
                 name: 'Atlantic HMS Commercial Permit - General Category',
                 required: true,
                 cfr: '50 CFR 635.4',
-                notes: 'General Category permit for rod and reel, handline, or green-stick gear'
+                notes: 'General Category permit — shortfin mako retention prohibited'
             },
             'commercial-harpoon': {
                 name: 'Atlantic HMS Commercial Permit - Harpoon Category',
@@ -5442,29 +5443,41 @@ SPECIES_DATA['shortfin-mako-shark'] = {
             },
             'commercial-charter-headboat': {
                 name: 'Commercial - Charter/Headboat Category',
-                limit: null,
-                unit: 'No Limit',
-                cfr: '50 CFR 635.23',
-                notes: 'No Limit'
+                limit: { count: 0, unit: 'fish' },
+                unit: 'Prohibited',
+                cfr: '50 CFR 635.22',
+                notes: 'PROHIBITED — retention limit zero.',
+                prohibited: true
             },
             'recreational': {
                 name: 'Recreational',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from pelagic shark management group'
+                limit: { count: 0, unit: 'fish' },
+                unit: 'Prohibited',
+                cfr: '50 CFR 635.22',
+                notes: 'PROHIBITED — retention limit zero (effective July 5, 2022). Release at haulback; remain in water.',
+                prohibited: true
             },
             'recreational-charter-headboat': {
                 name: 'Recreational - Charter/Headboat',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from pelagic shark management group'
+                limit: { count: 0, unit: 'fish' },
+                unit: 'Prohibited',
+                cfr: '50 CFR 635.22',
+                notes: 'PROHIBITED — must release at haulback.',
+                prohibited: true
             }
         },
+        dataSources: [
+            {
+                title: 'Zero Atlantic Shortfin Mako Retention Limit',
+                url: 'https://www.fisheries.noaa.gov/action/zero-atlantic-shortfin-mako-shark-retention-limit',
+                effective: '2022-07-05'
+            }
+        ],
         size: {
             minimum: null,
-            unit: 'varies',
-            cfr: '50 CFR 635.23',
-            notes: 'Check current size requirements for pelagic sharks'
+            unit: 'N/A — retention prohibited',
+            cfr: '50 CFR 635.22',
+            notes: 'No retention allowed; release all shortfin mako at haulback.'
         },
         gear: {
             'rod-reel': {
@@ -5629,22 +5642,22 @@ SPECIES_DATA['longfin-mako-shark'] = {
             },
             'recreational': {
                 name: 'Recreational',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from pelagic shark management group'
+                limit: { count: 1, unit: 'fish per vessel per trip' },
+                cfr: '50 CFR 635.22',
+                notes: '1 shark per vessel per trip (allowable species list). 54" FL minimum. Cannot retain with tuna/swordfish/billfish on board.'
             },
             'recreational-charter-headboat': {
                 name: 'Recreational - Charter/Headboat',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from pelagic shark management group'
+                limit: { count: 1, unit: 'fish per vessel per trip' },
+                cfr: '50 CFR 635.22',
+                notes: '1 shark per vessel per trip (allowable species list). 54" FL minimum. Cannot retain with tuna/swordfish/billfish on board.'
             }
         },
         size: {
-            minimum: null,
-            unit: 'varies',
-            cfr: '50 CFR 635.23',
-            notes: 'Check current size requirements for pelagic sharks'
+            minimum: 54,
+            unit: 'inches (fork length)',
+            cfr: '50 CFR 635.20',
+            notes: 'Minimum 54" fork length (pelagic and other authorized sharks, except hammerheads at 78").'
         },
         gear: {
             'rod-reel': {
@@ -5740,22 +5753,22 @@ SPECIES_DATA['blue-shark'] = {
             },
             'recreational': {
                 name: 'Recreational',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from pelagic shark management group'
+                limit: { count: 1, unit: 'fish per vessel per trip' },
+                cfr: '50 CFR 635.22',
+                notes: '1 shark per vessel per trip (allowable species list). 54" FL minimum. Cannot retain with tuna/swordfish/billfish on board.'
             },
             'recreational-charter-headboat': {
                 name: 'Recreational - Charter/Headboat',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from pelagic shark management group'
+                limit: { count: 1, unit: 'fish per vessel per trip' },
+                cfr: '50 CFR 635.22',
+                notes: '1 shark per vessel per trip (allowable species list). 54" FL minimum. Cannot retain with tuna/swordfish/billfish on board.'
             }
         },
         size: {
-            minimum: null,
-            unit: 'varies',
-            cfr: '50 CFR 635.23',
-            notes: 'Check current size requirements for pelagic sharks'
+            minimum: 54,
+            unit: 'inches (fork length)',
+            cfr: '50 CFR 635.20',
+            notes: 'Minimum 54" fork length (pelagic and other authorized sharks, except hammerheads at 78").'
         },
         gear: {
             'rod-reel': {
@@ -5983,22 +5996,22 @@ SPECIES_DATA['common-thresher-shark'] = {
             },
             'recreational': {
                 name: 'Recreational',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from pelagic shark management group'
+                limit: { count: 1, unit: 'fish per vessel per trip' },
+                cfr: '50 CFR 635.22',
+                notes: '1 shark per vessel per trip (allowable species list). 54" FL minimum. Cannot retain with tuna/swordfish/billfish on board.'
             },
             'recreational-charter-headboat': {
                 name: 'Recreational - Charter/Headboat',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from pelagic shark management group'
+                limit: { count: 1, unit: 'fish per vessel per trip' },
+                cfr: '50 CFR 635.22',
+                notes: '1 shark per vessel per trip (allowable species list). 54" FL minimum. Cannot retain with tuna/swordfish/billfish on board.'
             }
         },
         size: {
-            minimum: null,
-            unit: 'varies',
-            cfr: '50 CFR 635.23',
-            notes: 'Check current size requirements for pelagic sharks'
+            minimum: 54,
+            unit: 'inches (fork length)',
+            cfr: '50 CFR 635.20',
+            notes: 'Minimum 54" fork length (pelagic and other authorized sharks, except hammerheads at 78").'
         },
         gear: {
             'rod-reel': {
@@ -6148,6 +6161,7 @@ SPECIES_DATA['oceanic-whitetip-shark'] = {
     image: null,
     imagePath: 'images/fish/Oceanic_Whitetip_Shark.webp',
     color: '#64748b',
+    prohibited: true,
     regulations: {
         permits: {
             'commercial-general': {
@@ -6226,22 +6240,33 @@ SPECIES_DATA['oceanic-whitetip-shark'] = {
             },
             'recreational': {
                 name: 'Recreational',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from pelagic shark management group'
+                limit: { count: 0, unit: 'fish' },
+                unit: 'Prohibited',
+                cfr: '50 CFR 635.22',
+                notes: 'PROHIBITED in U.S. Atlantic waters (effective Feb 2, 2024).',
+                prohibited: true
             },
             'recreational-charter-headboat': {
                 name: 'Recreational - Charter/Headboat',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from pelagic shark management group'
+                limit: { count: 0, unit: 'fish' },
+                unit: 'Prohibited',
+                cfr: '50 CFR 635.22',
+                notes: 'PROHIBITED in U.S. Atlantic waters.',
+                prohibited: true
             }
         },
+        dataSources: [
+            {
+                title: 'Oceanic Whitetip Retention Prohibition',
+                url: 'https://www.fisheries.noaa.gov/action/retention-prohibition-oceanic-whitetip-sharks-us-atlantic-waters-and-hammerhead-sharks-us',
+                effective: '2024-02-02'
+            }
+        ],
         size: {
             minimum: null,
-            unit: 'varies',
-            cfr: '50 CFR 635.23',
-            notes: 'Check current size requirements for pelagic sharks'
+            unit: 'N/A — retention prohibited',
+            cfr: '50 CFR 635.22',
+            notes: 'Retention prohibited in U.S. Atlantic, Gulf of Mexico, and Caribbean.'
         },
         gear: {
             'rod-reel': {
@@ -6337,22 +6362,22 @@ SPECIES_DATA['porbeagle-shark'] = {
             },
             'recreational': {
                 name: 'Recreational',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from pelagic shark management group'
+                limit: { count: 1, unit: 'fish per vessel per trip' },
+                cfr: '50 CFR 635.22',
+                notes: '1 shark per vessel per trip (allowable species list). 54" FL minimum. Cannot retain with tuna/swordfish/billfish on board.'
             },
             'recreational-charter-headboat': {
                 name: 'Recreational - Charter/Headboat',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from pelagic shark management group'
+                limit: { count: 1, unit: 'fish per vessel per trip' },
+                cfr: '50 CFR 635.22',
+                notes: '1 shark per vessel per trip (allowable species list). 54" FL minimum. Cannot retain with tuna/swordfish/billfish on board.'
             }
         },
         size: {
-            minimum: null,
-            unit: 'varies',
-            cfr: '50 CFR 635.23',
-            notes: 'Check current size requirements for pelagic sharks'
+            minimum: 54,
+            unit: 'inches (fork length)',
+            cfr: '50 CFR 635.20',
+            notes: 'Minimum 54" fork length (pelagic and other authorized sharks, except hammerheads at 78").'
         },
         gear: {
             'rod-reel': {
@@ -6463,16 +6488,16 @@ SPECIES_DATA['white-shark'] = {
             },
             'recreational': {
                 name: 'Recreational',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from Atlantic aggregated large coastal shark (LCS) management group'
+                limit: { count: 1, unit: 'fish per vessel per trip' },
+                cfr: '50 CFR 635.22',
+                notes: '1 shark per vessel per trip (allowable species list). 54" FL minimum. Cannot retain with tuna/swordfish/billfish on board.'
             }
         },
         size: {
-            minimum: null,
-            unit: 'varies',
-            cfr: '50 CFR 635.23',
-            notes: 'Check current size requirements for LCS'
+            minimum: 54,
+            unit: 'inches (fork length)',
+            cfr: '50 CFR 635.20',
+            notes: 'Minimum 54" fork length for LCS species in allowable retention list.'
         },
         gear: {
             'rod-reel': {
@@ -6696,16 +6721,16 @@ SPECIES_DATA['bull-shark'] = {
             },
             'recreational': {
                 name: 'Recreational',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from Atlantic aggregated large coastal shark (LCS) management group'
+                limit: { count: 1, unit: 'fish per vessel per trip' },
+                cfr: '50 CFR 635.22',
+                notes: '1 shark per vessel per trip (allowable species list). 54" FL minimum. Cannot retain with tuna/swordfish/billfish on board.'
             }
         },
         size: {
-            minimum: null,
-            unit: 'varies',
-            cfr: '50 CFR 635.23',
-            notes: 'Check current size requirements for LCS'
+            minimum: 54,
+            unit: 'inches (fork length)',
+            cfr: '50 CFR 635.20',
+            notes: 'Minimum 54" fork length for LCS species in allowable retention list.'
         },
         gear: {
             'rod-reel': {
@@ -6809,16 +6834,16 @@ SPECIES_DATA['lemon-shark'] = {
             },
             'recreational': {
                 name: 'Recreational',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from Atlantic aggregated large coastal shark (LCS) management group'
+                limit: { count: 1, unit: 'fish per vessel per trip' },
+                cfr: '50 CFR 635.22',
+                notes: '1 shark per vessel per trip (allowable species list). 54" FL minimum. Cannot retain with tuna/swordfish/billfish on board.'
             }
         },
         size: {
-            minimum: null,
-            unit: 'varies',
-            cfr: '50 CFR 635.23',
-            notes: 'Check current size requirements for LCS'
+            minimum: 54,
+            unit: 'inches (fork length)',
+            cfr: '50 CFR 635.20',
+            notes: 'Minimum 54" fork length for LCS species in allowable retention list.'
         },
         gear: {
             'rod-reel': {
@@ -6922,16 +6947,16 @@ SPECIES_DATA['nurse-shark'] = {
             },
             'recreational': {
                 name: 'Recreational',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from Atlantic aggregated large coastal shark (LCS) management group'
+                limit: { count: 1, unit: 'fish per vessel per trip' },
+                cfr: '50 CFR 635.22',
+                notes: '1 shark per vessel per trip (allowable species list). 54" FL minimum. Cannot retain with tuna/swordfish/billfish on board.'
             }
         },
         size: {
-            minimum: null,
-            unit: 'varies',
-            cfr: '50 CFR 635.23',
-            notes: 'Check current size requirements for LCS'
+            minimum: 54,
+            unit: 'inches (fork length)',
+            cfr: '50 CFR 635.20',
+            notes: 'Minimum 54" fork length for LCS species in allowable retention list.'
         },
         gear: {
             'rod-reel': {
@@ -7035,16 +7060,16 @@ SPECIES_DATA['spinner-shark'] = {
             },
             'recreational': {
                 name: 'Recreational',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from Atlantic aggregated large coastal shark (LCS) management group'
+                limit: { count: 1, unit: 'fish per vessel per trip' },
+                cfr: '50 CFR 635.22',
+                notes: '1 shark per vessel per trip (allowable species list). 54" FL minimum. Cannot retain with tuna/swordfish/billfish on board.'
             }
         },
         size: {
-            minimum: null,
-            unit: 'varies',
-            cfr: '50 CFR 635.23',
-            notes: 'Check current size requirements for LCS'
+            minimum: 54,
+            unit: 'inches (fork length)',
+            cfr: '50 CFR 635.20',
+            notes: 'Minimum 54" fork length for LCS species in allowable retention list.'
         },
         gear: {
             'rod-reel': {
@@ -7523,16 +7548,16 @@ SPECIES_DATA['tiger-shark'] = {
             },
             'recreational': {
                 name: 'Recreational',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from Atlantic aggregated large coastal shark (LCS) management group'
+                limit: { count: 1, unit: 'fish per vessel per trip' },
+                cfr: '50 CFR 635.22',
+                notes: '1 shark per vessel per trip (allowable species list). 54" FL minimum. Cannot retain with tuna/swordfish/billfish on board.'
             }
         },
         size: {
-            minimum: null,
-            unit: 'varies',
-            cfr: '50 CFR 635.23',
-            notes: 'Check current size requirements for LCS'
+            minimum: 54,
+            unit: 'inches (fork length)',
+            cfr: '50 CFR 635.20',
+            notes: 'Minimum 54" fork length for LCS species in allowable retention list.'
         },
         gear: {
             'rod-reel': {
@@ -13721,10 +13746,10 @@ SPECIES_DATA['atlantic-cod'] = {
             },
             'common-pool': {
                 name: 'Common Pool (DAS/Trip Limits)',
-                limit: null, // Varies by DAS category and trip limits
+                limit: null,
                 unit: 'lbs',
-                cfr: '50 CFR 648.82',
-                notes: 'Trip limits vary by DAS category - check current trip limits'
+                cfr: '50 CFR 648.86',
+                notes: 'Mar 2026: GOM 25 lb/DAS (max 50/trip) Cat A; GB/SNE possession prohibited.'
             },
             'recreational': {
                 name: 'Recreational',
@@ -13733,6 +13758,13 @@ SPECIES_DATA['atlantic-cod'] = {
                 notes: '10 fish per person per day'
             }
         },
+        dataSources: [
+            {
+                title: 'Northeast Multispecies Common Pool Trip Limits',
+                url: 'https://www.fisheries.noaa.gov/new-england-mid-atlantic/commercial-fishing/northeast-multispecies-common-pool-fishery',
+                effective: '2026-03-09'
+            }
+        ],
         size: {
             minimum: 22,
             unit: 'inches (total length)',
@@ -13763,6 +13795,22 @@ SPECIES_DATA['atlantic-cod'] = {
                 ],
                 cfr: '50 CFR 648.87, 648.82'
             },
+            dasCategory: {
+                question: 'What is the common pool DAS/permit category?',
+                field: 'dasCategory',
+                required: false,
+                type: 'choice',
+                dependsOn: ['permitType', 'vesselCategory'],
+                applicablePermits: ['multispecies-commercial'],
+                options: [
+                    { value: 'category-a', label: 'Category A (Regular A DAS)', notes: 'GOM cod: 25 lb/DAS, max 50 lb/trip' },
+                    { value: 'handgear-a', label: 'Handgear A', notes: 'GOM cod: 25 lb/trip' },
+                    { value: 'type-c', label: 'Small Vessel (Type C)', notes: 'GOM cod: 25 lb/trip' },
+                    { value: 'handgear-b', label: 'Handgear B', notes: 'GOM cod: 25 lb/trip' }
+                ],
+                notes: 'GB/SNE cod: possession prohibited. Verify stock area.',
+                cfr: '50 CFR 648.86'
+            },
             possessionAmount: {
                 question: 'What is the possession amount on board?',
                 field: 'possessionAmount',
@@ -13778,9 +13826,9 @@ SPECIES_DATA['atlantic-cod'] = {
                 field: 'exceedsLimit',
                 required: false,
                 type: 'auto',
-                dependsOn: ['permitType', 'vesselCategory', 'possessionAmount'],
+                dependsOn: ['permitType', 'vesselCategory', 'dasCategory', 'fishingArea', 'possessionAmount'],
                 autoCheck: true,
-                notes: 'Sector vessels: Check ACE allocation. Common pool: Check DAS category trip limits.',
+                notes: 'Sector: ACE allocation. Common pool: trip limits per GROUND_FISH_TRIP_LIMITS_CONFIG (Mar 2026).',
                 violation: {
                     ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or ACE allocation (50 CFR 648.87, 648.82)'
                 },
@@ -13892,8 +13940,8 @@ SPECIES_DATA['haddock'] = {
                 name: 'Common Pool (DAS/Trip Limits)',
                 limit: null,
                 unit: 'lbs',
-                cfr: '50 CFR 648.82',
-                notes: 'Trip limits vary by DAS category'
+                cfr: '50 CFR 648.86',
+                notes: 'Mar 2026: GOM/GB 1,000 lb/DAS (max 2,000/trip) Cat A; Type C 300 lb/trip.'
             },
             'recreational': {
                 name: 'Recreational',
@@ -13902,6 +13950,13 @@ SPECIES_DATA['haddock'] = {
                 notes: '15 fish per person per day'
             }
         },
+        dataSources: [
+            {
+                title: 'Northeast Multispecies Common Pool Trip Limits',
+                url: 'https://www.fisheries.noaa.gov/new-england-mid-atlantic/commercial-fishing/northeast-multispecies-common-pool-fishery',
+                effective: '2026-03-09'
+            }
+        ],
         size: {
             minimum: 17,
             unit: 'inches (total length)',
@@ -13931,6 +13986,21 @@ SPECIES_DATA['haddock'] = {
                 ],
                 cfr: '50 CFR 648.87, 648.82'
             },
+            dasCategory: {
+                question: 'What is the common pool DAS/permit category?',
+                field: 'dasCategory',
+                required: false,
+                type: 'choice',
+                dependsOn: ['permitType', 'vesselCategory'],
+                applicablePermits: ['multispecies-commercial'],
+                options: [
+                    { value: 'category-a', label: 'Category A (Regular A DAS)', notes: '1,000 lb/DAS, max 2,000 lb/trip' },
+                    { value: 'handgear-a', label: 'Handgear A', notes: '1,000 lb/trip' },
+                    { value: 'type-c', label: 'Small Vessel (Type C)', notes: '300 lb/trip' },
+                    { value: 'handgear-b', label: 'Handgear B', notes: '1,000 lb/trip' }
+                ],
+                cfr: '50 CFR 648.86'
+            },
             possessionAmount: {
                 question: 'What is the possession amount on board?',
                 field: 'possessionAmount',
@@ -13946,9 +14016,9 @@ SPECIES_DATA['haddock'] = {
                 field: 'exceedsLimit',
                 required: false,
                 type: 'auto',
-                dependsOn: ['permitType', 'vesselCategory', 'possessionAmount'],
+                dependsOn: ['permitType', 'vesselCategory', 'dasCategory', 'fishingArea', 'possessionAmount'],
                 autoCheck: true,
-                notes: 'Sector vessels: Check ACE allocation. Common pool: Check DAS category trip limits.',
+                notes: 'Sector: ACE allocation. Common pool: trip limits per area/DAS (Mar 2026).',
                 violation: {
                     ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or ACE allocation (50 CFR 648.87, 648.82)'
                 },

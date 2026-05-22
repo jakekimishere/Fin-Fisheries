@@ -12,6 +12,26 @@
   "changes": [
     {
       "date": "2026-05-21",
+      "title": "Tier D: sharks, groundfish trip limits, pre-report summary",
+      "description": "HMS shark recreational limits (635.22, 54\" FL); shortfin mako and oceanic whitetip prohibited; cod/haddock common pool trip limits via GROUND_FISH_TRIP_LIMITS_CONFIG; pre-report violation summary overlay before full report.",
+      "affectedSpecies": [
+        "blue-shark",
+        "shortfin-mako-shark",
+        "oceanic-whitetip-shark",
+        "common-thresher-shark",
+        "porbeagle-shark",
+        "tiger-shark",
+        "atlantic-cod",
+        "haddock"
+      ],
+      "sources": [
+        "https://www.fisheries.noaa.gov/s3/2025-04/HMS-Recreational-Compliance-Guide-2025-Final.pdf",
+        "https://www.fisheries.noaa.gov/action/zero-atlantic-shortfin-mako-shark-retention-limit",
+        "https://www.fisheries.noaa.gov/new-england-mid-atlantic/commercial-fishing/northeast-multispecies-common-pool-fishery"
+      ]
+    },
+    {
+      "date": "2026-05-21",
       "title": "Tier C regulation refresh",
       "description": "2026 scup, black sea bass, and bluefish specifications; bluefish 5/7 bag limits; conservation equivalency notes for BSB; SPECIES_GROUPS 635.22 alignment; species-data validation script.",
       "affectedSpecies": [

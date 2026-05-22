@@ -136,6 +136,19 @@
                 <!-- Assessment steps will be dynamically generated for each selected species -->
             </div>
 
+            <!-- Pre-report violation summary (shown before full report) -->
+            <div id="pre-report-overlay" class="pre-report-overlay" style="display: none;" role="dialog" aria-labelledby="pre-report-title">
+                <div class="pre-report-panel">
+                    <h2 id="pre-report-title">Assessment Summary</h2>
+                    <p class="pre-report-subtitle">Review potential compliance issues before generating the full report.</p>
+                    <div id="pre-report-body"></div>
+                    <div class="pre-report-actions">
+                        <button type="button" class="btn-secondary" onclick="closePreReportSummary()">← Back to Assessment</button>
+                        <button type="button" class="btn-primary" id="pre-report-confirm-btn" onclick="confirmGenerateReport()">Generate Full Report →</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Results/Receipt Section -->
             <section class="step-section" id="results-section">
                 <div id="report-content">
@@ -167,6 +180,7 @@
     <script src="species-data.js"></script>
     <script src="update-checker.js"></script>
     <script src="REGULATION_DATES_CONFIG.js"></script>
+    <script src="GROUND_FISH_TRIP_LIMITS_CONFIG.js"></script>
     <script src="SPECIES_GROUPS_CONFIG.js"></script>
 
     <!-- Utils & state -->
