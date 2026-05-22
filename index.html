@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FIN - Fisheries Inspection Navigator - Personal Project (Not affiliated with USCG or any government agency)">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>FIN - Fisheries Inspection Navigator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-badge">FIN</div>
+            <h1>Fisheries Inspection Navigator</h1>
+            <p class="subtitle">Personal Project - Not Affiliated with USCG</p>
+        </header>
+
+        <main>
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+                <span class="progress-text" id="progress-text">Step 1 of 9</span>
+            </div>
+
+            <!-- Step 0: Homepage -->
+            <section class="step-section active" id="step-homepage">
+                <div class="homepage-update-notice">
+                    <div class="update-notice-icon">📅</div>
+                    <div class="update-notice-text">
+                        <strong>Last NOAA Update:</strong> <span id="homepage-last-update-date">Loading...</span>
+                    </div>
+                </div>
+                
+                <div class="homepage-content">
+                    <div class="personal-project-notice" style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                        <strong>⚠️ Personal Project Disclaimer:</strong> This tool is a personal project and is <strong>NOT</strong> affiliated with, endorsed by, or representative of the U.S. Coast Guard or any government agency. Always verify regulations with official NOAA sources.
+                    </div>
+                    <h2>Select Regional Fishery</h2>
+                    <p class="info-note">Choose a regional fishery to begin the compliance assessment.</p>
+                    
+                    <div class="regional-fisheries-grid">
+                        <div class="regional-fishery-card" onclick="selectRegionalFishery('northeast')">
+                            <div class="regional-fishery-icon">🌊</div>
+                            <h3>Northeast Regional Fisheries</h3>
+                            <p class="regional-fishery-description">Atlantic Sea Scallop, Summer Flounder, Groundfish, and other Northeast species</p>
+                            <div class="regional-fishery-arrow">→</div>
+                        </div>
+                        
+                        <!-- Placeholder for future regional fisheries -->
+                        <!-- 
+                        <div class="regional-fishery-card unavailable">
+                            <div class="regional-fishery-icon">🌊</div>
+                            <h3>Southeast Regional Fisheries</h3>
+                            <p class="regional-fishery-description">Coming Soon</p>
+                        </div>
+                        -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 1: Species Selection -->
+            <section class="step-section" id="step-0">
+                <h2>Select Species to Inspect</h2>
+                <p class="info-note">Select one or more species that are on board the vessel. You can select multiple species and assess them together.</p>
+                
+                <!-- Assessment Date Input -->
+                <div class="assessment-date-container">
+                    <label for="assessment-date" class="date-label">
+                        <span class="date-icon">📅</span>
+                        <strong>Assessment Date:</strong>
+                    </label>
+                    <div class="date-input-wrapper">
+                        <input type="date" 
+                               id="assessment-date" 
+                               class="assessment-date-input"
+                               onchange="updateAssessmentDate(this.value)">
+                        <span class="date-display" id="date-display">Today</span>
+                    </div>
+                    <p class="date-help-text">Select the date of the inspection. Regulations are calculated based on this date.</p>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="species-search-container">
+                    <input type="text" 
+                           id="species-search" 
+                           class="species-search-input" 
+                           placeholder="Search for a fish species..." 
+                           oninput="filterSpeciesGrid(this.value)">
+                    <span class="search-icon">🔍</span>
+                </div>
+                
+                <!-- Favorites Section -->
+                <div class="favorites-section" id="favorites-section" style="display: none;">
+                    <div class="favorites-header">
+                        <h3>⭐ Favorites</h3>
+                        <p class="favorites-help">Your frequently used species</p>
+                    </div>
+                    <div class="favorites-grid" id="favorites-grid">
+                        <!-- Favorites will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- All Species Section -->
+                <div class="all-species-section">
+                    <div class="all-species-header">
+                        <h3>All Species</h3>
+                    </div>
+                </div>
+                
+                <!-- Selected Species Display at Top -->
+                <div class="selected-species-display-top" id="selected-species-display-top" style="display: none;">
+                    <div class="selected-species-header">
+                        <h3>Selected Species:</h3>
+                        <button class="btn-primary" id="continue-species" onclick="nextStep(0)" disabled>Proceed to Assessment →</button>
+                    </div>
+                    <div id="selected-list-top" class="selected-species-list"></div>
+                </div>
+                
+                <div class="species-grid" id="species-grid">
+                    <!-- Species cards will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Dynamic Assessment Steps (will be generated per species) -->
+            <div id="assessment-sections">
+                <!-- Assessment steps will be dynamically generated for each selected species -->
+            </div>
+
+            <!-- Results/Receipt Section -->
+            <section class="step-section" id="results-section">
+                <div id="report-content">
+                    <!-- Report will be generated here -->
+                </div>
+                <div class="report-actions">
+                    <button class="btn-secondary" onclick="goBackToEdit()">← Back to Edit</button>
+                    <button class="btn-primary" onclick="printReport()">🖨️ Print Report</button>
+                    <button class="btn-secondary" onclick="startOver()">Start New Assessment</button>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Reference: 50 USC 648 | Data sourced from NOAA Greater Atlantic Regional Fisheries Office</p>
+            <p class="disclaimer"><strong>⚠️ DISCLAIMER:</strong> This is a personal project and is NOT affiliated with, endorsed by, or representative of the U.S. Coast Guard or any government agency. Always verify current regulations with official NOAA sources. Last updated: <span id="last-update-date">Loading...</span></p>
+            <p class="data-sources">
+                <small>
+                    Sources: <a href="https://www.fisheries.noaa.gov/bulletin/2025-specifications-summer-flounder-scup-black-sea-bass-and-bluefish-fisheries" target="_blank">NOAA 2025 Summer Flounder Specifications</a> | 
+                    <a href="https://www.fisheries.noaa.gov/bulletin/2025-fishing-year-limited-access-allocations-atlantic-sea-scallop-fishery" target="_blank">NOAA 2025 Scallop Framework 39</a>
+                </small>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Core data (regulationMeta must load before update-checker) -->
+    <script src="js/config/regulationMeta.js"></script>
+    <script src="fish-images.js"></script>
+    <script src="species-data.js"></script>
+    <script src="update-checker.js"></script>
+    <script src="REGULATION_DATES_CONFIG.js"></script>
+    <script src="SPECIES_GROUPS_CONFIG.js"></script>
+
+    <!-- Utils & state -->
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/utils/dateManager.js"></script>
+    <script src="js/core/stateBridge.js"></script>
+    <script src="js/state/stateManager.js"></script>
+    <script src="js/utils/navigation.js"></script>
+    <script src="js/validation/validators.js"></script>
+
+    <!-- UI modules -->
+    <script src="js/ui/speciesGrid.js"></script>
+    <script src="js/ui/questionRenderer.js"></script>
+    <script src="js/ui/assessmentSteps.js"></script>
+    <script src="js/ui/reportGenerator.js"></script>
+
+    <!-- Legacy assessment engine (violations, grouped UI, report HTML) -->
+    <script src="js/legacy/assessmentEngine.js"></script>
+
+    <!-- App orchestrator (entry point) -->
+    <script src="app/main.js"></script>
+    
+    <!-- Service Worker -->
+    <script src="sw-register.js"></script>
+    
+    <!-- Automated Testing (for pre-testing checks) -->
+    <script src="automated-tests.js"></script>
+</body>
+</html>
