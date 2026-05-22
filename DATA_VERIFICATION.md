@@ -40,10 +40,21 @@ All HMS species data (tunas, swordfish, billfish, sharks) is sourced from:
 - **BFT IFQ Hotline**: (301) 427-8591 - Public contact information
 - **Trophy Fishery Status**: Publicly announced in NOAA bulletins
 
-### Yellowfin, Bigeye, Skipjack, Albacore Tuna
-- **Possession Limits**: All "No Limit" and "3 per day per person" limits are publicly documented in 50 CFR 635.23
+### Yellowfin, Bigeye, Skipjack, Albacore Tuna (BAYS)
+- **Yellowfin**: 3 per person per day, 27" CFL minimum — 50 CFR 635.22 (HMS Recreational Compliance Guide 2025)
+- **Bigeye, Skipjack, Albacore**: No federal recreational bag limit; bigeye 27" CFL minimum if retained
 - **Trap Prohibition**: Prohibition for Yellowfin, Bigeye, Skipjack, Albacore is publicly documented
 - **Permit Requirements**: All permit categories are publicly documented in 50 CFR 635.4
+
+### Mid-Atlantic (648) — 2026 Specifications
+- **Summer flounder, scup, black sea bass, bluefish**: Feb 19, 2026 specifications action
+- **Bluefish (2026)**: Private 5 fish/person/day; for-hire 7 fish/person/day (50 CFR 648.160)
+- **Scup / black sea bass recreational**: Conservation equivalency and status quo measures per Apr 30, 2026 recreational rule — verify state bag/size/season
+
+### Hammerhead Sharks (great, scalloped, smooth)
+- **Recreational**: 78" fork length; 1 shark per vessel per trip from allowable species list (50 CFR 635.22)
+- **U.S. Caribbean**: Retention prohibited (Feb 2, 2024 rule)
+- **Mixed retention**: Cannot retain with tuna, swordfish, or billfish on board
 
 ### Swordfish
 - **Possession Limits**: All limits are publicly documented in 50 CFR 635.23
