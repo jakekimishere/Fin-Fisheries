@@ -38,7 +38,11 @@
 - A11y: `focus-visible` on primary buttons; pre-report `aria-live` / `aria-modal`
 - Cache `fin-fisheries-v9`
 
+## Report migration (2026-05-21)
+- `ReportBuilder.buildFullReport` / `buildSpeciesSection` — full per-species report HTML
+- `generateReport()` delegates to ReportBuilder; format helpers live in reportBuilder
+- Cache `fin-fisheries-v10`
+
 ## Still recommended (future)
-- Move remaining `generateReport` species rows into `reportBuilder.js`
 - HMS shark commercial quota by species group
 - Playwright E2E in CI (optional)
