@@ -41,6 +41,7 @@ The footer, homepage badge, and update checker read `DATA_LAST_UPDATED` from thi
 
 ### 4. Verify in the app
 
+- [ ] Run `node scripts/validate-species-data.js` (checks structure, groups, key limits)
 - [ ] Hard refresh (Ctrl+F5) or bump `APP_CACHE_NAME` in `js/config/appBundle.js` if testing offline
 - [ ] Run through affected species in browser (dynamic path if `assessmentQuestions` exist)
 - [ ] Confirm footer / homepage date matches `dataLastUpdated`

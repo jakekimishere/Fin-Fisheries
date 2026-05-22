@@ -16,17 +16,17 @@ const SPECIES_GROUPS = {
         ],
         limits: {
             'recreational': {
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from Atlantic aggregated large coastal shark (LCS) management group'
+                limit: { count: 1, unit: 'fish per vessel per trip' },
+                cfr: '50 CFR 635.22',
+                notes: '1 shark per vessel per trip from allowable species list (LCS). 54" FL minimum for most LCS; cannot retain with tunas/billfish/swordfish on board.'
             }
         }
     },
     
-    // Hammerhead Sharks - Recreational: 1 shark total from this group
+    // Hammerhead Sharks - only one hammerhead species may be retained per trip (78" FL); shares vessel trip limit with other allowable sharks
     'hammerhead-recreational': {
         name: 'Hammerhead Sharks',
-        description: 'Recreational limit: 1 shark per vessel per trip from this group',
+        description: 'Recreational: 1 shark per vessel per trip total (any allowable species, including hammerheads at 78" FL)',
         species: [
             'great-hammerhead-shark',
             'scalloped-hammerhead-shark',
@@ -34,9 +34,9 @@ const SPECIES_GROUPS = {
         ],
         limits: {
             'recreational': {
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 635.23',
-                notes: '1 shark per vessel per trip from hammerhead shark management group'
+                limit: { count: 1, unit: 'fish per vessel per trip' },
+                cfr: '50 CFR 635.22',
+                notes: '1 shark per vessel per trip from allowable species list. Hammerheads: 78" FL min; prohibited in U.S. Caribbean.'
             }
         }
     },

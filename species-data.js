@@ -14239,9 +14239,15 @@ SPECIES_DATA['bluefish'] = {
                 cfr: '50 CFR 648.4'
             },
             'recreational': {
-                name: 'Recreational (No Federal Permit Required)',
+                name: 'Recreational - Private Vessel',
                 required: false,
                 cfr: null
+            },
+            'recreational-for-hire': {
+                name: 'Recreational - For-Hire / Charter',
+                required: true,
+                cfr: '50 CFR 648.4',
+                notes: 'Bluefish charter/party vessel permit required for for-hire trips'
             }
         },
         possession: {
@@ -14253,12 +14259,25 @@ SPECIES_DATA['bluefish'] = {
                 notes: 'No federal possession limit. Check state regulations.'
             },
             'recreational': {
-                name: 'Recreational',
-                limit: { count: 15, unit: 'fish' },
+                name: 'Recreational - Private',
+                limit: { count: 5, unit: 'fish per person per day' },
                 cfr: '50 CFR 648.160',
-                notes: '15 fish per person per day (varies by state)'
+                notes: 'Private recreational vessels: 5 bluefish per person per day (2026 specs, effective Feb 19, 2026).'
+            },
+            'recreational-for-hire': {
+                name: 'Recreational - For-Hire',
+                limit: { count: 7, unit: 'fish per person per day' },
+                cfr: '50 CFR 648.160',
+                notes: 'For-hire/charter vessels: 7 bluefish per person per day (2026 specs).'
             }
         },
+        dataSources: [
+            {
+                title: 'NOAA 2026 Bluefish Specifications',
+                url: 'https://www.fisheries.noaa.gov/action/2026-and-projected-2027-summer-flounder-scup-black-sea-bass-and-bluefish-specifications',
+                effective: '2026-02-19'
+            }
+        ],
         size: {
             minimum: null,
             unit: 'No federal minimum size',
@@ -14279,7 +14298,8 @@ SPECIES_DATA['bluefish'] = {
                 required: true,
                 options: [
                     { value: 'commercial', label: 'Commercial Federal Permit', description: 'Commercial fishing permit' },
-                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing' }
+                    { value: 'recreational', label: 'Recreational - Private Vessel', description: 'Private angler, no charter permit' },
+                    { value: 'recreational-for-hire', label: 'Recreational - For-Hire / Charter', description: 'Charter or party boat with bluefish permit' }
                 ],
                 cfr: '50 CFR 648.4'
             },
@@ -14291,9 +14311,28 @@ SPECIES_DATA['bluefish'] = {
                 dependsOn: ['permitType'],
                 unit: {
                     commercial: 'lbs',
-                    recreational: 'fish'
+                    recreational: 'fish',
+                    'recreational-for-hire': 'fish'
                 },
                 notes: 'Record total weight in pounds (commercial) or number of fish (recreational)',
+                cfr: '50 CFR 648.160'
+            },
+            possessionLimitCheck: {
+                question: 'Does the possession amount exceed the permit limit?',
+                field: 'exceedsLimit',
+                required: false,
+                type: 'auto',
+                dependsOn: ['permitType', 'possessionAmount'],
+                autoCheck: true,
+                limits: {
+                    'commercial': null,
+                    'recreational': { count: 5, unit: 'fish per person per day' },
+                    'recreational-for-hire': { count: 7, unit: 'fish per person per day' }
+                },
+                notes: '2026 specs: private 5/day; for-hire 7/day. State rules may differ.',
+                violation: {
+                    ifExceeds: 'VIOLATION: Possession amount exceeds federal bluefish bag limit (50 CFR 648.160)'
+                },
                 cfr: '50 CFR 648.160'
             },
             recreationalBagLimit: {
@@ -14302,11 +14341,10 @@ SPECIES_DATA['bluefish'] = {
                 required: false,
                 type: 'number',
                 dependsOn: ['permitType'],
-                applicablePermits: ['recreational'],
-                limit: { count: 15, unit: 'fish per person per day' },
-                notes: 'Recreational limit: 15 fish per person per day (varies by state)',
+                applicablePermits: ['recreational', 'recreational-for-hire'],
+                notes: 'Private: 5 per person per day. For-hire: 7 per person per day (2026 specs).',
                 violation: {
-                    ifExceeds: 'VIOLATION: Recreational bag limit is 15 fish per person per day (50 CFR 648.160)'
+                    ifExceeds: 'VIOLATION: Recreational bag limit exceeded (50 CFR 648.160)'
                 },
                 cfr: '50 CFR 648.160'
             },
@@ -14315,7 +14353,7 @@ SPECIES_DATA['bluefish'] = {
                 field: 'stateRegulationsChecked',
                 required: false,
                 type: 'boolean',
-                notes: 'No federal possession limit for commercial. Recreational: 15 fish per person per day federal limit. State regulations may be more restrictive.',
+                notes: 'Federal limits: private 5/day, for-hire 7/day (2026). State regulations may be more restrictive.',
                 cfr: '50 CFR 648.160'
             },
             reportingStatus: {
@@ -14368,9 +14406,21 @@ SPECIES_DATA['black-sea-bass'] = {
                 name: 'Recreational',
                 limit: { count: 15, unit: 'fish' },
                 cfr: '50 CFR 648.140',
-                notes: '15 fish per person per day (varies by state and season)'
+                notes: 'Reference federal coastwide limit (status quo). Apr 30, 2026 rule: federal measures waived—conservation equivalency; state bag/size/season apply (~20% collective harvest increase).'
             }
         },
+        dataSources: [
+            {
+                title: 'NOAA 2026 Black Sea Bass Specifications',
+                url: 'https://www.fisheries.noaa.gov/action/2026-and-projected-2027-summer-flounder-scup-black-sea-bass-and-bluefish-specifications',
+                effective: '2026-02-19'
+            },
+            {
+                title: '2026–2027 Recreational Management Measures',
+                url: 'https://www.federalregister.gov/documents/2026/04/30/2026-08409/fisheries-of-the-northeastern-united-states-2026-and-2027-summer-flounder-scup-and-black-sea-bass',
+                effective: '2026-04-30'
+            }
+        ],
         size: {
             minimum: 12.5,
             unit: 'inches (total length)',
@@ -14388,7 +14438,7 @@ SPECIES_DATA['black-sea-bass'] = {
             federal: {
                 open: 'Seasonal with closures',
                 cfr: '50 CFR 648.140',
-                notes: 'Check current season dates and closures'
+                notes: '2026 specs: commercial quota 7.83M lb; recreational RHL 8.14M lb. Federal recreational measures waived—conservation equivalency (state measures apply).'
             }
         },
         assessmentQuestions: {
@@ -14425,9 +14475,9 @@ SPECIES_DATA['black-sea-bass'] = {
                 useAssessmentDate: true,
                 limits: {
                     'commercial': null, // Varies by season and area - check current regulations
-                    'recreational': { count: 15, unit: 'fish per person per day' }
+                    'recreational': null // Conservation equivalency — verify state bag limit
                 },
-                notes: 'Commercial limits vary by season and management area - check current regulations. Recreational: 15 fish per person per day (varies by state and season).',
+                notes: 'Commercial limits vary by season and area. Recreational: verify state/region measures under conservation equivalency (federal coastwide waived Apr 2026).',
                 violation: {
                     ifExceeds: 'VIOLATION: Possession amount exceeds permit limit (50 CFR 648.140)'
                 },
@@ -14521,9 +14571,21 @@ SPECIES_DATA['scup'] = {
                 name: 'Recreational',
                 limit: { count: 30, unit: 'fish' },
                 cfr: '50 CFR 648.121',
-                notes: '30 fish per person per day (varies by state and season)'
+                notes: 'Status quo federal coastwide: 30 fish per person per day (2026–2027 rec measures rule, Apr 30, 2026). Verify state measures.'
             }
         },
+        dataSources: [
+            {
+                title: 'NOAA 2026 Scup Specifications',
+                url: 'https://www.fisheries.noaa.gov/action/2026-and-projected-2027-summer-flounder-scup-black-sea-bass-and-bluefish-specifications',
+                effective: '2026-02-19'
+            },
+            {
+                title: '2026–2027 Recreational Management Measures',
+                url: 'https://www.federalregister.gov/documents/2026/04/30/2026-08409/fisheries-of-the-northeastern-united-states-2026-and-2027-summer-flounder-scup-and-black-sea-bass',
+                effective: '2026-04-30'
+            }
+        ],
         size: {
             minimum: 9,
             unit: 'inches (total length)',
@@ -14541,7 +14603,7 @@ SPECIES_DATA['scup'] = {
             federal: {
                 open: 'Seasonal with closures',
                 cfr: '50 CFR 648.121',
-                notes: 'Check current season dates and closures'
+                notes: '2026 specs: commercial quota 17.70M lb; recreational RHL 13.17M lb. Status quo federal recreational measures (30 fish) for 2026–2027.'
             }
         },
         assessmentQuestions: {

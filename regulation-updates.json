@@ -12,6 +12,20 @@
   "changes": [
     {
       "date": "2026-05-21",
+      "title": "Tier C regulation refresh",
+      "description": "2026 scup, black sea bass, and bluefish specifications; bluefish 5/7 bag limits; conservation equivalency notes for BSB; SPECIES_GROUPS 635.22 alignment; species-data validation script.",
+      "affectedSpecies": [
+        "scup",
+        "black-sea-bass",
+        "bluefish"
+      ],
+      "sources": [
+        "https://www.fisheries.noaa.gov/action/2026-and-projected-2027-summer-flounder-scup-black-sea-bass-and-bluefish-specifications",
+        "https://www.federalregister.gov/documents/2026/04/30/2026-08409/fisheries-of-the-northeastern-united-states-2026-and-2027-summer-flounder-scup-and-black-sea-bass"
+      ]
+    },
+    {
+      "date": "2026-05-21",
       "title": "Tier B regulation refresh",
       "description": "2026 summer flounder specifications and conservation equivalency notes; BAYS tuna (yellowfin/bigeye/skipjack/albacore) aligned with HMS 2025 compliance guide; hammerhead sharks (78\" FL, 635.22, Caribbean prohibition); scallop access-area possession checks in assessment engine.",
       "affectedSpecies": [
