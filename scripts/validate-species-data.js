@@ -84,8 +84,11 @@ function main() {
         }
         if (regs.assessmentQuestions?.possessionLimitCheck?.limits) {
             const permitOpts = regs.assessmentQuestions.permitType?.options?.map(o => o.value) || [];
+            const auxiliaryLimitKeys = ['commercial-large-mesh', 'commercial-small-mesh'];
             for (const permitKey of Object.keys(regs.assessmentQuestions.possessionLimitCheck.limits)) {
-                if (permitOpts.length && !permitOpts.includes(permitKey) && permitKey !== 'commercial' && permitKey !== 'recreational') {
+                if (permitOpts.length && !permitOpts.includes(permitKey)
+                    && permitKey !== 'commercial' && permitKey !== 'recreational'
+                    && !auxiliaryLimitKeys.includes(permitKey)) {
                     warnings.push(`${id}: possessionLimitCheck limit key "${permitKey}" not in permitType options`);
                 }
             }

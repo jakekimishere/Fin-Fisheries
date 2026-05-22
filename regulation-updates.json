@@ -12,6 +12,13 @@
   "changes": [
     {
       "date": "2026-05-21",
+      "title": "UX, violations, and assessment flow improvements",
+      "description": "Shared AssessmentViolations module; skip empty vessel-requirements and unnecessary vessel-classification steps; dynamic report fields; summer flounder limit keys; simplified groundfish assessment questions; npm run validate.",
+      "affectedSpecies": ["american-plaice", "summer-flounder"],
+      "sources": []
+    },
+    {
+      "date": "2026-05-21",
       "title": "Tier D: sharks, groundfish trip limits, pre-report summary",
       "description": "HMS shark recreational limits (635.22, 54\" FL); shortfin mako and oceanic whitetip prohibited; cod/haddock common pool trip limits via GROUND_FISH_TRIP_LIMITS_CONFIG; pre-report violation summary overlay before full report.",
       "affectedSpecies": [

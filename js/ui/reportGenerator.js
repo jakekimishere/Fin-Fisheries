@@ -159,9 +159,10 @@ class ReportGenerator {
         }
         
         // Get violations from legacy function if available
-        if (typeof checkSpeciesViolations === 'function') {
-            const legacyViolations = checkSpeciesViolations(speciesId, species, speciesData);
-            violations.push(...legacyViolations);
+        if (typeof ViolationChecker !== 'undefined') {
+            violations.push(...ViolationChecker.checkSpecies(speciesId, species, speciesData));
+        } else if (typeof checkSpeciesViolations === 'function') {
+            violations.push(...checkSpeciesViolations(speciesId, species, speciesData));
         }
         
         // Remove duplicates

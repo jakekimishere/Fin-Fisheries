@@ -603,6 +603,43 @@ function updateHomepageUpdateDate() {
     tryUpdate();
 }
 
+/** Hide assessment, results, and pre-report overlay when returning home. */
+function hideAssessmentAndResultsUI() {
+    if (typeof closePreReportSummary === 'function') {
+        closePreReportSummary();
+    }
+    document.querySelectorAll('.grouped-assessment').forEach(el => {
+        el.classList.remove('active');
+        el.style.display = 'none';
+    });
+    const assessmentSections = document.getElementById('assessment-sections');
+    if (assessmentSections) {
+        assessmentSections.style.display = 'none';
+    }
+    const resultsSection = document.getElementById('results-section');
+    if (resultsSection) {
+        resultsSection.classList.remove('active');
+        resultsSection.style.display = 'none';
+    }
+    const step0 = document.getElementById('step-0');
+    if (step0) {
+        step0.classList.remove('active');
+        step0.style.display = 'none';
+    }
+}
+
+/** FIN badge / header — return to regional fishery home without clearing saved answers. */
+function goHome() {
+    currentStep = -1;
+    hideAssessmentAndResultsUI();
+    if (typeof window.navigation !== 'undefined' && window.navigation.showStep) {
+        window.navigation.showStep(-1);
+    } else {
+        showStep(-1);
+    }
+    updateProgress();
+}
+
 // Select regional fishery
 function selectRegionalFishery(region) {
     if (region === 'northeast') {
@@ -622,8 +659,9 @@ function showStep(step) {
     const hasMultispecies = multispeciesSelected.length > 0;
     
     if (step === -1) {
-        // Homepage
-        document.getElementById('step-homepage').classList.add('active');
+        hideAssessmentAndResultsUI();
+        const homepage = document.getElementById('step-homepage');
+        if (homepage) homepage.classList.add('active');
     } else if (step === 0) {
         // Species selection - hide assessment sections and results
         const step0 = document.getElementById('step-0');
@@ -655,37 +693,27 @@ function showStep(step) {
         // Generate grouped assessment steps
         if (selectedSpecies.length > 0) {
             generateGroupedAssessmentSteps();
-            if (hasMultispecies) {
+            if (hasMultispecies && (typeof MultispeciesFlow === 'undefined' || MultispeciesFlow.vesselClassificationStepNeeded())) {
                 showGroupedStep('vessel-classification');
+            } else if (hasMultispecies && typeof MultispeciesFlow !== 'undefined') {
+                MultispeciesFlow.applyDefaultVesselClassification();
+                showGroupedStep('permits');
+            } else if (shouldUseDynamicAssessmentQuestions()) {
+                showGroupedStep('dynamic-assessment');
             } else {
                 showGroupedStep('permits');
             }
         }
-    } else if (hasMultispecies && step >= 2 && step <= 6) {
-        // Show specific grouped assessment step (with vessel classification)
-        // Step 1 is assessment start, so step 2 = vessel-classification(0), step 3 = permits(1), step 4 = possession(2), etc.
-        const stepNames = ['vessel-classification', 'permits', 'possession', 'size-gear', 'vessel-requirements'];
+    } else if (step >= 2 && step < getReportStepNumber()) {
+        const stepOrder = getAssessmentStepOrder();
         const stepIndex = step - 2;
-        const stepName = stepNames[stepIndex];
-        console.log(`showStep(${step}) for multispecies: stepIndex=${stepIndex}, stepName=${stepName}`);
+        const stepName = stepOrder[stepIndex];
         if (stepName) {
             showGroupedStep(stepName);
         } else {
-            console.error(`Invalid step index ${stepIndex} for multispecies (step ${step})`);
+            console.error(`Invalid assessment step index ${stepIndex} (step ${step})`);
         }
-    } else if (!hasMultispecies && step >= 2 && step <= 5) {
-        // Show specific grouped assessment step (without vessel classification)
-        // Step 2 = permits(0), step 3 = possession(1), step 4 = size-gear(2), step 5 = vessel-requirements(3)
-        const stepNames = ['permits', 'possession', 'size-gear', 'vessel-requirements'];
-        const stepIndex = step - 2;
-        const stepName = stepNames[stepIndex];
-        console.log(`showStep(${step}) for non-multispecies: stepIndex=${stepIndex}, stepName=${stepName}`);
-        if (stepName) {
-            showGroupedStep(stepName);
-        } else {
-            console.error(`Invalid step index ${stepIndex} for non-multispecies (step ${step})`);
-        }
-    } else if ((hasMultispecies && step === 7) || (!hasMultispecies && step === 6)) {
+    } else if (step === getReportStepNumber() || step === 6 || step === 7) {
         // Results step
         // Results - hide all grouped assessment steps first
         document.querySelectorAll('.grouped-assessment').forEach(groupedStep => {
@@ -698,7 +726,9 @@ function showStep(step) {
             assessmentSections.style.display = 'none';
         }
         
-        // Pre-report summary (full report after user confirms)
+        if (!window.lastGroupedStepName) {
+            rememberGroupedStep(getLastAssessmentStepBeforeReport());
+        }
         showPreReportSummary();
     }
     
@@ -908,16 +938,20 @@ function generateGroupedAssessmentSteps() {
             assessmentData.species[speciesId] = {};
         }
         
-        // If we have multispecies, add vessel classification step
-        if (multispeciesSelected.length > 0) {
+        if (multispeciesSelected.length > 0
+            && (typeof MultispeciesFlow === 'undefined' || MultispeciesFlow.vesselClassificationStepNeeded())) {
             createVesselClassificationSection(container);
+        } else if (multispeciesSelected.length > 0 && typeof MultispeciesFlow !== 'undefined') {
+            MultispeciesFlow.applyDefaultVesselClassification();
         }
         
         // Create grouped assessment sections
         createGroupedPermitsSection(container);
         createGroupedPossessionSection(container);
         createGroupedSizeGearSection(container);
-        createGroupedVesselRequirementsSection(container);
+        if (vesselRequirementsStepNeeded()) {
+            createGroupedVesselRequirementsSection(container);
+        }
         
     } catch (error) {
         console.error('Error generating grouped assessment steps:', error);
@@ -1596,10 +1630,11 @@ function createGroupedSizeGearSection(container) {
         `;
     });
     
+    const needsVesselRequirements = vesselRequirementsStepNeeded();
     html += `
         <div class="nav-buttons">
             <button class="btn-secondary" onclick="prevGroupedStep('size-gear')">← Back</button>
-            <button class="btn-primary" onclick="nextGroupedStep('size-gear')">Continue to Vessel Requirements →</button>
+            <button class="btn-primary" onclick="nextGroupedStep('size-gear')">${needsVesselRequirements ? 'Continue to Vessel Requirements →' : 'Generate Report →'}</button>
         </div>
     `;
     
@@ -2132,6 +2167,11 @@ function populateScallopAdditionalChecks(speciesId, additionalContent) {
 }
 // Show grouped assessment step
 function showGroupedStep(stepName) {
+    if (stepName === 'vessel-requirements' && !vesselRequirementsStepNeeded()) {
+        showStep(getReportStepNumber());
+        return;
+    }
+    rememberGroupedStep(stepName);
     // Hide species selection (step 0) - ensure it's completely hidden
     const speciesStep = document.getElementById('step-0');
     if (speciesStep) {
@@ -2467,11 +2507,7 @@ function nextGroupedStep(currentStepName) {
             }
         }
         
-        // Define step order based on whether we have multispecies
-        const stepOrder = hasMultispecies ? 
-            ['vessel-classification', 'permits', 'possession', 'size-gear', 'vessel-requirements'] :
-            ['permits', 'possession', 'size-gear', 'vessel-requirements'];
-        
+        const stepOrder = getAssessmentStepOrder();
         const currentIndex = stepOrder.indexOf(currentStepName);
         
         if (currentIndex === -1) {
@@ -2479,41 +2515,17 @@ function nextGroupedStep(currentStepName) {
             return;
         }
         
-        // Save any input data before moving
         saveGroupedStepData(currentStepName);
+        rememberGroupedStep(currentStepName);
         
         if (currentIndex < stepOrder.length - 1) {
-            let nextStep = stepOrder[currentIndex + 1];
-            
-            // If next step is 'vessel-requirements', check if there are any requirements
-            if (nextStep === 'vessel-requirements') {
-                const requiresVMS = selectedSpecies.includes('atlantic-sea-scallop');
-                const requiresObserver = selectedSpecies.includes('atlantic-sea-scallop');
-                const requiresTDD = selectedSpecies.includes('atlantic-sea-scallop');
-                const hmsReportingSpecies = ['bluefin-tuna', 'swordfish', 'billfish'];
-                const requiresHMSReporting = selectedSpecies.some(id => hmsReportingSpecies.includes(id));
-                
-                // If no vessel requirements, skip directly to report generation
-                if (!requiresVMS && !requiresObserver && !requiresTDD && !requiresHMSReporting) {
-                    // Generate report - step numbers must match showStep logic
-                    // With multispecies: step 7, without: step 6 (vessel info step removed)
-                    const reportStep = hasMultispecies ? 7 : 6;
-                    showStep(reportStep);
-                    return;
-                }
+            const nextStep = stepOrder[currentIndex + 1];
+            const stepNumber = groupedStepNameToStepNumber(nextStep);
+            if (stepNumber != null) {
+                showStep(stepNumber);
             }
-            
-            // Step 0 = species selection, Step 1 = assessment starts (vessel info removed)
-            // For multispecies: step 2=vessel-classification(0), 3=permits(1), 4=possession(2), 5=size-gear(3), 6=vessel-requirements(4)
-            // For non-multispecies: step 2=permits(0), 3=possession(1), 4=size-gear(2), 5=vessel-requirements(3)
-            const nextIndex = currentIndex + 1;
-            const stepNumber = hasMultispecies ? 2 + nextIndex : 2 + nextIndex;
-            showStep(stepNumber);
         } else {
-            // Generate report - step numbers must match showStep logic
-            // With multispecies: step 7, without: step 6 (vessel info step removed)
-            const reportStep = hasMultispecies ? 7 : 6;
-            showStep(reportStep);
+            showStep(getReportStepNumber());
         }
     } catch (error) {
         console.error('❌ ERROR in nextGroupedStep:', error);
@@ -2612,33 +2624,22 @@ function prevGroupedStep(currentStepName) {
             selectedSpecies = window.selectedSpecies;
         }
         
-        const multispeciesSelected = selectedSpecies.filter(id => isMultispecies(id));
-        const hasMultispecies = multispeciesSelected.length > 0;
-        
-        // Define step order based on whether we have multispecies
-        const stepOrder = hasMultispecies ? 
-            ['vessel-classification', 'permits', 'possession', 'size-gear', 'vessel-requirements'] :
-            ['permits', 'possession', 'size-gear', 'vessel-requirements'];
-        
+        const stepOrder = getAssessmentStepOrder();
         const currentIndex = stepOrder.indexOf(currentStepName);
         
         if (currentIndex === -1) {
             console.error('Current step not found in step order:', currentStepName);
-            // Fallback: go back to species selection
             showStep(0);
             return;
         }
         
         if (currentIndex > 0) {
-            const prevStep = stepOrder[currentIndex - 1];
-            // Step 0 = species selection, Step 1 = assessment starts (vessel info removed)
-            // For multispecies: step 2=vessel-classification(0), 3=permits(1), 4=possession(2), 5=size-gear(3), 6=vessel-requirements(4)
-            // For non-multispecies: step 2=permits(0), 3=possession(1), 4=size-gear(2), 5=vessel-requirements(3)
-            const prevIndex = currentIndex - 1;
-            const stepNumber = hasMultispecies ? 2 + prevIndex : 2 + prevIndex;
-            showStep(stepNumber);
+            const prevStepName = stepOrder[currentIndex - 1];
+            const stepNumber = groupedStepNameToStepNumber(prevStepName);
+            if (stepNumber != null) {
+                showStep(stepNumber);
+            }
         } else {
-            // Go back to species selection (step 0)
             showStep(0);
         }
     } catch (error) {
@@ -3458,6 +3459,9 @@ function showPreReportSummary() {
         saveGroupedStepData('possession');
         saveGroupedStepData('dynamic-assessment');
     }
+    if (window.questionRenderer && typeof window.questionRenderer.recheckAllQuestionViolations === 'function') {
+        window.questionRenderer.recheckAllQuestionViolations();
+    }
 
     const overlay = document.getElementById('pre-report-overlay');
     const body = document.getElementById('pre-report-body');
@@ -3467,9 +3471,7 @@ function showPreReportSummary() {
     }
 
     const allViolations = checkAllViolations();
-    const speciesIds = (window.appState && window.appState.selectedSpecies.length)
-        ? window.appState.selectedSpecies
-        : (window.selectedSpecies || selectedSpecies || []);
+    const speciesIds = getSelectedSpeciesIds();
 
     let html = '';
     if (allViolations.length === 0) {
@@ -3492,7 +3494,8 @@ function showPreReportSummary() {
                 ${speciesIds.map(speciesId => {
                     const species = SPECIES_DATA[speciesId];
                     if (!species) return '';
-                    const data = (window.assessmentData || assessmentData).species[speciesId] || {};
+                    const rawData = (window.assessmentData || assessmentData).species[speciesId] || {};
+                    const data = normalizeSpeciesAssessmentData(speciesId, species, rawData);
                     const violations = checkSpeciesViolations(speciesId, species, data);
                     if (violations.length === 0) return `<p class="pre-report-species-ok">✓ ${species.name || speciesId}</p>`;
                     return `
@@ -3539,6 +3542,9 @@ function generateReport() {
             saveGroupedStepData('possession');
             saveGroupedStepData('dynamic-assessment');
         }
+        if (window.questionRenderer && typeof window.questionRenderer.recheckAllQuestionViolations === 'function') {
+            window.questionRenderer.recheckAllQuestionViolations();
+        }
 
         const reportContent = document.getElementById('report-content');
         if (!reportContent) {
@@ -3550,10 +3556,14 @@ function generateReport() {
             return;
         }
 
-        // Ensure we have selected species
-        const currentSelectedSpecies = (typeof window !== 'undefined' && window.selectedSpecies) 
-            ? window.selectedSpecies 
-            : selectedSpecies;
+        const dataSource = (typeof window !== 'undefined' && window.assessmentData)
+            ? window.assessmentData
+            : assessmentData;
+        const currentSelectedSpecies = (window.appState && window.appState.selectedSpecies && window.appState.selectedSpecies.length)
+            ? window.appState.selectedSpecies
+            : ((typeof window !== 'undefined' && window.selectedSpecies && window.selectedSpecies.length)
+                ? window.selectedSpecies
+                : selectedSpecies);
         
         if (!currentSelectedSpecies || currentSelectedSpecies.length === 0) {
             const errorMessage = typeof Helpers !== 'undefined' && Helpers.showErrorMessage 
@@ -3576,9 +3586,18 @@ function generateReport() {
     
     // Check all violations including combined limits (centralized check)
     const allViolations = checkAllViolations();
+
+    html += `
+        <div class="report-summary-banner ${allViolations.length > 0 ? 'violation' : 'compliant'}">
+            <p><strong>${allViolations.length > 0
+                ? `⚠️ ${allViolations.length} potential violation(s) identified`
+                : '✓ No potential violations identified from entered data'}</strong></p>
+            ${allViolations.length > 0 ? '<p>Review species sections and the final verdict below.</p>' : ''}
+        </div>
+    `;
     
     // Generate report for each species
-    selectedSpecies.forEach(speciesId => {
+    currentSelectedSpecies.forEach(speciesId => {
         const species = SPECIES_DATA[speciesId];
         if (!species) {
             console.error(`Species data not found for ${speciesId}`);
@@ -3594,51 +3613,82 @@ function generateReport() {
             return;
         }
         
-        const speciesData = assessmentData.species[speciesId] || {};
-        // Get species-specific violations for this species
+        const rawSpeciesData = (dataSource.species && dataSource.species[speciesId]) || {};
+        const speciesData = normalizeSpeciesAssessmentData(speciesId, species, rawSpeciesData);
         const violations = checkSpeciesViolations(speciesId, species, speciesData);
+        const hasViolations = violations.length > 0;
         
         html += `
             <div class="report-section">
                 <h3>${species.name ? species.name.toUpperCase() : speciesId.toUpperCase()} ASSESSMENT</h3>
+                <div class="report-row">
+                    <span class="report-label">Compliance Status:</span>
+                    <span class="report-value report-species-status ${hasViolations ? 'violation' : 'compliant'}">
+                        ${hasViolations ? '⚠️ POTENTIAL VIOLATION(S)' : '✓ NO ISSUES IDENTIFIED'}
+                    </span>
+                </div>
         `;
         
-        // Permit
-        const permitCFR = species.regulations?.permits && Object.values(species.regulations.permits).length > 0 ? 
-            Object.values(species.regulations.permits)[0]?.cfr : null;
-        
-        html += `
-            <div class="report-row">
-                <span class="report-label">Federal Permit:</span>
-                <span class="report-value ${speciesData['has-permit'] !== 'yes' ? 'violation' : 'compliant'}">
-                    ${formatPermitStatus(speciesData['has-permit'])}
-                    ${permitCFR ? ` <span class="cfr-cite">(${permitCFR})</span>` : ''}
-                </span>
-            </div>
-        `;
-        
-        if (speciesData['has-permit'] === 'yes' && speciesData['permit-type'] && species.regulations?.permits) {
-            const permit = species.regulations.permits[speciesData['permit-type']];
+        const permitTypeKey = speciesData['permit-type'] || speciesData.permitType;
+        const usesDynamicQuestions = !!(species.regulations?.assessmentQuestions);
+        const hasGroupedPermit = speciesData['has-permit'] !== undefined && speciesData['has-permit'] !== '';
+
+        if (!usesDynamicQuestions || hasGroupedPermit) {
+            const permitCFR = species.regulations?.permits && Object.values(species.regulations.permits).length > 0 ?
+                Object.values(species.regulations.permits)[0]?.cfr : null;
+            html += `
+                <div class="report-row">
+                    <span class="report-label">Federal Permit:</span>
+                    <span class="report-value ${speciesData['has-permit'] !== 'yes' ? 'violation' : 'compliant'}">
+                        ${formatPermitStatus(speciesData['has-permit'])}
+                        ${permitCFR ? ` <span class="cfr-cite">(${permitCFR})</span>` : ''}
+                    </span>
+                </div>
+            `;
+        }
+        if ((speciesData['has-permit'] === 'yes' || permitTypeKey) && permitTypeKey && species.regulations?.permits) {
+            const permit = species.regulations.permits[permitTypeKey];
             if (permit) {
                 html += `
                     <div class="report-row">
                         <span class="report-label">Permit Type:</span>
-                        <span class="report-value">${permit.name || speciesData['permit-type']} ${permit.cfr ? `<span class="cfr-cite">(${permit.cfr})</span>` : ''}</span>
+                        <span class="report-value">${permit.name || permitTypeKey} ${permit.cfr ? `<span class="cfr-cite">(${permit.cfr})</span>` : ''}</span>
                     </div>
                 `;
             }
         }
-        
-        // Possession
-        if (speciesData.possessionAmount !== undefined) {
-            const isViolation = violations.some(v => v.includes('possession') || v.includes('Possession') || v.includes('PROHIBITED'));
-            const isProhibited = isProhibitedSpecies(speciesId) && speciesData.possessionAmount > 0;
+
+        const onBoardYes = speciesData.hasShark === true || speciesData.hasShark === 'yes'
+            || speciesData.isProhibited === true || speciesData.isProhibited === 'yes';
+        if (onBoardYes) {
             html += `
                 <div class="report-row">
-                    <span class="report-label">Possession Amount:</span>
-                    <span class="report-value ${isViolation || isProhibited ? 'violation' : ''}">
-                        ${speciesData.possessionAmount} ${getPossessionUnit(speciesId, speciesData)}
-                        ${isProhibited ? ' (PROHIBITED SPECIES)' : isViolation ? ' (OVER LIMIT)' : ''}
+                    <span class="report-label">On Board / Prohibited:</span>
+                    <span class="report-value violation">Yes — prohibited or restricted species reported on vessel</span>
+                </div>
+            `;
+        }
+        if (speciesData.released === false || speciesData.released === 'no') {
+            html += `
+                <div class="report-row">
+                    <span class="report-label">Release Status:</span>
+                    <span class="report-value violation">Not all fish released immediately</span>
+                </div>
+            `;
+        }
+
+        const possessionCount = getSpeciesPossessionCount(speciesData);
+        if (possessionCount !== null) {
+            const possessionViolation = violations.some(v =>
+                /possession|prohibited|exceeds limit|retention/i.test(v)
+            );
+            const isProhibited = isProhibitedSpecies(speciesId) && possessionCount > 0;
+            html += `
+                <div class="report-row">
+                    <span class="report-label">${(speciesData.numberOfFish !== undefined && speciesData.numberOfFish !== '') || (speciesData.numberOfSharks !== undefined && speciesData.numberOfSharks !== '') ? 'Fish on Board:' : 'Possession Amount:'}</span>
+                    <span class="report-value ${possessionViolation || isProhibited ? 'violation' : ''}">
+                        ${possessionCount} ${getPossessionUnit(speciesId, speciesData)}
+                        ${isProhibited ? ' (PROHIBITED SPECIES)' : possessionViolation ? ' (OVER LIMIT / PROHIBITED)' : ''}
                     </span>
                 </div>
             `;
@@ -3684,7 +3734,7 @@ function generateReport() {
         
         // HMS Reporting requirements
         if (species.regulations?.reporting?.required) {
-            const hmsReported = assessmentData.vessel.requirements?.['hms-reported'] || assessmentData.species[speciesId]?.['hms-reported'];
+            const hmsReported = dataSource.vessel?.requirements?.['hms-reported'] || dataSource.species?.[speciesId]?.['hms-reported'];
             html += `
                 <div class="report-row">
                     <span class="report-label">HMS Catch Reporting:</span>
@@ -3735,19 +3785,31 @@ function generateReport() {
             }
         }
         
-        // Species violations
-        if (violations.length > 0) {
-            html += `
-                <div class="report-row">
-                    <span class="report-label">Violations:</span>
-                    <span class="report-value violation">
-                        <ul class="violation-list-small">
-                            ${violations.map(v => `<li>${v}</li>`).join('')}
-                        </ul>
-                    </span>
-                </div>
-            `;
+        if (typeof AssessmentViolations !== 'undefined' && AssessmentViolations.formatDynamicReportRows) {
+            const dynamicRows = AssessmentViolations.formatDynamicReportRows(speciesId, species, speciesData);
+            dynamicRows.forEach(row => {
+                const rowViolation = hasViolations && violations.some(v =>
+                    row.label && v.toLowerCase().includes(row.label.toLowerCase().slice(0, 12))
+                );
+                html += `
+                    <div class="report-row">
+                        <span class="report-label">${row.label}:</span>
+                        <span class="report-value ${rowViolation ? 'violation' : ''}">${row.value}</span>
+                    </div>
+                `;
+            });
         }
+
+        html += `
+            <div class="report-row">
+                <span class="report-label">Potential Issues:</span>
+                <span class="report-value ${hasViolations ? 'violation' : 'compliant'}">
+                    ${hasViolations
+                        ? `<ul class="violation-list-small">${violations.map(v => `<li>${v}</li>`).join('')}</ul>`
+                        : 'None identified for this species based on entered data.'}
+                </span>
+            </div>
+        `;
         
         html += `</div>`;
     });
@@ -3792,14 +3854,13 @@ function checkAllViolations() {
     }
     
     // Check individual species violations
-    const speciesIds = (window.appState && window.appState.selectedSpecies.length)
-        ? window.appState.selectedSpecies
-        : (window.selectedSpecies || selectedSpecies);
+    const speciesIds = getSelectedSpeciesIds();
     speciesIds.forEach(speciesId => {
         const species = SPECIES_DATA[speciesId];
         if (!species) return;
         
-        const speciesData = (window.assessmentData || assessmentData).species[speciesId] || {};
+        const rawData = (window.assessmentData || assessmentData).species[speciesId] || {};
+        const speciesData = normalizeSpeciesAssessmentData(speciesId, species, rawData);
         const violations = checkSpeciesViolations(speciesId, species, speciesData);
         allViolations.push(...violations);
     });
@@ -3810,24 +3871,190 @@ function checkAllViolations() {
         allViolations.push(...combinedViolations);
     }
     
-    return allViolations;
+    return [...new Set(allViolations)];
 }
 
-// Check if species is prohibited
-function isProhibitedSpecies(speciesId) {
-    const prohibitedSpecies = [
-        'atlantic-wolffish',
-        'windowpane-flounder',
-        'ocean-pout',
-        'oceanic-whitetip-shark',
-        'shortfin-mako-shark',
-        'sandbar-shark',
-        'silky-shark',
-        'dusky-shark'
+/** Fish/lbs count from grouped or dynamic assessment fields. */
+function getSpeciesPossessionCount(speciesData) {
+    if (typeof AssessmentViolations !== 'undefined' && AssessmentViolations.getCountFromData) {
+        return AssessmentViolations.getCountFromData(speciesData);
+    }
+    if (!speciesData) return null;
+    const fields = [
+        speciesData.possessionAmount,
+        speciesData.numberOfFish,
+        speciesData.numberOfSharks,
+        speciesData['possession-amount'],
+        speciesData['number-of-fish']
     ];
-    if (prohibitedSpecies.includes(speciesId)) return true;
+    for (const val of fields) {
+        if (val !== undefined && val !== null && val !== '') {
+            const n = Number(val);
+            return Number.isFinite(n) ? n : 0;
+        }
+    }
+    return null;
+}
+
+/** Align dynamic assessment fields (permitType, numberOfFish) with grouped checks. */
+function normalizeSpeciesAssessmentData(speciesId, species, speciesData) {
+    const data = { ...speciesData };
+    const count = getSpeciesPossessionCount(data);
+    if (count !== null && data.possessionAmount === undefined) {
+        data.possessionAmount = count;
+    }
+    if (data.permitType && !data['permit-type']) {
+        data['permit-type'] = data.permitType;
+    }
+    if (data.permitType && (data['has-permit'] === undefined || data['has-permit'] === '')) {
+        data['has-permit'] = 'yes';
+    }
+    return data;
+}
+
+function getSelectedSpeciesIds() {
+    if (window.appState && window.appState.selectedSpecies && window.appState.selectedSpecies.length) {
+        return window.appState.selectedSpecies;
+    }
+    if (window.selectedSpecies && window.selectedSpecies.length) {
+        return window.selectedSpecies;
+    }
+    return selectedSpecies || [];
+}
+
+function shouldUseDynamicAssessmentQuestions() {
+    if (window.assessmentSteps && typeof window.assessmentSteps.shouldUseDynamicQuestions === 'function') {
+        return window.assessmentSteps.shouldUseDynamicQuestions();
+    }
+    return getSelectedSpeciesIds().some(id => {
+        const species = typeof SPECIES_DATA !== 'undefined' && SPECIES_DATA[id];
+        return species && species.regulations && species.regulations.assessmentQuestions;
+    });
+}
+
+/** Ordered grouped assessment step ids for the current species selection. */
+function getAssessmentStepOrder() {
+    const speciesIds = getSelectedSpeciesIds();
+    const hasMultispecies = speciesIds.some(id => isMultispecies(id));
+    let order;
+    if (shouldUseDynamicAssessmentQuestions()) {
+        order = hasMultispecies
+            ? ['vessel-classification', 'dynamic-assessment']
+            : ['dynamic-assessment'];
+    } else {
+        order = hasMultispecies
+            ? ['vessel-classification', 'permits', 'possession', 'size-gear', 'vessel-requirements']
+            : ['permits', 'possession', 'size-gear', 'vessel-requirements'];
+    }
+    if (!vesselRequirementsStepNeeded()) {
+        order = order.filter(step => step !== 'vessel-requirements');
+    }
+    if (typeof MultispeciesFlow !== 'undefined' && !MultispeciesFlow.vesselClassificationStepNeeded()) {
+        order = order.filter(step => step !== 'vessel-classification');
+    }
+    return order;
+}
+
+function getReportStepNumber() {
+    return 2 + getAssessmentStepOrder().length;
+}
+
+function groupedStepNameToStepNumber(stepName) {
+    const order = getAssessmentStepOrder();
+    const idx = order.indexOf(stepName);
+    return idx === -1 ? null : 2 + idx;
+}
+
+function vesselRequirementsStepNeeded() {
+    if (typeof MultispeciesFlow !== 'undefined') {
+        return MultispeciesFlow.vesselRequirementsStepNeeded();
+    }
+    const speciesIds = getSelectedSpeciesIds();
+    const requiresScallop = speciesIds.includes('atlantic-sea-scallop');
+    const hmsReportingSpecies = ['bluefin-tuna', 'swordfish', 'billfish'];
+    const requiresHMSReporting = speciesIds.some(id => hmsReportingSpecies.includes(id));
+    return requiresScallop || requiresHMSReporting;
+}
+
+function rememberGroupedStep(stepName) {
+    window.lastGroupedStepName = stepName;
+    if (window.appState) {
+        window.appState.lastGroupedStepName = stepName;
+    }
+}
+
+/** Last assessment screen before report (respects skipped vessel-requirements). */
+function getLastAssessmentStepBeforeReport() {
+    const order = getAssessmentStepOrder();
+    const remembered = window.lastGroupedStepName || (window.appState && window.appState.lastGroupedStepName);
+    if (remembered && order.includes(remembered)) {
+        return remembered;
+    }
+    return order[order.length - 1];
+}
+
+/** Return from pre-report or full report to the last assessment step. */
+function restoreLastAssessmentStep() {
+    const stepName = getLastAssessmentStepBeforeReport();
+    const stepNumber = groupedStepNameToStepNumber(stepName);
+    const resultsSection = document.getElementById('results-section');
+    if (resultsSection) {
+        resultsSection.classList.remove('active');
+        resultsSection.style.display = 'none';
+    }
+    if (stepNumber != null) {
+        if (typeof window.navigation !== 'undefined' && window.navigation.showStep) {
+            window.navigation.showStep(stepNumber);
+        } else {
+            showStep(stepNumber);
+        }
+    } else if (typeof showGroupedStep === 'function') {
+        showGroupedStep(stepName);
+    }
+    if (typeof window !== 'undefined') {
+        window.scrollTo(0, 0);
+    }
+}
+
+function backFromPreReport() {
+    closePreReportSummary();
+    restoreLastAssessmentStep();
+}
+
+// Check if species is prohibited (data-driven — all species with zero retention / protected status)
+function isProhibitedSpecies(speciesId) {
+    if (typeof AssessmentViolations !== 'undefined') {
+        return AssessmentViolations.isProhibitedSpecies(speciesId);
+    }
     const entry = typeof SPECIES_DATA !== 'undefined' && SPECIES_DATA[speciesId];
-    return !!(entry && (entry.prohibited || entry.regulations?.possession?.recreational?.prohibited));
+    return !!(entry && entry.prohibited);
+}
+
+function mapPermitTypeToPossessionKey(permitType) {
+    if (typeof AssessmentViolations !== 'undefined') {
+        return AssessmentViolations.mapPermitTypeToPossessionKey(permitType);
+    }
+    if (!permitType) return null;
+    if (permitType.startsWith('commercial')) return 'commercial';
+    if (permitType.startsWith('recreational')) return 'recreational';
+    return permitType;
+}
+
+/** Evaluate assessmentQuestions.violation rules (all dynamic species). */
+function checkAssessmentQuestionViolations(speciesId, species, speciesData) {
+    if (typeof AssessmentViolations !== 'undefined') {
+        return AssessmentViolations.evaluateAssessmentQuestionViolations(speciesId, species, speciesData);
+    }
+    return [];
+}
+
+function getStoredDynamicViolations(speciesId) {
+    const assessmentRef = window.assessmentData || assessmentData;
+    const fromState = window.appState && window.appState.getAssessmentData
+        ? window.appState.getAssessmentData(`violations.${speciesId}`)
+        : null;
+    const list = fromState || assessmentRef?.violations?.[speciesId];
+    return Array.isArray(list) ? list : [];
 }
 
 // Check violations for a species
@@ -3841,53 +4068,60 @@ function checkSpeciesViolations(speciesId, species, speciesData) {
     }
     
     try {
+        const data = normalizeSpeciesAssessmentData(speciesId, species, speciesData);
         const regs = species.regulations;
         const speciesName = species.name ? species.name.toLowerCase() : speciesId.replace(/-/g, ' ');
+        const assessmentRef = window.assessmentData || assessmentData;
+        const permitOk = data['has-permit'] === 'yes' || !!data.permitType;
+
+        violations.push(...checkAssessmentQuestionViolations(speciesId, species, data));
+        violations.push(...getStoredDynamicViolations(speciesId));
         
         // Check for prohibited species - ANY possession is a violation
         if (isProhibitedSpecies(speciesId)) {
-            const possessionAmount = speciesData.possessionAmount || 0;
-            if (possessionAmount > 0) {
-                violations.push(`PROHIBITED SPECIES: ${species.name || speciesName} possession prohibited (50 CFR 648.81)`);
+            const possessionCount = getSpeciesPossessionCount(data) || 0;
+            if (possessionCount > 0) {
+                violations.push(`PROHIBITED SPECIES: ${species.name || speciesName} — retention/possession prohibited (50 CFR 635.23)`);
             }
         }
         
         // Permit violations
-        if (speciesData['has-permit'] === 'no') {
+        if (data['has-permit'] === 'no') {
             const cfr = regs?.permits && Object.values(regs.permits).length > 0 ? 
                 Object.values(regs.permits)[0]?.cfr : null;
             violations.push(`No valid federal ${speciesName} permit${cfr ? ` (${cfr})` : ''}`);
-        } else if (speciesData['has-permit'] === 'expired') {
+        } else if (data['has-permit'] === 'expired') {
             violations.push(`Expired federal ${speciesName} permit`);
         }
         
-        // Only check other violations if permit exists and regulations are available
-        if (speciesData['has-permit'] === 'yes' && regs) {
-            // Possession limits (skip for prohibited species as they're already flagged)
+        if (permitOk && regs) {
             if (!isProhibitedSpecies(speciesId)) {
-                const possessionViolations = checkPossessionViolations(speciesId, species, speciesData);
+                const possessionViolations = checkPossessionViolations(speciesId, species, data);
                 violations.push(...possessionViolations);
             }
             
-            // Size violations
-            if (speciesData['size-compliant'] === 'no') {
+            if (data['size-compliant'] === 'no') {
                 const cfr = regs.size?.cfr || regs.size?.commercialCFR;
                 violations.push(`Undersized ${speciesName} present${cfr ? ` (${cfr})` : ''}`);
             }
+
+            if (data.lowerJawForkLength != null && data.lowerJawForkLength !== '' && regs.size?.minimum) {
+                const ljfl = Number(data.lowerJawForkLength);
+                if (Number.isFinite(ljfl) && ljfl < regs.size.minimum) {
+                    violations.push(`Undersized ${speciesName}: ${ljfl}" below ${regs.size.minimum}" minimum (${regs.size.cfr || 'size limit'})`);
+                }
+            }
             
-            // Gear violations
-            const gearViolations = checkGearViolations(speciesId, species, speciesData);
+            const gearViolations = checkGearViolations(speciesId, species, data);
             violations.push(...gearViolations);
             
-            // Additional violations (for scallops)
             if (speciesId === 'atlantic-sea-scallop') {
-                const additionalViolations = checkScallopAdditionalViolations(speciesData);
+                const additionalViolations = checkScallopAdditionalViolations(data);
                 violations.push(...additionalViolations);
             }
             
-            // HMS Reporting violations
             if (regs.reporting && regs.reporting.required) {
-                const hmsReported = assessmentData.vessel.requirements?.['hms-reported'] || speciesData['hms-reported'];
+                const hmsReported = assessmentRef.vessel?.requirements?.['hms-reported'] || data['hms-reported'];
                 if (hmsReported === 'no') {
                     violations.push(`HMS catch reporting required but not completed for ${speciesName} (${regs.reporting.cfr})`);
                 }
@@ -3899,6 +4133,57 @@ function checkSpeciesViolations(speciesId, species, speciesData) {
         violations.push(`Error checking compliance for ${speciesName} - manual verification required`);
     }
     
+    return [...new Set(violations)];
+}
+
+// Check possession limits from regulations.possession[permitType] (dynamic HMS assessments)
+function checkRegulationPossessionLimits(speciesId, species, speciesData) {
+    const violations = [];
+    const permitType = speciesData.permitType || speciesData['permit-type'];
+    const possessionRules = species.regulations?.possession;
+    if (!possessionRules || !permitType) return violations;
+
+    const possessionKey = possessionRules[permitType]
+        ? permitType
+        : mapPermitTypeToPossessionKey(permitType);
+    const rule = possessionKey ? possessionRules[possessionKey] : null;
+    if (!rule) return violations;
+
+    const count = getSpeciesPossessionCount(speciesData);
+    if (count === null) return violations;
+
+    if (rule.prohibited && count > 0) {
+        violations.push(`PROHIBITED: ${species.name} retention not allowed under ${rule.name || permitType} (${rule.cfr || ''})`);
+        return violations;
+    }
+
+    const lim = rule.limit;
+    if (lim && typeof lim === 'object' && lim.count != null && count > lim.count) {
+        violations.push(`${species.name} possession exceeds limit: ${count} vs ${lim.count} ${lim.unit || rule.unit || 'fish'} (${rule.cfr || ''})`);
+    }
+    return violations;
+}
+
+// Check limits from assessmentQuestions.possessionLimitCheck (swordfish, etc.)
+function checkAssessmentQuestionLimits(speciesId, species, speciesData) {
+    const violations = [];
+    const limitCheck = species.regulations?.assessmentQuestions?.possessionLimitCheck;
+    if (!limitCheck?.limits) return violations;
+
+    const permitType = speciesData.permitType || speciesData['permit-type'];
+    const count = getSpeciesPossessionCount(speciesData);
+    if (count === null || !permitType) return violations;
+
+    const limitRule = limitCheck.limits[permitType];
+    if (limitRule === undefined || limitRule === null) return violations;
+
+    const cfr = limitCheck.cfr || limitCheck.violation?.ifExceeds || '';
+
+    if (limitRule.prohibited || (limitRule.count === 0 && count > 0)) {
+        violations.push(`Possession prohibited for selected permit category${cfr ? ` (${cfr})` : ''}`);
+    } else if (limitRule.count != null && count > limitRule.count) {
+        violations.push(`Possession exceeds limit: ${count} vs ${limitRule.count} ${limitRule.unit || 'fish'}${cfr ? ` (${cfr})` : ''}`);
+    }
     return violations;
 }
 
@@ -3906,12 +4191,8 @@ function checkSpeciesViolations(speciesId, species, speciesData) {
 function checkPossessionViolations(speciesId, species, speciesData) {
     const violations = [];
     
-    if (!species || speciesData.possessionAmount === undefined) return violations;
-    
-    // Only check possession for species with defined possession rules
-    if (!species.regulations || !species.regulations.possession) {
-        return violations; // No possession rules defined for this species
-    }
+    if (!species) return violations;
+    if (getSpeciesPossessionCount(speciesData) === null) return violations;
     
     try {
         if (speciesId === 'summer-flounder') {
@@ -3923,10 +4204,16 @@ function checkPossessionViolations(speciesId, species, speciesData) {
         } else if (speciesId === 'atlantic-cod' || speciesId === 'haddock') {
             violations.push(...checkGroundfishPossession(speciesId, species, speciesData));
         } else if (isMultispecies(speciesId)) {
-            if (speciesData.possessionAmount && speciesData.possessionAmount > 0) {
-                // Other groundfish: manual ACE/trip verification
-            }
+            violations.push(...checkMultispeciesGroupedPossession(speciesId, species, speciesData));
         }
+
+        const hasDedicatedPossessionCheck = [
+            'summer-flounder', 'atlantic-sea-scallop', 'bluefin-tuna', 'atlantic-cod', 'haddock'
+        ].includes(speciesId);
+        if (species.regulations?.possession && !hasDedicatedPossessionCheck) {
+            violations.push(...checkRegulationPossessionLimits(speciesId, species, speciesData));
+        }
+        violations.push(...checkAssessmentQuestionLimits(speciesId, species, speciesData));
     } catch (error) {
         console.error(`Error checking possession violations for ${speciesId}:`, error);
         violations.push(`Error checking possession limits - manual verification required`);
@@ -4174,13 +4461,39 @@ function checkBluefinTunaPossession(species, speciesData) {
     return violations;
 }
 
+// Grouped multispecies: size compliance + cod/haddock-style trip limits when configured
+function checkMultispeciesGroupedPossession(speciesId, species, speciesData) {
+    const violations = [];
+    if (speciesData['size-compliant'] === 'no') {
+        const cfr = species.regulations?.size?.cfr || '50 CFR 648.83';
+        violations.push(`Undersized ${species.name || speciesId} present (${cfr})`);
+    }
+    if (MULTISPECIES_TRIP_LIMIT_SPECIES && MULTISPECIES_TRIP_LIMIT_SPECIES.includes(speciesId)) {
+        violations.push(...checkGroundfishPossession(speciesId, species, speciesData));
+    } else if (typeof getGroundfishTripLimit === 'function') {
+        violations.push(...checkGroundfishPossession(speciesId, species, speciesData));
+    }
+    const rec = species.regulations?.possession?.recreational;
+    const count = getSpeciesPossessionCount(speciesData);
+    if (count !== null && rec?.limit?.count != null && count > rec.limit.count) {
+        violations.push(`${species.name} recreational possession exceeds ${rec.limit.count} ${rec.limit.unit || 'fish'} (${rec.cfr || '50 CFR 648.83'})`);
+    }
+    return violations;
+}
+
+const MULTISPECIES_TRIP_LIMIT_SPECIES = ['atlantic-cod', 'haddock'];
+
 // Check Northeast multispecies common pool trip limits (cod, haddock)
 function checkGroundfishPossession(speciesId, species, speciesData) {
     const violations = [];
     const amount = Number(speciesData.possessionAmount || speciesData['possession-amount'] || 0);
     if (!amount || amount <= 0) return violations;
 
-    const vesselCategory = speciesData.vesselCategory || speciesData['vessel-category'];
+    const assessmentRef = window.assessmentData || assessmentData;
+    const vesselCategory = speciesData.vesselCategory || speciesData['vessel-category']
+        || speciesData.vesselClassification
+        || assessmentRef.vessel?.multispecies?.classification
+        || assessmentRef.vesselClassification;
     if (vesselCategory !== 'common-pool') return violations;
 
     const stockArea = speciesData.fishingArea || speciesData['fishing-area'];
@@ -4375,43 +4688,8 @@ function printReport() {
 }
 
 function goBackToEdit() {
-    // Go back to the vessel requirements step (last step before results)
-    // This allows users to edit their inputs and navigate back through all steps
-    
-    // Determine if we have multispecies to calculate correct step number
-    let hasMultispecies = false;
-    let selectedSpeciesList = [];
-    
-    // Try to get from new state system first
-    if (typeof window.appState !== 'undefined' && window.appState.selectedSpecies) {
-        selectedSpeciesList = window.appState.selectedSpecies;
-        if (typeof window.navigation !== 'undefined' && window.navigation.isMultispecies) {
-            hasMultispecies = selectedSpeciesList.some(id => window.navigation.isMultispecies(id));
-        }
-    }
-    
-    // Fallback to old system
-    if (selectedSpeciesList.length === 0 && typeof selectedSpecies !== 'undefined') {
-        selectedSpeciesList = selectedSpecies;
-        if (typeof isMultispecies === 'function') {
-            hasMultispecies = selectedSpeciesList.some(id => isMultispecies(id));
-        }
-    }
-    
-    // Calculate the step number for vessel requirements
-    // For multispecies: step 6 = vessel-requirements (step 2 + 4)
-    // For non-multispecies: step 5 = vessel-requirements (step 2 + 3)
-    const vesselRequirementsStep = hasMultispecies ? 6 : 5;
-    
-    // Use navigation if available, otherwise use showStep
-    if (typeof window.navigation !== 'undefined' && window.navigation.showStep) {
-        window.navigation.showStep(vesselRequirementsStep);
-    } else if (typeof showStep === 'function') {
-        showStep(vesselRequirementsStep);
-    } else {
-        console.error('Navigation function not available');
-        alert('Unable to navigate back. Please refresh the page.');
-    }
+    closePreReportSummary();
+    restoreLastAssessmentStep();
 }
 
 function startOver() {
@@ -4463,6 +4741,22 @@ if (typeof window !== 'undefined') {
     if (typeof goBackToEdit === 'function') {
         window.goBackToEdit = goBackToEdit;
     }
-    
-    // Test that functions are accessible
+    if (typeof goHome === 'function') {
+        window.goHome = goHome;
+    }
+    if (typeof hideAssessmentAndResultsUI === 'function') {
+        window.hideAssessmentAndResultsUI = hideAssessmentAndResultsUI;
+    }
+    if (typeof backFromPreReport === 'function') {
+        window.backFromPreReport = backFromPreReport;
+    }
+    if (typeof restoreLastAssessmentStep === 'function') {
+        window.restoreLastAssessmentStep = restoreLastAssessmentStep;
+    }
+    if (typeof getAssessmentStepOrder === 'function') {
+        window.getAssessmentStepOrder = getAssessmentStepOrder;
+    }
+    if (typeof getReportStepNumber === 'function') {
+        window.getReportStepNumber = getReportStepNumber;
+    }
 }

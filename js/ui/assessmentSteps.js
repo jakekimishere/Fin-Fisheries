@@ -42,8 +42,11 @@ class AssessmentSteps {
             }
 
             // If we have multispecies, add vessel classification step
-            if (multispeciesSelected.length > 0) {
+            if (multispeciesSelected.length > 0
+                && (typeof MultispeciesFlow === 'undefined' || MultispeciesFlow.vesselClassificationStepNeeded())) {
                 this.createVesselClassificationSection();
+            } else if (multispeciesSelected.length > 0 && typeof MultispeciesFlow !== 'undefined') {
+                MultispeciesFlow.applyDefaultVesselClassification();
             }
 
             // Create grouped assessment sections
@@ -54,7 +57,9 @@ class AssessmentSteps {
                 this.createPermitsSection();
                 this.createPossessionSection();
                 this.createSizeGearSection();
-                this.createVesselRequirementsSection();
+                if (typeof vesselRequirementsStepNeeded === 'function' ? vesselRequirementsStepNeeded() : true) {
+                    this.createVesselRequirementsSection();
+                }
             }
 
         } catch (error) {

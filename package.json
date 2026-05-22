@@ -1,0 +1,11 @@
+{
+  "name": "fin-fisheries-inspection-navigator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FIN - Fisheries Inspection Navigator (Northeast)",
+  "scripts": {
+    "validate": "node scripts/validate-species-data.js && node scripts/validate-violation-coverage.js",
+    "validate:species": "node scripts/validate-species-data.js",
+    "validate:violations": "node scripts/validate-violation-coverage.js"
+  }
+}

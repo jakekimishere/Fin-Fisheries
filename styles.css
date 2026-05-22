@@ -69,6 +69,54 @@ header {
     letter-spacing: 2px;
     margin-bottom: 10px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.header-badge:hover,
+.header-badge:focus-visible {
+    background: var(--gold-light);
+    outline: 2px solid var(--white);
+    outline-offset: 2px;
+}
+
+.header-badge:active {
+    transform: scale(0.98);
+}
+
+.report-summary-banner {
+    padding: 16px 18px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 2px solid transparent;
+}
+
+.report-summary-banner.violation {
+    background: var(--red-light);
+    border-color: var(--red);
+    color: var(--red);
+}
+
+.report-summary-banner.compliant {
+    background: var(--green-light);
+    border-color: var(--green);
+    color: var(--green);
+}
+
+.report-species-status {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.report-species-status.violation {
+    color: var(--red);
+}
+
+.report-species-status.compliant {
+    color: var(--green);
 }
 
 header h1 {
@@ -1675,9 +1723,11 @@ footer p {
         max-width: 100%;
     }
     
+    header,
     .progress-container,
     .nav-buttons,
     .report-actions,
+    .pre-report-overlay,
     footer {
         display: none !important;
     }
