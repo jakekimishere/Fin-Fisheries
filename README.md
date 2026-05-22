@@ -13,9 +13,25 @@ Offline-capable web app for Northeast fisheries and Atlantic HMS compliance asse
 - Printable compliance report with CFR citations
 - PWA offline support after first load
 
+## Live app (GitHub Pages)
+
+**URL:** [https://jakekimishere.github.io/Fin-Fisheries/](https://jakekimishere.github.io/Fin-Fisheries/)
+
+Use that exact path (repo name is case-sensitive: `Fin-Fisheries`).
+
+### If you see a 404
+
+1. Open repo **Settings → Pages**.
+2. Under **Build and deployment**, set **Source** to **GitHub Actions** (not “Deploy from branch” unless you prefer that).
+3. After pushing `main`, open the **Actions** tab → **Deploy to GitHub Pages** → wait for green check.
+4. Confirm the repo is **Public** (private repos need GitHub Pro for Pages on personal accounts).
+5. Wait 1–2 minutes, then hard-refresh the live URL (Ctrl+F5).
+
+Local testing: open `index.html` directly or use any static file server.
+
 ## Quick start
 
-1. Open `index.html` in a modern browser (or serve the folder with any static host).
+1. Open the live link above (or `index.html` locally).
 2. Select **Northeast Regional Fisheries** → choose species → complete assessment → print report.
 
 ## Project layout
