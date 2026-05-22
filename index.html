@@ -37,7 +37,7 @@
                 <div class="homepage-update-notice">
                     <div class="update-notice-icon">📅</div>
                     <div class="update-notice-text">
-                        <strong>Last NOAA Update:</strong> <span id="homepage-last-update-date">Loading...</span>
+                        <strong>Last NOAA Update:</strong> <span id="homepage-last-update-date">2026-05-21</span>
                     </div>
                 </div>
                 
@@ -140,11 +140,11 @@
             </div>
 
             <!-- Pre-report violation summary (shown before full report) -->
-            <div id="pre-report-overlay" class="pre-report-overlay" style="display: none;" role="dialog" aria-labelledby="pre-report-title">
+            <div id="pre-report-overlay" class="pre-report-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="pre-report-title">
                 <div class="pre-report-panel">
                     <h2 id="pre-report-title">Assessment Summary</h2>
                     <p class="pre-report-subtitle">Review potential compliance issues before generating the full report.</p>
-                    <div id="pre-report-body"></div>
+                    <div id="pre-report-body" aria-live="polite"></div>
                     <div class="pre-report-actions">
                         <button type="button" class="btn-secondary" onclick="backFromPreReport()">← Back to Assessment</button>
                         <button type="button" class="btn-primary" id="pre-report-confirm-btn" onclick="confirmGenerateReport()">Generate Full Report →</button>
@@ -167,7 +167,7 @@
 
         <footer>
             <p>Reference: 50 USC 648 | Data sourced from NOAA Greater Atlantic Regional Fisheries Office</p>
-            <p class="disclaimer"><strong>⚠️ DISCLAIMER:</strong> This is a personal project and is NOT affiliated with, endorsed by, or representative of the U.S. Coast Guard or any government agency. Always verify current regulations with official NOAA sources. Last updated: <span id="last-update-date">Loading...</span></p>
+            <p class="disclaimer"><strong>⚠️ DISCLAIMER:</strong> This is a personal project and is NOT affiliated with, endorsed by, or representative of the U.S. Coast Guard or any government agency. Always verify current regulations with official NOAA sources. Last updated: <span id="last-update-date">2026-05-21</span></p>
             <p class="data-sources">
                 <small>
                     Sources: <a href="https://www.fisheries.noaa.gov/bulletin/2025-specifications-summer-flounder-scup-black-sea-bass-and-bluefish-fisheries" target="_blank">NOAA 2025 Summer Flounder Specifications</a> | 
@@ -184,6 +184,7 @@
     <script src="update-checker.js"></script>
     <script src="REGULATION_DATES_CONFIG.js"></script>
     <script src="GROUND_FISH_TRIP_LIMITS_CONFIG.js"></script>
+    <script src="FISHERY_QUOTA_STATUS_CONFIG.js"></script>
     <script src="SPECIES_GROUPS_CONFIG.js"></script>
 
     <!-- Utils & state -->
@@ -201,6 +202,7 @@
     <script src="js/ui/speciesGrid.js"></script>
     <script src="js/ui/questionRenderer.js"></script>
     <script src="js/ui/assessmentSteps.js"></script>
+    <script src="js/ui/reportBuilder.js"></script>
     <script src="js/ui/reportGenerator.js"></script>
 
     <!-- Legacy assessment engine (violations, grouped UI, report HTML) -->

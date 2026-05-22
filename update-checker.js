@@ -352,17 +352,19 @@ function getDataVersion() {
     };
 }
 
-// Update footer date dynamically
+// Update footer and homepage dates from REGULATION_META
 function updateFooterDate() {
-    const footerDateElement = document.getElementById('last-update-date');
-    if (footerDateElement) {
-        footerDateElement.textContent = formatDate(DATA_LAST_UPDATED);
-    }
-    
-    // Also update homepage date
-    const homepageDateElement = document.getElementById('homepage-last-update-date');
-    if (homepageDateElement) {
-        homepageDateElement.textContent = formatDate(DATA_LAST_UPDATED);
-    }
+    const dateText = typeof formatDate === 'function'
+        ? formatDate(DATA_LAST_UPDATED)
+        : DATA_LAST_UPDATED;
+    ['last-update-date', 'homepage-last-update-date'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = dateText;
+    });
+}
+
+/** @deprecated Prefer updateFooterDate — kept for callers in assessmentEngine */
+function updateHomepageUpdateDate() {
+    updateFooterDate();
 }
 

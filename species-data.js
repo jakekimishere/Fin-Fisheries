@@ -694,7 +694,7 @@ SPECIES_DATA['bluefin-tuna'] = {
                 limit: null, // Varies by quota allocation and season
                 unit: 'fish',
                 cfr: '50 CFR 635.23',
-                notes: 'Subject to quota allocation and category-specific limits. Check current retention limits and seasonal closures.',
+                notes: 'Subject to quota and season. Jan 14–Mar 31, 2026 General Category closure for large medium/giant (≥73" CFL). June 2026: 3 fish/vessel/day; July–Aug: 1 fish on open days; RFDs Tue/Fri/Sat = 0.',
                 minimumSize: 73,
                 sizeUnit: 'inches CFL',
                 allowedSizeClasses: ['large-medium', 'giant'],
@@ -731,7 +731,7 @@ SPECIES_DATA['bluefin-tuna'] = {
                 limit: null, // Varies by quota allocation
                 unit: 'fish',
                 cfr: '50 CFR 635.23',
-                notes: 'Harpoon Category has separate quota allocation. Limits vary by size class and season. Check current retention limits.',
+                notes: 'Harpoon Category: up to 5 large medium/giant combined per vessel per day/trip (max 2 large medium). Separate quota allocation.',
                 minimumSize: 73,
                 sizeUnit: 'inches CFL',
                 allowedSizeClasses: ['large-medium', 'giant'],
@@ -769,7 +769,7 @@ SPECIES_DATA['bluefin-tuna'] = {
                 limit: null, // Varies by quota allocation
                 unit: 'fish',
                 cfr: '50 CFR 635.23',
-                notes: 'Trap Category has separate quota allocation. Limits vary by size class and season. Check current retention limits.',
+                notes: 'Trap Category: 1 large medium or giant per vessel per year. Separate quota allocation.',
                 minimumSize: 73,
                 sizeUnit: 'inches CFL',
                 allowedSizeClasses: ['large-medium', 'giant'],
@@ -826,8 +826,8 @@ SPECIES_DATA['bluefin-tuna'] = {
                     limit: { count: 1, period: 'per vessel per year' },
                     status: {
                         south: 'Closed through Dec 31, 2026',
-                        sne: 'Check NOAA bulletin',
-                        gom: 'Check NOAA bulletin'
+                        sne: 'Verify NOAA HMS bulletin for trophy quota',
+                        gom: 'Verify NOAA HMS bulletin for trophy quota'
                     },
                     notes: 'Southern area trophy fishery closed effective Jan 13, 2026 through Dec 31, 2026 (≥73" CFL). Other areas: verify current NOAA HMS bulletins.'
                 }
@@ -852,8 +852,8 @@ SPECIES_DATA['bluefin-tuna'] = {
                     limit: { count: 1, period: 'per vessel per year' },
                     status: {
                         south: 'Closed through Dec 31, 2026',
-                        sne: 'Check NOAA bulletin',
-                        gom: 'Check NOAA bulletin'
+                        sne: 'Verify NOAA HMS bulletin for trophy quota',
+                        gom: 'Verify NOAA HMS bulletin for trophy quota'
                     },
                     notes: 'Southern area trophy fishery closed effective Jan 13, 2026 through Dec 31, 2026 (≥73" CFL). Other areas: verify current NOAA HMS bulletins.'
                 }
@@ -963,6 +963,29 @@ SPECIES_DATA['bluefin-tuna'] = {
                 cfr: '50 CFR 635.23',
                 notes: 'Count all bluefin tuna currently on board the vessel'
             },
+            possessionLimitCheck: {
+                question: 'Does retention exceed the permit daily limit?',
+                field: 'exceedsLimit',
+                type: 'auto',
+                dependsOn: ['permitType', 'numberOfFish', 'restrictedFishingDay', 'dateOfCatch'],
+                autoCheck: true,
+                useAssessmentDate: true,
+                limits: {
+                    'commercial-general': null,
+                    'commercial-harpoon': { count: 5 },
+                    'commercial-longline': null,
+                    'commercial-trap': { count: 1 },
+                    'commercial-purse-seine': { count: 0, prohibited: true },
+                    'commercial-charter-headboat': null,
+                    'recreational': { count: 1 },
+                    'recreational-charter-headboat': { count: 1 }
+                },
+                violation: {
+                    ifExceeds: 'VIOLATION: Bluefin tuna possession exceeds daily/category limit (50 CFR 635.23)',
+                    ifProhibited: 'VIOLATION: Bluefin tuna retention prohibited — fishery closed or category restriction (50 CFR 635.23)'
+                },
+                cfr: '50 CFR 635.23'
+            },
             fishMeasurements: {
                 question: 'What are the curved fork length (CFL) measurements of each fish?',
                 field: 'fishMeasurements',
@@ -1017,7 +1040,7 @@ SPECIES_DATA['bluefin-tuna'] = {
                     // Use: const month = new Date(assessmentDate).getMonth() + 1;
                     // if (![7,8,9,10,11].includes(month)) { skip this question }
                 },
-                notes: 'RFDs may apply July 1 - November 30 for commercial permits. Check current RFD schedule.',
+                notes: 'RFDs apply July 1–November 30: Tuesday, Friday, and Saturday = 0 large medium/giant retention.',
                 violation: {
                     ifTrue: 'Commercial fishing for bluefin tuna is prohibited on Restricted Fishing Days'
                 },
@@ -9766,30 +9789,33 @@ SPECIES_DATA['atlantic-salmon'] = {
         },
         possession: {
             'commercial': {
-                name: 'Commercial',
-                limit: null,
-                unit: 'lbs',
-                cfr: '50 CFR 648.4',
-                notes: 'Check current regulations and quotas'
+                name: 'Commercial / EEZ',
+                limit: { count: 0 },
+                unit: 'fish',
+                prohibited: true,
+                cfr: '50 CFR 648.40',
+                notes: 'Possession in the EEZ is prohibited (prima facie evidence of violation). Incidental catch must be released for maximum survival.'
             },
             'recreational': {
-                name: 'Recreational',
-                limit: null,
+                name: 'Recreational / EEZ',
+                limit: { count: 0 },
                 unit: 'fish',
-                cfr: null,
-                notes: 'Check state regulations'
+                prohibited: true,
+                cfr: '50 CFR 648.40',
+                notes: 'Possession in federal waters prohibited except fish being sorted on deck. Verify state-waters harvest if applicable.'
             }
         },
         size: {
             minimum: null,
-            unit: 'varies',
-            cfr: null,
-            notes: 'Check current size requirements'
+            unit: 'n/a',
+            cfr: '50 CFR 648.40',
+            notes: 'No retention in EEZ — size not applicable for possessed salmon.'
         },
         seasons: {
             federal: {
-                open: 'Check current regulations',
-                notes: 'Regulations vary by area and season'
+                open: 'EEZ possession prohibited',
+                cfr: '50 CFR 648.40',
+                notes: 'Directed or retained Atlantic salmon in the EEZ is prohibited.'
             }
         },
         assessmentQuestions: {
@@ -9804,21 +9830,39 @@ SPECIES_DATA['atlantic-salmon'] = {
                 cfr: '50 CFR 648.4'
             },
             possessionAmount: {
-                question: 'What is the possession amount on board?',
-                field: 'possessionAmount',
+                question: 'How many Atlantic salmon are on board?',
+                field: 'numberOfFish',
                 required: true,
                 type: 'number',
-                unit: 'lbs',
+                unit: 'fish',
                 dependsOn: ['permitType'],
-                notes: 'Record total weight in pounds (commercial) or number of fish (recreational)',
-                cfr: '50 CFR 648.4'
+                notes: 'Any salmon on board in the EEZ is a presumptive violation unless rebutted (state waters, aquaculture, etc.).',
+                cfr: '50 CFR 648.40',
+                violation: {
+                    ifProhibited: 'VIOLATION: Atlantic salmon possession prohibited in EEZ (50 CFR 648.40)'
+                }
+            },
+            possessionLimitCheck: {
+                question: 'Retention check (auto)',
+                field: 'exceedsLimit',
+                type: 'auto',
+                dependsOn: ['permitType', 'numberOfFish'],
+                autoCheck: true,
+                limits: {
+                    commercial: { count: 0, prohibited: true },
+                    recreational: { count: 0, prohibited: true }
+                },
+                violation: {
+                    ifProhibited: 'VIOLATION: Atlantic salmon possession prohibited in EEZ (50 CFR 648.40)'
+                },
+                cfr: '50 CFR 648.40'
             },
             stateRegulations: {
                 question: 'Have state regulations been checked?',
                 field: 'stateRegulationsChecked',
                 required: true,
                 type: 'boolean',
-                notes: 'Atlantic salmon regulations vary by area and season. Check current regulations and state requirements.',
+                notes: 'EEZ possession prohibited (50 CFR 648.40). If fish are from state waters or aquaculture, document source to rebut presumption.',
                 cfr: '50 CFR 648.4'
             },
             reportingStatus: {
@@ -10156,21 +10200,21 @@ SPECIES_DATA['atlantic-herring'] = {
                 limit: null,
                 unit: 'lbs',
                 cfr: '50 CFR 648.200',
-                notes: 'Subject to quota and area-specific limits. Check current regulations.'
+                notes: 'Area 1A/1B: 2,000 lb per trip/day when 92% sub-ACL projected (verify NOAA bulletin). Areas 2–3: phase limits per 50 CFR 648.201.'
             },
             'recreational': {
                 name: 'Recreational',
                 limit: null,
                 unit: 'lbs',
                 cfr: null,
-                notes: 'Check state regulations'
+                notes: 'No federal recreational herring limit — verify state measures.'
             }
         },
         size: {
             minimum: null,
-            unit: 'varies',
+            unit: 'n/a',
             cfr: '50 CFR 648.200',
-            notes: 'Check current size requirements'
+            notes: 'No federal minimum size for Atlantic herring.'
         },
         gear: {
             'purse-seine': {
@@ -10220,10 +10264,10 @@ SPECIES_DATA['atlantic-herring'] = {
                 dependsOn: ['permitType', 'possessionAmount'],
                 autoCheck: true,
                 limits: {
-                    'commercial': null, // Subject to quota and area-specific limits
-                    'recreational': null // Check state regulations
+                    'commercial': null,
+                    'recreational': null
                 },
-                notes: 'Commercial limits subject to quota and area-specific limits - check current regulations. Recreational: Check state regulations.',
+                notes: 'Commercial: 2,000 lb/trip/day in Areas 1A/1B when in-season adjustment active. Recreational: state measures.',
                 violation: {
                     ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or quota (50 CFR 648.200)'
                 },
@@ -10237,8 +10281,8 @@ SPECIES_DATA['atlantic-herring'] = {
                 dependsOn: ['permitType'],
                 applicablePermits: ['commercial'],
                 options: [
-                    { value: 'area-1a', label: 'Area 1A', notes: 'Area 1A specific limits apply' },
-                    { value: 'area-1b', label: 'Area 1B', notes: 'Area 1B specific limits apply' },
+                    { value: 'area-1a', label: 'Area 1A', notes: '2,000 lb/trip/day when 92% sub-ACL adjustment active (2026)' },
+                    { value: 'area-1b', label: 'Area 1B', notes: '2,000 lb/trip/day effective Jan 9, 2026 per NOAA bulletin' },
                     { value: 'area-2', label: 'Area 2', notes: 'Area 2 specific limits apply' },
                     { value: 'area-3', label: 'Area 3', notes: 'Area 3 specific limits apply' },
                     { value: 'closed-area', label: 'Closed Area', violation: true, notes: 'VIOLATION: Fishing prohibited in closed areas' }
@@ -10270,7 +10314,8 @@ SPECIES_DATA['atlantic-herring'] = {
                 dependsOn: ['permitType'],
                 applicablePermits: ['commercial'],
                 autoCheck: true,
-                notes: 'Check current quota status - fishery may close when quota is reached',
+                notes: 'Auto: verify NOAA/ASMFC bulletin — fishery closes at quota.',
+                quotaClosedViolation: 'VIOLATION: Atlantic herring commercial fishery closed due to quota (50 CFR 648.200)',
                 cfr: '50 CFR 648.200'
             },
             reportingStatus: {
@@ -10316,21 +10361,21 @@ SPECIES_DATA['skate'] = {
                 limit: null,
                 unit: 'lbs',
                 cfr: '50 CFR 648.320',
-                notes: 'Subject to quota and trip limits. Check current regulations.'
+                notes: 'Skate wing DAS limits: 4,000 lb (May 1–Aug 31) or 6,000 lb (Sep 1–Apr 30); incidental 500 lb when reduced (50 CFR 648.322).'
             },
             'recreational': {
                 name: 'Recreational',
                 limit: null,
                 unit: 'fish',
                 cfr: null,
-                notes: 'Check state regulations'
+                notes: 'No federal recreational skate limit — verify state measures.'
             }
         },
         size: {
             minimum: null,
-            unit: 'varies by species',
+            unit: 'n/a',
             cfr: '50 CFR 648.320',
-            notes: 'Check species-specific size requirements'
+            notes: 'No federal minimum size under skate wing fishery; species-specific rules may apply.'
         },
         seasons: {
             federal: {
@@ -10449,21 +10494,21 @@ SPECIES_DATA['silver-hake'] = {
                 limit: null,
                 unit: 'lbs',
                 cfr: '50 CFR 648.86',
-                notes: 'Check current trip limits'
+                notes: 'Combined silver/offshore hake: 15,000 lb (<3" mesh) or 30,000/40,000 lb (≥3" mesh by exemption area) per 50 CFR 648.86(d).'
             },
             'recreational': {
                 name: 'Recreational',
                 limit: null,
                 unit: 'fish',
                 cfr: null,
-                notes: 'Check state regulations'
+                notes: 'No federal recreational limit — verify state measures.'
             }
         },
         size: {
             minimum: null,
-            unit: 'varies',
+            unit: 'n/a',
             cfr: '50 CFR 648.86',
-            notes: 'Check current size requirements'
+            notes: 'No federal minimum size for silver hake (whiting).'
         },
         assessmentQuestions: {
             permitType: {
@@ -10476,14 +10521,40 @@ SPECIES_DATA['silver-hake'] = {
                 ],
                 cfr: '50 CFR 648.4'
             },
+            meshSize: {
+                question: 'What is the mesh size of nets on board?',
+                field: 'meshSize',
+                required: false,
+                type: 'choice',
+                dependsOn: ['permitType'],
+                applicablePermits: ['commercial'],
+                options: [
+                    { value: 'mesh-under-3', label: 'Less than 3 inches', notes: '15,000 lb combined silver/offshore hake limit' },
+                    { value: 'mesh-3-plus-gom-gb', label: '3 inches or greater (GOM/GB exemption area)', notes: '30,000 lb limit' },
+                    { value: 'mesh-3-plus-sne-ma', label: '3 inches or greater (SNE/MA exemption area)', notes: '40,000 lb limit' }
+                ],
+                cfr: '50 CFR 648.86'
+            },
+            exemptionArea: {
+                question: 'Which exemption area applies (if mesh ≥3")?',
+                field: 'exemptionArea',
+                required: false,
+                type: 'choice',
+                dependsOn: ['meshSize'],
+                options: [
+                    { value: 'gom-gb', label: 'GOM or GB Exemption Area' },
+                    { value: 'sne-ma', label: 'SNE or MA Exemption Area' }
+                ],
+                cfr: '50 CFR 648.80'
+            },
             possessionAmount: {
-                question: 'What is the possession amount on board?',
+                question: 'What is the possession amount on board (lbs)?',
                 field: 'possessionAmount',
                 required: true,
                 type: 'number',
                 unit: 'lbs',
                 dependsOn: ['permitType'],
-                notes: 'Record total weight in pounds',
+                notes: 'Combined silver hake and offshore hake weight in pounds',
                 cfr: '50 CFR 648.86'
             },
             possessionLimitCheck: {
@@ -10491,13 +10562,13 @@ SPECIES_DATA['silver-hake'] = {
                 field: 'exceedsLimit',
                 required: false,
                 type: 'auto',
-                dependsOn: ['permitType', 'possessionAmount'],
+                dependsOn: ['permitType', 'possessionAmount', 'meshSize', 'exemptionArea'],
                 autoCheck: true,
                 limits: {
                     'commercial': null,
                     'recreational': null
                 },
-                notes: 'Commercial limits subject to trip limits - check current regulations. Recreational: Check state regulations.',
+                notes: 'Commercial trip limits per mesh size and exemption area (50 CFR 648.86(d)).',
                 violation: {
                     ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or quota (50 CFR 648.86)'
                 },
@@ -10511,7 +10582,7 @@ SPECIES_DATA['silver-hake'] = {
                 dependsOn: ['permitType'],
                 applicablePermits: ['commercial'],
                 autoCheck: true,
-                notes: 'Check current quota status - fishery may close when quota is reached',
+                notes: 'In-season reduction may lower limits to 2,000 lb combined — verify NOAA bulletin.',
                 cfr: '50 CFR 648.86'
             },
             reportingStatus: {
@@ -10557,21 +10628,21 @@ SPECIES_DATA['longhorn-sculpin'] = {
                 limit: null,
                 unit: 'lbs',
                 cfr: '50 CFR 648.86',
-                notes: 'Check current trip limits'
+                notes: 'No federal common-pool trip limit listed for longhorn sculpin — verify sector/state rules.'
             },
             'recreational': {
                 name: 'Recreational',
                 limit: null,
                 unit: 'fish',
                 cfr: null,
-                notes: 'Check state regulations'
+                notes: 'No federal recreational limit — verify state measures.'
             }
         },
         size: {
             minimum: null,
-            unit: 'varies',
+            unit: 'n/a',
             cfr: null,
-            notes: 'Check current size requirements'
+            notes: 'No federal minimum size for longhorn sculpin.'
         },
         assessmentQuestions: {
             permitType: {
@@ -10599,7 +10670,7 @@ SPECIES_DATA['longhorn-sculpin'] = {
                 field: 'stateRegulationsChecked',
                 required: true,
                 type: 'boolean',
-                notes: 'Check current trip limits and state regulations for size requirements.',
+                notes: 'No federal trip or size limit — verify state and sector rules.',
                 cfr: null
             },
             reportingStatus: {
@@ -11071,21 +11142,21 @@ SPECIES_DATA['thorny-skate'] = {
                 limit: null,
                 unit: 'lbs',
                 cfr: '50 CFR 648.320',
-                notes: 'Subject to quota and trip limits. Check current regulations.'
+                notes: 'Skate wing DAS limits: 4,000 lb (May 1–Aug 31) or 6,000 lb (Sep 1–Apr 30); incidental 500 lb when reduced (50 CFR 648.322).'
             },
             'recreational': {
                 name: 'Recreational',
                 limit: null,
                 unit: 'fish',
                 cfr: null,
-                notes: 'Check state regulations'
+                notes: 'No federal recreational skate limit — verify state measures.'
             }
         },
         size: {
             minimum: null,
-            unit: 'varies',
+            unit: 'n/a',
             cfr: '50 CFR 648.320',
-            notes: 'Check current size requirements'
+            notes: 'No federal minimum size under skate wing fishery.'
         },
         seasons: {
             federal: {
@@ -11126,7 +11197,7 @@ SPECIES_DATA['thorny-skate'] = {
                     'commercial': null, // Subject to quota and trip limits
                     'recreational': null // Check state regulations
                 },
-                notes: 'Commercial limits subject to quota and trip limits - check current regulations. Recreational: Check state regulations.',
+                notes: 'Commercial wing trip limits enforced by season (see 50 CFR 648.322). Recreational: state measures.',
                 violation: {
                     ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or quota (50 CFR 648.320)'
                 },
@@ -11140,7 +11211,7 @@ SPECIES_DATA['thorny-skate'] = {
                 dependsOn: ['permitType'],
                 applicablePermits: ['commercial'],
                 autoCheck: true,
-                notes: 'Check current quota status - fishery may close when quota is reached',
+                notes: 'Quota trigger may reduce wing limit to 500 lb — verify NOAA bulletin.',
                 cfr: '50 CFR 648.320'
             },
             reportingStatus: {
@@ -11186,21 +11257,21 @@ SPECIES_DATA['smooth-skate'] = {
                 limit: null,
                 unit: 'lbs',
                 cfr: '50 CFR 648.320',
-                notes: 'Subject to quota and trip limits. Check current regulations.'
+                notes: 'Skate wing DAS limits: 4,000 lb (May 1–Aug 31) or 6,000 lb (Sep 1–Apr 30); incidental 500 lb when reduced (50 CFR 648.322).'
             },
             'recreational': {
                 name: 'Recreational',
                 limit: null,
                 unit: 'fish',
                 cfr: null,
-                notes: 'Check state regulations'
+                notes: 'No federal recreational skate limit — verify state measures.'
             }
         },
         size: {
             minimum: null,
-            unit: 'varies',
+            unit: 'n/a',
             cfr: '50 CFR 648.320',
-            notes: 'Check current size requirements'
+            notes: 'No federal minimum size under skate wing fishery.'
         },
         seasons: {
             federal: {
@@ -11241,7 +11312,7 @@ SPECIES_DATA['smooth-skate'] = {
                     'commercial': null, // Subject to quota and trip limits
                     'recreational': null // Check state regulations
                 },
-                notes: 'Commercial limits subject to quota and trip limits - check current regulations. Recreational: Check state regulations.',
+                notes: 'Commercial wing trip limits enforced by season (see 50 CFR 648.322). Recreational: state measures.',
                 violation: {
                     ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or quota (50 CFR 648.320)'
                 },
@@ -11255,7 +11326,7 @@ SPECIES_DATA['smooth-skate'] = {
                 dependsOn: ['permitType'],
                 applicablePermits: ['commercial'],
                 autoCheck: true,
-                notes: 'Check current quota status - fishery may close when quota is reached',
+                notes: 'Quota trigger may reduce wing limit to 500 lb — verify NOAA bulletin.',
                 cfr: '50 CFR 648.320'
             },
             reportingStatus: {
@@ -11301,21 +11372,21 @@ SPECIES_DATA['barndoor-skate'] = {
                 limit: null,
                 unit: 'lbs',
                 cfr: '50 CFR 648.320',
-                notes: 'Subject to quota and trip limits. Check current regulations.'
+                notes: 'Skate wing DAS limits: 4,000 lb (May 1–Aug 31) or 6,000 lb (Sep 1–Apr 30); incidental 500 lb when reduced (50 CFR 648.322).'
             },
             'recreational': {
                 name: 'Recreational',
                 limit: null,
                 unit: 'fish',
                 cfr: null,
-                notes: 'Check state regulations'
+                notes: 'No federal recreational skate limit — verify state measures.'
             }
         },
         size: {
             minimum: null,
-            unit: 'varies',
+            unit: 'n/a',
             cfr: '50 CFR 648.320',
-            notes: 'Check current size requirements'
+            notes: 'No federal minimum size under skate wing fishery.'
         },
         seasons: {
             federal: {
@@ -11356,7 +11427,7 @@ SPECIES_DATA['barndoor-skate'] = {
                     'commercial': null, // Subject to quota and trip limits
                     'recreational': null // Check state regulations
                 },
-                notes: 'Commercial limits subject to quota and trip limits - check current regulations. Recreational: Check state regulations.',
+                notes: 'Commercial wing trip limits enforced by season (see 50 CFR 648.322). Recreational: state measures.',
                 violation: {
                     ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or quota (50 CFR 648.320)'
                 },
@@ -11370,7 +11441,7 @@ SPECIES_DATA['barndoor-skate'] = {
                 dependsOn: ['permitType'],
                 applicablePermits: ['commercial'],
                 autoCheck: true,
-                notes: 'Check current quota status - fishery may close when quota is reached',
+                notes: 'Quota trigger may reduce wing limit to 500 lb — verify NOAA bulletin.',
                 cfr: '50 CFR 648.320'
             },
             reportingStatus: {
@@ -12508,26 +12579,26 @@ SPECIES_DATA['tigerfish'] = {
                 limit: null,
                 unit: 'lbs',
                 cfr: null,
-                notes: 'Check current regulations'
+                notes: 'No federal NE multispecies limit — verify state and local rules.'
             },
             'recreational': {
                 name: 'Recreational',
                 limit: null,
                 unit: 'fish',
                 cfr: null,
-                notes: 'Check state regulations'
+                notes: 'No federal limit — verify state measures.'
             }
         },
         size: {
             minimum: null,
-            unit: 'varies',
+            unit: 'n/a',
             cfr: null,
-            notes: 'Check current size requirements'
+            notes: 'No federal minimum size.'
         },
         seasons: {
             federal: {
-                open: 'Check current regulations',
-                notes: 'Regulations vary by area'
+                open: 'State-managed',
+                notes: 'No federal FMP entry for tigerfish in Northeast — verify state regulations.'
             }
         },
         assessmentQuestions: {
@@ -12536,7 +12607,7 @@ SPECIES_DATA['tigerfish'] = {
                 field: 'permitType',
                 required: true,
                 options: [
-                    { value: 'commercial', label: 'Commercial Permit', description: 'Commercial fishing - Check for specific permit requirements' },
+                    { value: 'commercial', label: 'Commercial Permit', description: 'Commercial fishing - verify state permit requirements' },
                     { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing - No federal permit required' }
                 ],
                 cfr: null
@@ -12557,7 +12628,7 @@ SPECIES_DATA['tigerfish'] = {
                 required: true,
                 type: 'boolean',
                 dependsOn: ['permitType'],
-                notes: 'Tigerfish regulations vary by area. Check current state and federal regulations.',
+                notes: 'Tigerfish is state-managed in the Northeast — verify applicable state regulations.',
                 violation: {
                     ifFalse: 'WARNING: Verify compliance with state and federal regulations'
                 },
@@ -12603,14 +12674,13 @@ SPECIES_DATA['king-mackerel'] = {
                 limit: null,
                 unit: 'lbs',
                 cfr: '50 CFR 622.38',
-                notes: 'Subject to quota and trip limits. Check current regulations.'
+                notes: 'Commercial trip limits and quota — verify NOAA Southeast bulletin.'
             },
             'recreational': {
                 name: 'Recreational',
-                limit: null,
-                unit: 'fish',
-                cfr: '50 CFR 622.38',
-                notes: 'Check current bag limits'
+                limit: { count: 3, unit: 'fish per person per day' },
+                cfr: '50 CFR 622.382',
+                notes: 'Atlantic migratory group: 3 king mackerel per person per day (50 CFR 622.382).'
             }
         },
         size: {
@@ -12655,14 +12725,28 @@ SPECIES_DATA['king-mackerel'] = {
                 dependsOn: ['permitType', 'possessionAmount'],
                 autoCheck: true,
                 limits: {
-                    'commercial': null, // Subject to quota and trip limits
-                    'recreational': null // Check current bag limits
+                    'commercial': null,
+                    'recreational': { count: 3, unit: 'fish per person per day' }
                 },
-                notes: 'Commercial limits subject to quota and trip limits - check current regulations. Recreational: Check current bag limits.',
+                notes: 'Recreational: 3 fish/person/day (50 CFR 622.382). Commercial: quota/trip limits per bulletin.',
                 violation: {
                     ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or quota (50 CFR 622.38)'
                 },
                 cfr: '50 CFR 622.38'
+            },
+            numberOfFish: {
+                question: 'How many king mackerel are on board (recreational)?',
+                field: 'numberOfFish',
+                required: false,
+                type: 'number',
+                dependsOn: ['permitType'],
+                applicablePermits: ['recreational'],
+                notes: '3 fish per person per day (50 CFR 622.382)',
+                violation: {
+                    ifGreaterThan: 3,
+                    message: 'VIOLATION: Recreational bag limit is 3 king mackerel per person per day (50 CFR 622.382)'
+                },
+                cfr: '50 CFR 622.382'
             },
             sizeCompliance: {
                 question: 'What is the fork length of the fish?',
@@ -12685,7 +12769,7 @@ SPECIES_DATA['king-mackerel'] = {
                 dependsOn: ['permitType'],
                 applicablePermits: ['commercial'],
                 autoCheck: true,
-                notes: 'Check current quota status - fishery may close when quota is reached',
+                notes: 'Commercial fishery may close when ACL reached — verify NOAA bulletin.',
                 cfr: '50 CFR 622.38'
             },
             reportingStatus: {
@@ -12731,14 +12815,13 @@ SPECIES_DATA['spanish-mackerel'] = {
                 limit: null,
                 unit: 'lbs',
                 cfr: '50 CFR 622.38',
-                notes: 'Subject to quota and trip limits. Check current regulations.'
+                notes: 'Commercial trip limits and quota — verify NOAA Southeast bulletin.'
             },
             'recreational': {
                 name: 'Recreational',
-                limit: null,
-                unit: 'fish',
-                cfr: '50 CFR 622.38',
-                notes: 'Check current bag limits'
+                limit: { count: 15, unit: 'fish per person per day' },
+                cfr: '50 CFR 622.382',
+                notes: 'Atlantic migratory group: 15 Spanish mackerel per person per day (50 CFR 622.382).'
             }
         },
         size: {
@@ -12783,14 +12866,28 @@ SPECIES_DATA['spanish-mackerel'] = {
                 dependsOn: ['permitType', 'possessionAmount'],
                 autoCheck: true,
                 limits: {
-                    'commercial': null, // Subject to quota and trip limits
-                    'recreational': null // Check current bag limits
+                    'commercial': null,
+                    'recreational': { count: 15, unit: 'fish per person per day' }
                 },
-                notes: 'Commercial limits subject to quota and trip limits - check current regulations. Recreational: Check current bag limits.',
+                notes: 'Recreational: 15 fish/person/day (50 CFR 622.382). Commercial: quota/trip limits per bulletin.',
                 violation: {
                     ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or quota (50 CFR 622.38)'
                 },
                 cfr: '50 CFR 622.38'
+            },
+            numberOfFish: {
+                question: 'How many Spanish mackerel are on board (recreational)?',
+                field: 'numberOfFish',
+                required: false,
+                type: 'number',
+                dependsOn: ['permitType'],
+                applicablePermits: ['recreational'],
+                notes: '15 fish per person per day (50 CFR 622.382)',
+                violation: {
+                    ifGreaterThan: 15,
+                    message: 'VIOLATION: Recreational bag limit is 15 Spanish mackerel per person per day (50 CFR 622.382)'
+                },
+                cfr: '50 CFR 622.382'
             },
             sizeCompliance: {
                 question: 'What is the fork length of the fish?',
@@ -12813,7 +12910,7 @@ SPECIES_DATA['spanish-mackerel'] = {
                 dependsOn: ['permitType'],
                 applicablePermits: ['commercial'],
                 autoCheck: true,
-                notes: 'Check current quota status - fishery may close when quota is reached',
+                notes: 'Commercial fishery may close when ACL reached — verify NOAA bulletin.',
                 cfr: '50 CFR 622.38'
             },
             reportingStatus: {
@@ -14823,13 +14920,13 @@ SPECIES_DATA['tautog'] = {
                 limit: null, // Varies by season
                 unit: 'lbs',
                 cfr: '50 CFR 648.163',
-                notes: 'Possession limits vary by season. Check current regulations.'
+                notes: 'Commercial possession varies by season — verify NOAA Greater Atlantic bulletin.'
             },
             'recreational': {
                 name: 'Recreational',
-                limit: { count: 4, unit: 'fish' },
+                limit: null,
                 cfr: '50 CFR 648.163',
-                notes: '4 fish per person per day (varies by state and season)'
+                notes: 'Federal recreational bag limit waived; state conservation equivalency measures apply (2026).'
             }
         },
         size: {
@@ -14849,7 +14946,7 @@ SPECIES_DATA['tautog'] = {
             federal: {
                 open: 'Seasonal with closures',
                 cfr: '50 CFR 648.163',
-                notes: 'Check current season dates and closures'
+                notes: 'Seasonal closures may apply — verify state CE measures and NOAA bulletin.'
             }
         },
         assessmentQuestions: {
@@ -14885,10 +14982,10 @@ SPECIES_DATA['tautog'] = {
                 autoCheck: true,
                 useAssessmentDate: true,
                 limits: {
-                    'commercial': null, // Varies by season - check current regulations
-                    'recreational': { count: 4, unit: 'fish per person per day' }
+                    'commercial': null,
+                    'recreational': null
                 },
-                notes: 'Commercial limits vary by season - check current regulations. Recreational: 4 fish per person per day (varies by state and season).',
+                notes: 'Federal recreational bag waived (conservation equivalency). Commercial limits vary by season. Verify state measures.',
                 violation: {
                     ifExceeds: 'VIOLATION: Possession amount exceeds permit limit (50 CFR 648.163)'
                 },
@@ -14907,17 +15004,16 @@ SPECIES_DATA['tautog'] = {
                 },
                 cfr: '50 CFR 648.163'
             },
-            recreationalBagLimit: {
-                question: 'How many tautog are on board (recreational)?',
-                field: 'numberOfFish',
-                required: false,
-                type: 'number',
+            stateRegulationsCheck: {
+                question: 'Have applicable state recreational measures been verified?',
+                field: 'stateRegsChecked',
+                required: true,
+                type: 'boolean',
                 dependsOn: ['permitType'],
                 applicablePermits: ['recreational'],
-                limit: { count: 4, unit: 'fish per person per day' },
-                notes: 'Recreational limit: 4 fish per person per day (varies by state and season)',
+                notes: 'Federal coastwide recreational measures waived — state bag/size/season apply.',
                 violation: {
-                    ifExceeds: 'VIOLATION: Recreational bag limit is 4 fish per person per day (50 CFR 648.163)'
+                    ifFalse: 'WARNING: Verify state conservation equivalency measures for tautog'
                 },
                 cfr: '50 CFR 648.163'
             },
@@ -14929,7 +15025,7 @@ SPECIES_DATA['tautog'] = {
                 dependsOn: ['permitType', 'dateOfCatch'],
                 useAssessmentDate: true,
                 autoCheck: true,
-                notes: 'Check current season dates and closures - seasonal with closures',
+                notes: 'Verify state season and closure dates for the assessment area.',
                 cfr: '50 CFR 648.163'
             },
             reportingStatus: {

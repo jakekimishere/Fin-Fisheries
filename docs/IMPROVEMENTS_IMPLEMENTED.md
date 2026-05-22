@@ -24,8 +24,21 @@
 - Cache bump: `fin-fisheries-v7` in `js/config/appBundle.js`
 - Script bundle lists new validation/config files
 
+## Tier E — High impact data & quota (2026-05-21)
+- `FISHERY_QUOTA_STATUS_CONFIG.js` — BFT commercial daily limits (closure/RFD/season), herring Area 1A/1B 2,000 lb, skate wing trips, silver hake mesh limits, salmon EEZ prohibition
+- `assessmentViolations.js` — uses quota config when `possessionLimitCheck` limits are null; quota closed / closed-area flags
+- **12 placeholder species** updated: salmon, bluefin, herring, silver hake, sculpin, skates, tigerfish, king/Spanish mackerel, tautog
+- Cache `fin-fisheries-v8`; validator asserts salmon prohibited, mackerel 3/15, herring 1B 2000 lb, BFT June limit 3
+
+## Engineering & ops (2026-05-21)
+- `js/ui/reportBuilder.js` — shared report/pre-report HTML (header, summary, verdict, species blocks)
+- `scripts/smoke-scenarios.js` — `npm run test:smoke` (8 scenario checks)
+- `docs/OPS.md` — deploy checklist; `DATA_VERIFICATION.md` tier table
+- Footer/home dates: static fallback in HTML + `updateFooterDate()` in `update-checker.js`
+- A11y: `focus-visible` on primary buttons; pre-report `aria-live` / `aria-modal`
+- Cache `fin-fisheries-v9`
+
 ## Still recommended (future)
-- Migrate `generateReport` fully into `reportGenerator.js`
-- Tier updates for species with "Check current" placeholders (validator warnings)
-- HMS commercial quota open/closed flags
-- Automated browser tests (Playwright) for smoke paths
+- Move remaining `generateReport` species rows into `reportBuilder.js`
+- HMS shark commercial quota by species group
+- Playwright E2E in CI (optional)

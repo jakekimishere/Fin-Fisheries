@@ -6,7 +6,7 @@ class ReportGenerator {
         this.state = state || window.appState;
     }
 
-    // Generate the full compliance report
+    // Pre-report summary then full report (legacy engine + ReportBuilder)
     generate() {
         try {
             if (typeof StateBridge !== 'undefined') {
@@ -18,20 +18,15 @@ class ReportGenerator {
 
             const reportContent = document.getElementById('report-content');
             if (!reportContent) {
-                console.error('report-content element not found');
-                if (typeof Helpers !== 'undefined' && Helpers.showErrorMessage) {
-                    Helpers.showErrorMessage('Error: Report container not found. Please refresh and try again.');
-                } else if (typeof showErrorMessage === 'function') {
-                    showErrorMessage('Error: Report container not found. Please refresh and try again.');
-                }
+                this._reportError('Report container not found. Please refresh and try again.');
                 return;
             }
 
-            // Delegate to existing function if available (it's very large and complex)
-            // TODO: Migrate fully later
             if (typeof showPreReportSummary === 'function') {
                 showPreReportSummary();
-            } else if (typeof generateReport === 'function') {
+                return;
+            }
+            if (typeof generateReport === 'function') {
                 generateReport();
                 if (typeof StateBridge !== 'undefined') {
                     StateBridge.syncFromWindow(this.state);
@@ -39,22 +34,7 @@ class ReportGenerator {
                 return;
             }
 
-            // Fallback: generate basic report if old function not available
-            const now = new Date();
-            let html = `
-                <div class="report-header">
-                    <h2>FIN - FISHERIES INSPECTION NAVIGATOR</h2>
-                    <h3>NORTHEAST FISHERIES COMPLIANCE REPORT</h3>
-                    <p class="report-date">Generated: ${now.toLocaleString()}</p>
-                </div>
-                <div class="report-body">
-                    <div class="report-section">
-                        <p>Report generation in progress. Please ensure all assessment steps are completed.</p>
-                    </div>
-                </div>
-            `;
-
-            reportContent.innerHTML = html;
+            this._renderMinimalFallback(reportContent);
 
         } catch (error) {
             console.error('Error generating report:', error);
@@ -185,6 +165,25 @@ class ReportGenerator {
             return getPossessionUnit(speciesId, speciesData);
         }
         return 'units';
+    }
+
+    _reportError(message) {
+        console.error(message);
+        if (typeof Helpers !== 'undefined' && Helpers.showErrorMessage) {
+            Helpers.showErrorMessage(message);
+        } else if (typeof showErrorMessage === 'function') {
+            showErrorMessage(message);
+        } else {
+            alert(message);
+        }
+    }
+
+    _renderMinimalFallback(reportContent) {
+        const now = new Date();
+        const header = typeof ReportBuilder !== 'undefined'
+            ? ReportBuilder.buildReportHeader(now)
+            : `<p>Generated: ${now.toLocaleString()}</p>`;
+        reportContent.innerHTML = `${header}<div class="report-body"><p>Complete assessment steps, then generate the report again.</p></div>`;
     }
 }
 

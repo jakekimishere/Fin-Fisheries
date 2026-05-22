@@ -9,6 +9,8 @@ const REGULATION_META = {
     dataFiles: [
         'species-data.js',
         'REGULATION_DATES_CONFIG.js',
+        'FISHERY_QUOTA_STATUS_CONFIG.js',
+        'GROUND_FISH_TRIP_LIMITS_CONFIG.js',
         'SPECIES_GROUPS_CONFIG.js',
         'regulation-updates.json'
     ],

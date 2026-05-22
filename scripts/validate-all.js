@@ -9,7 +9,8 @@ const path = require('path');
 const root = path.join(__dirname, '..');
 const scripts = [
     'validate-species-data.js',
-    'validate-violation-coverage.js'
+    'validate-violation-coverage.js',
+    'smoke-scenarios.js'
 ];
 
 let failed = false;

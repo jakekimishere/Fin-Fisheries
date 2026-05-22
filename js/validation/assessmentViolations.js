@@ -32,7 +32,15 @@
         return permitType;
     }
 
+    function getQuotaConfigLimit(speciesId, permitType, speciesData) {
+        if (typeof getCommercialPossessionLimit !== 'function' || !permitType) {
+            return null;
+        }
+        return getCommercialPossessionLimit(speciesId, permitType, speciesData);
+    }
+
     function isProhibitedSpecies(speciesId, entry) {
+        if (speciesId === 'atlantic-salmon') return true;
         if (!entry && typeof SPECIES_DATA !== 'undefined') {
             entry = SPECIES_DATA[speciesId];
         }
@@ -86,17 +94,42 @@
             lim = mapped ? plc.limits[mapped] : undefined;
         }
         if (lim === null || lim === undefined) {
+            const quotaLim = getQuotaConfigLimit(speciesId, permitType, speciesData);
+            if (quotaLim && (quotaLim.count != null || quotaLim.prohibited)) {
+                return {
+                    count: quotaLim.count,
+                    prohibited: !!quotaLim.prohibited,
+                    message: quotaLim.message || plc?.violation?.ifExceeds || plc?.violation?.ifProhibited || null
+                };
+            }
             return { count: null, prohibited: false, message: null };
         }
         if (typeof lim === 'object') {
+            let count = lim.count != null ? lim.count : null;
+            let prohibited = !!(lim.prohibited || lim.count === 0);
+            if (count == null && !prohibited) {
+                const quotaLim = getQuotaConfigLimit(speciesId, permitType, speciesData);
+                if (quotaLim) {
+                    count = quotaLim.count;
+                    prohibited = !!quotaLim.prohibited;
+                }
+            }
             return {
-                count: lim.count != null ? lim.count : null,
-                prohibited: !!(lim.prohibited || lim.count === 0),
+                count,
+                prohibited,
                 message: plc.violation?.ifExceeds || plc.violation?.ifProhibited || null
             };
         }
         if (typeof lim === 'number') {
             return { count: lim, prohibited: lim === 0, message: plc.violation?.ifExceeds || null };
+        }
+        const quotaLim = getQuotaConfigLimit(speciesId, permitType, speciesData);
+        if (quotaLim && (quotaLim.count != null || quotaLim.prohibited)) {
+            return {
+                count: quotaLim.count,
+                prohibited: !!quotaLim.prohibited,
+                message: quotaLim.message || null
+            };
         }
         return { count: null, prohibited: false, message: null };
     }
@@ -225,6 +258,16 @@
         };
 
         violations.push(...checkCountFieldViolations(speciesData, questions, ctx));
+
+        const count = getCountFromData(speciesData);
+        if (count > 0 && speciesData.quotaStatus === 'closed') {
+            violations.push(
+                `VIOLATION: ${ctx.speciesName} — commercial fishery closed due to quota (${questions.quotaStatus?.cfr || '50 CFR'})`
+            );
+        }
+        if (count > 0 && speciesData.fishingArea === 'closed-area') {
+            violations.push(`VIOLATION: ${ctx.speciesName} — fishing in closed area`);
+        }
 
         for (const questionData of Object.values(questions)) {
             if (!questionData?.violation || !questionData.field) continue;

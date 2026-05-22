@@ -73,7 +73,10 @@
             'generateReport',
             'checkSpeciesViolations',
             'checkAllViolations',
-            'validatePermitsStep'
+            'validatePermitsStep',
+            'goHome',
+            'showPreReportSummary',
+            'updateFooterDate'
         ];
         
         requiredFunctions.forEach(funcName => {
@@ -92,7 +95,11 @@
             { name: 'SPECIES_DATA', check: () => typeof SPECIES_DATA !== 'undefined' || typeof window.SPECIES_DATA !== 'undefined' },
             { name: 'REGULATION_DATES', check: () => typeof REGULATION_DATES !== 'undefined' || typeof window.REGULATION_DATES !== 'undefined' },
             { name: 'SPECIES_GROUPS', check: () => typeof SPECIES_GROUPS !== 'undefined' || typeof window.SPECIES_GROUPS !== 'undefined' },
-            { name: 'DATA_LAST_UPDATED', check: () => typeof DATA_LAST_UPDATED !== 'undefined' || typeof window.DATA_LAST_UPDATED !== 'undefined' }
+            { name: 'DATA_LAST_UPDATED', check: () => typeof DATA_LAST_UPDATED !== 'undefined' || typeof window.DATA_LAST_UPDATED !== 'undefined' },
+            { name: 'ReportBuilder', check: () => typeof ReportBuilder !== 'undefined' },
+            { name: 'AssessmentViolations', check: () => typeof AssessmentViolations !== 'undefined' },
+            { name: 'FISHERY_QUOTA_STATUS', check: () => typeof FISHERY_QUOTA_STATUS !== 'undefined' },
+            { name: 'getCommercialPossessionLimit', check: () => typeof getCommercialPossessionLimit === 'function' }
         ];
         
         requiredObjects.forEach(obj => {

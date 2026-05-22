@@ -6,6 +6,8 @@
   "scripts": {
     "validate": "node scripts/validate-species-data.js && node scripts/validate-violation-coverage.js",
     "validate:species": "node scripts/validate-species-data.js",
-    "validate:violations": "node scripts/validate-violation-coverage.js"
+    "validate:violations": "node scripts/validate-violation-coverage.js",
+    "test:smoke": "node scripts/smoke-scenarios.js",
+    "test": "npm run validate && npm run test:smoke"
   }
 }
