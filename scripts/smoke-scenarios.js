@@ -21,6 +21,21 @@ function loadSandbox() {
     load('REGULATION_DATES_CONFIG.js');
     load('SCALLOP648_POLICY_CONFIG.js');
     load('SURFCLAM648_POLICY_CONFIG.js');
+    load('SUMMERFLOUNDER648_POLICY_CONFIG.js');
+    load('SCUP648_POLICY_CONFIG.js');
+    load('BSB648_POLICY_CONFIG.js');
+    load('BLUEFISH648_POLICY_CONFIG.js');
+    load('HERRING648_POLICY_CONFIG.js');
+    load('DOGFISH648_POLICY_CONFIG.js');
+    load('REDFCRAB648_POLICY_CONFIG.js');
+    load('TILEFISH648_POLICY_CONFIG.js');
+    load('SKATE648_POLICY_CONFIG.js');
+    load('LOBSTER697_POLICY_CONFIG.js');
+    load('PROHIB697_POLICY_CONFIG.js');
+    load('MPS24_POLICY_CONFIG.js');
+    load('DOLPHIN622_POLICY_CONFIG.js');
+    load('CMP622_POLICY_CONFIG.js');
+    load('FORAGE648_POLICY_CONFIG.js');
     load('NMS648_POLICY_CONFIG.js');
     load('MONKFISH648_POLICY_CONFIG.js');
     load('SMB648_POLICY_CONFIG.js');
@@ -346,14 +361,335 @@ function main() {
         });
         assert('monkfish NFMA without letter', monkNfma.some(m => /NFMA fishing without/i.test(m)), monkNfma.join('; '));
 
+        assert('SUMMERFLOUNDER648 policy profile', typeof sb.getSummerFlounder648PolicyProfile === 'function' && sb.getSummerFlounder648PolicyProfile('summer-flounder')?.conservationEquivalency);
+
+        assert(
+            'summer flounder location checklist merged',
+            SPECIES_DATA['summer-flounder']?.regulations?.assessmentQuestions?.location_locSfSeaTurtleTed?.section === 'location-checklist'
+        );
+
+        const sfTed = AV.evaluateAssessmentQuestionViolations('summer-flounder', SPECIES_DATA['summer-flounder'], {
+            'permit-type': 'commercial',
+            gearType: 'otter-trawl',
+            locSfSeaTurtleTed: 'yes'
+        });
+        assert('summer flounder TED violation', sfTed.some(m => /TED required/i.test(m)), sfTed.join('; '));
+
+        const sfLoa = AV.evaluateAssessmentQuestionViolations('summer-flounder', SPECIES_DATA['summer-flounder'], {
+            'permit-type': 'commercial',
+            locSfSmallMeshLoa: 'yes',
+            dateOfCatch: '2026-07-01'
+        });
+        assert('summer flounder small mesh LOA', sfLoa.some(m => /valid LOA/i.test(m)), sfLoa.join('; '));
+
+        const sfRecSkip = checkSpeciesViolations('summer-flounder', SPECIES_DATA['summer-flounder'], {
+            'permit-type': 'recreational',
+            possessionAmount: 50
+        });
+        assert('summer flounder recreational no federal limit', !sfRecSkip.some(m => /exceeds limit/i.test(m)), sfRecSkip.join('; '));
+
+        assert('SCUP648 policy profile', typeof sb.getScup648PolicyProfile === 'function' && sb.getScup648PolicyProfile('scup')?.headline);
+
+        assert(
+            'scup location checklist merged',
+            SPECIES_DATA['scup']?.regulations?.assessmentQuestions?.location_locScupWinterOneClosed?.section === 'location-checklist'
+        );
+
+        const scupWinter = AV.evaluateAssessmentQuestionViolations('scup', SPECIES_DATA['scup'], {
+            'permit-type': 'commercial',
+            locScupWinterOneClosed: 'yes',
+            dateOfCatch: '2026-02-15'
+        });
+        assert('scup Winter I closure attestation', scupWinter.some(m => /Winter I/i.test(m)), scupWinter.join('; '));
+
+        const scupGra = AV.evaluateAssessmentQuestionViolations('scup', SPECIES_DATA['scup'], {
+            'permit-type': 'commercial',
+            locScupNorthernGra: 'yes',
+            dateOfCatch: '2026-11-15'
+        });
+        assert('scup Northern GRA mesh', scupGra.some(m => /Northern Scup GRA/i.test(m)), scupGra.join('; '));
+
+        const scupWinterPoss = checkSpeciesViolations('scup', SPECIES_DATA['scup'], {
+            'permit-type': 'commercial',
+            possessionAmount: 500,
+            dateOfCatch: '2026-03-01'
+        });
+        assert('scup Winter I possession prohibited', scupWinterPoss.some(m => /prohibited|closed/i.test(m)), scupWinterPoss.join('; '));
+
+        const scupWinterII = checkSpeciesViolations('scup', SPECIES_DATA['scup'], {
+            'permit-type': 'commercial',
+            possessionAmount: 15000,
+            meshSize: 'compliant-mesh',
+            dateOfCatch: '2026-11-15'
+        });
+        assert('scup Winter II over 12000 lb', scupWinterII.some(m => /exceeds.*limit/i.test(m)), scupWinterII.join('; '));
+
+        assert('BSB648 policy profile', typeof sb.getBsb648PolicyProfile === 'function' && sb.getBsb648PolicyProfile('black-sea-bass')?.conservationEquivalency);
+
+        assert(
+            'bsb location checklist merged',
+            SPECIES_DATA['black-sea-bass']?.regulations?.assessmentQuestions?.location_locBsbTransferAtSea?.section === 'location-checklist'
+        );
+
+        const bsbTransfer = AV.evaluateAssessmentQuestionViolations('black-sea-bass', SPECIES_DATA['black-sea-bass'], {
+            'permit-type': 'commercial',
+            locBsbTransferAtSea: 'yes'
+        });
+        assert('bsb transfer at sea prohibited', bsbTransfer.some(m => /Transfer at sea prohibited/i.test(m)), bsbTransfer.join('; '));
+
+        const bsbMesh = checkSpeciesViolations('black-sea-bass', SPECIES_DATA['black-sea-bass'], {
+            'permit-type': 'commercial',
+            'gear-type': 'otter-trawl',
+            meshSize: 'non-compliant-mesh',
+            possessionAmount: 150,
+            dateOfCatch: '2026-07-01'
+        });
+        assert('bsb trawl mesh over 100 lb threshold', bsbMesh.some(m => /4\.5.*mesh/i.test(m)), bsbMesh.join('; '));
+
+        const bsbTote = AV.evaluateAssessmentQuestionViolations('black-sea-bass', SPECIES_DATA['black-sea-bass'], {
+            'permit-type': 'commercial',
+            toteStorage: 'no'
+        });
+        assert('bsb not in standard totes', bsbTote.some(m => /100 lb totes/i.test(m)), bsbTote.join('; '));
+
+        assert('BLUEFISH648 policy profile', typeof sb.getBluefish648PolicyProfile === 'function' && sb.getBluefish648PolicyProfile('bluefish')?.conservationEquivalency);
+
+        assert(
+            'bluefish location checklist merged',
+            SPECIES_DATA['bluefish']?.regulations?.assessmentQuestions?.location_locBluefishClosedArea?.section === 'location-checklist'
+        );
+
+        const bfCharter = AV.evaluateAssessmentQuestionViolations('bluefish', SPECIES_DATA['bluefish'], {
+            'permit-type': 'recreational-for-hire',
+            locBluefishCharterBag: 'yes'
+        });
+        assert('bluefish charter bag attestation', bfCharter.some(m => /Charter\/party bluefish/i.test(m)), bfCharter.join('; '));
+
+        assert('HERRING648 policy profile', typeof sb.getHerring648PolicyProfile === 'function' && sb.getHerring648PolicyProfile('atlantic-herring')?.level === 'complex');
+
+        assert(
+            'herring location checklist merged',
+            SPECIES_DATA['atlantic-herring']?.regulations?.assessmentQuestions?.location_locHerringTransferAtSea?.section === 'location-checklist'
+        );
+
+        const herringTransfer = AV.evaluateAssessmentQuestionViolations('atlantic-herring', SPECIES_DATA['atlantic-herring'], {
+            'permit-type': 'herring-cat-d',
+            locHerringTransferAtSea: 'yes'
+        });
+        assert('herring transfer at sea prohibited', herringTransfer.some(m => /transfer at sea/i.test(m)), herringTransfer.join('; '));
+
+        const herringCatD = checkSpeciesViolations('atlantic-herring', SPECIES_DATA['atlantic-herring'], {
+            'permit-type': 'herring-cat-d',
+            possessionAmount: 7000,
+            fishingArea: 'area-2',
+            dateOfCatch: '2026-05-21'
+        });
+        assert('herring Cat D over 6600 lb', herringCatD.some(m => /exceeds limit/i.test(m)), herringCatD.join('; '));
+
+        const herring1A = checkSpeciesViolations('atlantic-herring', SPECIES_DATA['atlantic-herring'], {
+            'permit-type': 'herring-cat-a',
+            possessionAmount: 500,
+            fishingArea: 'area-1a',
+            dateOfCatch: '2026-05-21'
+        });
+        assert('herring Area 1A directed prohibited', herring1A.some(m => /prohibited/i.test(m)), herring1A.join('; '));
+
+        assert('DOGFISH648 policy profile', typeof sb.getDogfish648PolicyProfile === 'function' && sb.getDogfish648PolicyProfile('spiny-dogfish')?.level === 'complex');
+
+        assert(
+            'dogfish location checklist merged',
+            SPECIES_DATA['spiny-dogfish']?.regulations?.assessmentQuestions?.location_locDogfishSecondTripDay?.section === 'location-checklist'
+        );
+
+        const dogfishSecondTrip = AV.evaluateAssessmentQuestionViolations('spiny-dogfish', SPECIES_DATA['spiny-dogfish'], {
+            'permit-type': 'commercial',
+            locDogfishSecondTripDay: 'yes'
+        });
+        assert('dogfish second trip same day', dogfishSecondTrip.some(m => /one spiny dogfish trip/i.test(m)), dogfishSecondTrip.join('; '));
+
+        const dogfishOver = checkSpeciesViolations('spiny-dogfish', SPECIES_DATA['spiny-dogfish'], {
+            'permit-type': 'commercial',
+            possessionAmount: 8000,
+            dateOfCatch: '2026-07-01'
+        });
+        assert('dogfish over 7500 lb', dogfishOver.some(m => /exceeds limit/i.test(m)), dogfishOver.join('; '));
+
+        assert('REDFCRAB648 policy profile', typeof sb.getRedCrab648PolicyProfile === 'function' && sb.getRedCrab648PolicyProfile('atlantic-deep-sea-red-crab')?.level === 'complex');
+
+        assert(
+            'red crab location checklist merged',
+            SPECIES_DATA['atlantic-deep-sea-red-crab']?.regulations?.assessmentQuestions?.location_locRedCrabTransferAtSea?.section === 'location-checklist'
+        );
+
+        const redCrabTransfer = AV.evaluateAssessmentQuestionViolations('atlantic-deep-sea-red-crab', SPECIES_DATA['atlantic-deep-sea-red-crab'], {
+            'permit-type': 'red-crab-cat-b',
+            transferAtSea: 'yes'
+        });
+        assert('red crab transfer at sea prohibited', redCrabTransfer.some(m => /Transfer at sea prohibited/i.test(m)), redCrabTransfer.join('; '));
+
+        const redCrabIncidental = checkSpeciesViolations('atlantic-deep-sea-red-crab', SPECIES_DATA['atlantic-deep-sea-red-crab'], {
+            'permit-type': 'red-crab-open-incidental',
+            possessionAmount: 600,
+            dateOfCatch: '2026-07-01'
+        });
+        assert('red crab open access over 500 lb', redCrabIncidental.some(m => /exceeds limit/i.test(m)), redCrabIncidental.join('; '));
+
+        assert('TILEFISH648 policy profile', typeof sb.getTilefish648PolicyProfile === 'function' && sb.getTilefish648PolicyProfile('golden-tilefish')?.level === 'complex');
+
+        assert(
+            'tilefish location checklist merged',
+            SPECIES_DATA['golden-tilefish']?.regulations?.assessmentQuestions?.location_locTilefishGraCanyon?.section === 'location-checklist'
+        );
+
+        const tilefishGra = AV.evaluateAssessmentQuestionViolations('golden-tilefish', SPECIES_DATA['golden-tilefish'], {
+            'permit-type': 'commercial',
+            locTilefishGraCanyon: 'yes'
+        });
+        assert('tilefish GRA bottom gear prohibited', tilefishGra.some(m => /Tilefish GRAs/i.test(m)), tilefishGra.join('; '));
+
+        const goldenOver = checkSpeciesViolations('golden-tilefish', SPECIES_DATA['golden-tilefish'], {
+            'permit-type': 'commercial',
+            possessionAmount: 600,
+            dateOfCatch: '2026-07-01'
+        });
+        assert('golden tilefish over 500 lb', goldenOver.some(m => /exceeds limit/i.test(m)), goldenOver.join('; '));
+
+        assert('SKATE648 policy profile', typeof sb.getSkate648PolicyProfile === 'function' && sb.getSkate648PolicyProfile('smooth-skate')?.level === 'complex');
+
+        assert(
+            'skate location checklist merged',
+            SPECIES_DATA['smooth-skate']?.regulations?.assessmentQuestions?.location_locSkateThornyOnBoard?.section === 'location-checklist'
+        );
+
+        const thornyLoc = AV.evaluateAssessmentQuestionViolations('smooth-skate', SPECIES_DATA['smooth-skate'], {
+            'permit-type': 'commercial',
+            locSkateThornyOnBoard: 'yes'
+        });
+        assert('thorny skate attestation', thornyLoc.some(m => /Thorny skate/i.test(m)), thornyLoc.join('; '));
+
+        const thornyPoss = checkSpeciesViolations('thorny-skate', SPECIES_DATA['thorny-skate'], {
+            'permit-type': 'commercial',
+            possessionAmount: 1,
+            dateOfCatch: '2026-05-21'
+        });
+        assert('thorny skate possession prohibited', thornyPoss.some(m => /prohibited/i.test(m)), thornyPoss.join('; '));
+
+        const smoothSkate = checkSpeciesViolations('smooth-skate', SPECIES_DATA['smooth-skate'], {
+            'permit-type': 'commercial',
+            possessionAmount: 5000,
+            dasTripType: 'nms-a-scallop-monkfish',
+            skateProductForm: 'wings',
+            dateOfCatch: '2026-06-01'
+        });
+        assert('smooth skate over 4000 lb wings season 1', smoothSkate.some(m => /exceeds limit/i.test(m)), smoothSkate.join('; '));
+
+        assert('LOBSTER697 policy profile', typeof sb.getLobster697PolicyProfile === 'function' && sb.getLobster697PolicyProfile('american-lobster')?.level === 'complex');
+
+        assert(
+            'lobster location checklist merged',
+            SPECIES_DATA['american-lobster']?.regulations?.assessmentQuestions?.location_locLobsterEggBearing?.section === 'location-checklist'
+        );
+
+        const lobsterEgg = AV.evaluateAssessmentQuestionViolations('american-lobster', SPECIES_DATA['american-lobster'], {
+            'permit-type': 'commercial-trap',
+            locLobsterEggBearing: 'yes'
+        });
+        assert('lobster egg-bearing prohibited', lobsterEgg.some(m => /Egg-bearing/i.test(m)), lobsterEgg.join('; '));
+
+        const lobsterNonTrap = checkSpeciesViolations('american-lobster', SPECIES_DATA['american-lobster'], {
+            'permit-type': 'commercial-non-trap',
+            possessionAmount: 150,
+            dateOfCatch: '2026-07-01'
+        });
+        assert('lobster non-trap over 100', lobsterNonTrap.some(m => /exceeds limit/i.test(m)), lobsterNonTrap.join('; '));
+
+        const jonahNonTrap = checkSpeciesViolations('jonah-crab', SPECIES_DATA['jonah-crab'], {
+            'permit-type': 'commercial-non-trap',
+            possessionAmount: 1100,
+            dateOfCatch: '2026-07-01'
+        });
+        assert('jonah non-trap over 1000', jonahNonTrap.some(m => /exceeds limit/i.test(m)), jonahNonTrap.join('; '));
+
+        const jonahRec = AV.evaluateAssessmentQuestionViolations('jonah-crab', SPECIES_DATA['jonah-crab'], {
+            'permit-type': 'recreational',
+            possessionAmount: 55
+        });
+        assert('jonah recreational over 50', jonahRec.some(m => /exceeds/i.test(m)), jonahRec.join('; '));
+
+        assert('PROHIB697 policy profile striped bass', typeof sb.getProhib697PolicyProfile === 'function' && sb.getProhib697PolicyProfile('striped-bass')?.level === 'prohibited');
+
+        assert(
+            'striped bass location checklist merged',
+            SPECIES_DATA['striped-bass']?.regulations?.assessmentQuestions?.location_locStripedBassEezPossession?.section === 'location-checklist'
+        );
+
+        const stripedEez = AV.evaluateAssessmentQuestionViolations('striped-bass', SPECIES_DATA['striped-bass'], {
+            'permit-type': 'recreational',
+            fishingArea: 'eez',
+            possessionAmount: 2,
+            locStripedBassEezPossession: 'yes'
+        });
+        assert('striped bass EEZ possession attestation', stripedEez.some(m => /prohibited/i.test(m)), stripedEez.join('; '));
+
+        const weakfishOver = checkSpeciesViolations('weakfish', SPECIES_DATA['weakfish'], {
+            'permit-type': 'commercial',
+            possessionAmount: 200,
+            dateOfCatch: '2026-05-21'
+        });
+        assert('weakfish commercial over 150 lb', weakfishOver.some(m => /exceeds limit/i.test(m)), weakfishOver.join('; '));
+
+        const redDrumRec = checkSpeciesViolations('red-drum', SPECIES_DATA['red-drum'], {
+            'permit-type': 'recreational',
+            fishingArea: 'north-allowed',
+            possessionAmount: 1,
+            dateOfCatch: '2026-05-21'
+        });
+        assert('red drum recreational federal prohibited', redDrumRec.some(m => /prohibited/i.test(m)), redDrumRec.join('; '));
+
+        assert('DOLPHIN622 policy profile', typeof sb.getDolphin622PolicyProfile === 'function' && sb.getDolphin622PolicyProfile('mahi-mahi')?.level === 'complex');
+
+        assert(
+            'dolphin location checklist merged',
+            SPECIES_DATA['mahi-mahi']?.regulations?.assessmentQuestions?.location_locDolphinTransferAtSea?.section === 'location-checklist'
+        );
+
+        const dolphinOver = checkSpeciesViolations('mahi-mahi', SPECIES_DATA['mahi-mahi'], {
+            'permit-type': 'commercial',
+            possessionAmount: 600,
+            dateOfCatch: '2026-05-21'
+        });
+        assert('dolphin commercial over 500 lb', dolphinOver.some(m => /exceeds limit/i.test(m)), dolphinOver.join('; '));
+
+        assert('CMP622 policy profile', typeof sb.getCmp622PolicyProfile === 'function' && sb.getCmp622PolicyProfile('king-mackerel')?.level === 'complex');
+
+        const kingOver = checkSpeciesViolations('king-mackerel', SPECIES_DATA['king-mackerel'], {
+            'permit-type': 'commercial',
+            possessionAmount: 4000,
+            dateOfCatch: '2026-05-21'
+        });
+        assert('king mackerel commercial over 3500 lb', kingOver.some(m => /exceeds limit/i.test(m)), kingOver.join('; '));
+
+        assert('FORAGE648 policy profile', typeof sb.getForage648PolicyProfile === 'function' && sb.getForage648PolicyProfile('anchovies')?.level === 'complex');
+
+        const forageOver = checkSpeciesViolations('anchovies', SPECIES_DATA['anchovies'], {
+            'permit-type': 'commercial',
+            possessionAmount: 1800,
+            dateOfCatch: '2026-05-21'
+        });
+        assert('forage combined over 1700 lb', forageOver.some(m => /exceeds limit/i.test(m)), forageOver.join('; '));
+
+        assert('MPS24 policy profile salmon', typeof sb.getMps24PolicyProfile === 'function' && sb.getMps24PolicyProfile('atlantic-salmon')?.level === 'prohibited');
+
         // Grouped assessment path (speciesViolationChecks)
         const sf = SPECIES_DATA['summer-flounder'];
         const sfV = checkSpeciesViolations('summer-flounder', sf, {
             'has-permit': 'yes',
-            'permit-type': 'recreational',
-            possessionAmount: 10
+            'permit-type': 'commercial',
+            'mesh-compliant': 'no',
+            possessionAmount: 150,
+            dateOfCatch: '2026-07-01'
         });
-        assert('grouped summer flounder over recreational bag', sfV.some(m => /exceeds limit/i.test(m)), sfV.join('; '));
+        assert('grouped summer flounder commercial over small-mesh limit', sfV.some(m => /exceeds limit/i.test(m)), sfV.join('; '));
 
         sb.assessmentData = { vessel: { multispecies: { classification: 'common-pool' } }, species: {} };
         const cod = SPECIES_DATA['atlantic-cod'];

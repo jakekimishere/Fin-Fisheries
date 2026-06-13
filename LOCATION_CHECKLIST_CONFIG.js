@@ -118,10 +118,141 @@ const LOCATION_CHECKLIST_TEMPLATES = {
             }
         ]
     },
+    bsb648: {
+        sectionTitle: 'Special location checklist — black sea bass',
+        intro: 'Answer based on charts, gear inspection, or vessel statement. “Yes” means the situation applies.',
+        cfr: '50 CFR Part 648 Subpart I',
+        items: [
+            {
+                field: 'locBsbTransferAtSea',
+                question: 'Was black sea bass transferred at sea?',
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: Transfer at sea prohibited for black sea bass (50 CFR 648.140)'
+                }
+            },
+            {
+                field: 'locBsbTrawlMeshThreshold',
+                question: 'Commercial otter trawl — possession over seasonal threshold (>500 lb Jan–Mar or >100 lb Apr–Dec) without 4.5″ diamond mesh (75 meshes forward of codend)?',
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: Trawl mesh non-compliant for possession level (50 CFR 648.140)'
+                }
+            },
+            {
+                field: 'locBsbNorthernGra',
+                question: 'Northern Scup Gear Restricted Area (Nov 1–Dec 31) — fishing for black sea bass (or longfin squid/whiting) without 5″ diamond mesh?',
+                dateFilter: { months: [11, 12] },
+                violation: {
+                    ifTrue: 'VIOLATION: 5″ diamond mesh required in Northern Scup GRA (50 CFR 648.122)'
+                }
+            },
+            {
+                field: 'locBsbSouthernGra',
+                question: 'Southern Scup Gear Restricted Area (Jan 1–Mar 15) — fishing for black sea bass (or longfin squid/whiting) without 5″ diamond mesh?',
+                dateFilter: { months: [1, 2, 3] },
+                notes: 'Southern GRA applies through March 15 each year.',
+                violation: {
+                    ifTrue: 'VIOLATION: 5″ diamond mesh required in Southern Scup GRA (50 CFR 648.122)'
+                }
+            }
+        ]
+    },
+    scup648: {
+        sectionTitle: 'Special location checklist — scup',
+        intro: 'Answer based on charts, gear inspection, or vessel statement. “Yes” means the situation applies.',
+        cfr: '50 CFR Part 648 Subpart H',
+        items: [
+            {
+                field: 'locScupWinterOneClosed',
+                question: 'Commercial moratorium — fishing for or possessing scup in the EEZ during Winter I (Jan 1–Apr 30)?',
+                applicablePermits: ['commercial'],
+                dateFilter: { months: [1, 2, 3, 4] },
+                violation: {
+                    ifTrue: 'VIOLATION: Commercial scup fishery closed in EEZ during Winter I (50 CFR 648.121)'
+                }
+            },
+            {
+                field: 'locScupTransferAtSea',
+                question: 'Transfer at sea — scup transferred without meeting all requirements (both federal scup permits, seaward of boundary, Winter I or II only, one transfer/trip, full codend, VTR)?',
+                applicablePermits: ['commercial'],
+                notes: 'Transfer boundary runs from 40°50′N 70°00′W south to 35°30′N 75°00′W.',
+                violation: {
+                    ifTrue: 'VIOLATION: Non-compliant scup transfer at sea (50 CFR 648.121)'
+                }
+            },
+            {
+                field: 'locScupNorthernGra',
+                question: 'Northern Scup Gear Restricted Area (Nov 1–Dec 31) — fishing for longfin squid, black sea bass, or whiting without 5″ diamond mesh?',
+                dateFilter: { months: [11, 12] },
+                violation: {
+                    ifTrue: 'VIOLATION: 5″ diamond mesh required in Northern Scup GRA (50 CFR 648.122)'
+                }
+            },
+            {
+                field: 'locScupSouthernGra',
+                question: 'Southern Scup Gear Restricted Area (Jan 1–Mar 15) — fishing for longfin squid, black sea bass, or whiting without 5″ diamond mesh?',
+                dateFilter: { months: [1, 2, 3] },
+                notes: 'Southern GRA applies through March 15 each year.',
+                violation: {
+                    ifTrue: 'VIOLATION: 5″ diamond mesh required in Southern Scup GRA (50 CFR 648.122)'
+                }
+            },
+            {
+                field: 'locScupReducedMeshTrawl',
+                question: 'Commercial trawl — possession exceeds reduced mesh limit for the season (1,000 lb Oct 1–Apr 14; 2,000 lb Apr 15–Jun 15; 200 lb Jun 16–Sep 30) without compliant >5″ diamond mesh?',
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: Scup possession exceeds reduced mesh trawl limit (50 CFR 648.121)'
+                }
+            },
+            {
+                field: 'locScupSkinRemoved',
+                question: 'Scup landed with skin removed when prohibited (moratorium or charter trip, or from EEZ north of 35°15.3′ N)?',
+                violation: {
+                    ifTrue: 'VIOLATION: Scup may not be landed with skin removed under these conditions (50 CFR 648.121)'
+                }
+            }
+        ]
+    },
+    summerflounder648: {
+        sectionTitle: 'Special location checklist — summer flounder',
+        intro: 'Answer based on charts, gear inspection, or vessel statement. “Yes” means the situation applies.',
+        cfr: '50 CFR Part 648 Subpart G',
+        items: [
+            {
+                field: 'locSfSeaTurtleTed',
+                question: 'Otter trawl in the Summer Flounder Sea Turtle Protection Area (VA/NC south of Cape Charles) — fishing without an approved TED in a compliant TED extension?',
+                applicablePermits: ['commercial'],
+                notes: 'TED extension ≤3.5″ stretched mesh; frame min 51″×32″, 1.25″ alum pipe, max 4″ bar spacing, 30–55° angle. Exempt north of 35°46.1′ N Jan 15–Mar 15.',
+                violation: {
+                    ifTrue: 'VIOLATION: Approved TED required in Summer Flounder Sea Turtle Protection Area (50 CFR 223.206)'
+                }
+            },
+            {
+                field: 'locSfSmallMeshLoa',
+                question: 'Commercial — fishing east of 72°30′ W (May 1–Oct 31) with mesh below 5.5″ diamond/6″ square without a valid small mesh LOA aboard?',
+                applicablePermits: ['commercial'],
+                dateFilter: { months: [5, 6, 7, 8, 9, 10] },
+                violation: {
+                    ifTrue: 'VIOLATION: Small mesh east of 72°30′ W requires valid LOA May 1–Oct 31 (50 CFR 648.106)'
+                }
+            },
+            {
+                field: 'locSfMeshOverThreshold',
+                question: 'Commercial moratorium — possession over seasonal threshold (100 lb May–Oct / 200 lb Nov–Apr) using mesh below 5.5″ diamond or 6″ square throughout the net (without valid small mesh LOA where applicable)?',
+                applicablePermits: ['commercial'],
+                notes: 'Compliant large mesh: no federal possession limit.',
+                violation: {
+                    ifTrue: 'VIOLATION: Non-compliant mesh for possession level (50 CFR 648.106)'
+                }
+            }
+        ]
+    },
     herring648: {
         sectionTitle: 'Special location checklist — Atlantic herring',
-        intro: 'Confirm area status from charts, VMS, or vessel statement.',
-        cfr: '50 CFR Part 648 Subpart J',
+        intro: 'Confirm area status from charts, VMS, or vessel statement. “Yes” means the situation applies.',
+        cfr: '50 CFR Part 648 — Atlantic Herring',
         items: [
             {
                 field: 'locHerringClosedArea',
@@ -129,6 +260,620 @@ const LOCATION_CHECKLIST_TEMPLATES = {
                 notes: 'Includes seasonal or in-season area closures beyond trip limits.',
                 violation: {
                     ifTrue: 'VIOLATION: Herring fishing in closed management area (50 CFR 648.201)'
+                }
+            },
+            {
+                field: 'locHerringArea1ADirected',
+                question: 'Directed Atlantic herring fishing in Area 1A (currently closed to directed fishery)?',
+                applicablePermits: ['commercial', 'herring-cat-a', 'herring-cat-b', 'herring-cat-c', 'herring-cat-d', 'herring-cat-e'],
+                violation: {
+                    ifTrue: 'VIOLATION: Area 1A closed to directed Atlantic herring fishery (50 CFR 648.201)'
+                }
+            },
+            {
+                field: 'locHerringMidwaterTrawl1A',
+                question: 'Midwater trawl fishing for herring in Area 1A during Jun 1–Sep 30?',
+                applicablePermits: ['commercial', 'herring-cat-a', 'herring-cat-b', 'herring-cat-c', 'herring-cat-d', 'herring-cat-e'],
+                dateFilter: { months: [6, 7, 8, 9] },
+                violation: {
+                    ifTrue: 'VIOLATION: Midwater trawl prohibited in Area 1A Jun 1–Sep 30 (50 CFR 648.201)'
+                }
+            },
+            {
+                field: 'locHerringArea1ATransit',
+                question: 'Transiting Area 1A with herring on board without all fishing gear stowed?',
+                applicablePermits: ['commercial', 'herring-cat-a', 'herring-cat-b', 'herring-cat-c', 'herring-cat-d', 'herring-cat-e'],
+                violation: {
+                    ifTrue: 'VIOLATION: Directed herring vessels transiting Area 1A must have all gear stowed (50 CFR 648.201)'
+                }
+            },
+            {
+                field: 'locHerringTransferAtSea',
+                question: 'Unauthorized transfer or receipt of Atlantic herring at sea (not carrier, personal bait, or authorized cooperative transfer)?',
+                applicablePermits: ['commercial', 'herring-cat-a', 'herring-cat-b', 'herring-cat-c', 'herring-cat-d', 'herring-cat-e'],
+                violation: {
+                    ifTrue: 'VIOLATION: Unauthorized Atlantic herring transfer at sea (50 CFR 648.201)'
+                }
+            },
+            {
+                field: 'locHerringDof',
+                question: 'Vessel declared out of the herring fishery (DOF) but harvesting, possessing, or landing herring on this trip?',
+                applicablePermits: ['commercial', 'herring-cat-a', 'herring-cat-b', 'herring-cat-c', 'herring-cat-d', 'herring-cat-e'],
+                violation: {
+                    ifTrue: 'VIOLATION: Declared out of fishery — may not harvest, possess, or land herring (50 CFR 648.201)'
+                }
+            },
+            {
+                field: 'locHerringCarrierGear',
+                question: 'Herring carrier operating with gear capable of catching or processing herring aboard, or engaged in fishing activity?',
+                violation: {
+                    ifTrue: 'VIOLATION: Herring carrier may not have catching/processing gear aboard or engage in fishing (50 CFR 648.201)'
+                }
+            },
+            {
+                field: 'locHerringObserverRequired',
+                question: 'Midwater trawl in NMS Closed Area 1 North (Feb 1–Apr 15), Closed Area 2, Cashes Ledge, or Western GOM without a NOAA observer?',
+                applicablePermits: ['commercial', 'herring-cat-a', 'herring-cat-b', 'herring-cat-c', 'herring-cat-d', 'herring-cat-e'],
+                violation: {
+                    ifTrue: 'VIOLATION: NOAA observer required for midwater trawl in designated areas (50 CFR 648.201)'
+                }
+            }
+        ]
+    },
+    bluefish648: {
+        sectionTitle: 'Special location checklist — bluefish',
+        intro: 'Answer based on charts or vessel statement. “Yes” means the situation applies.',
+        cfr: '50 CFR Part 648 — Atlantic Bluefish',
+        items: [
+            {
+                field: 'locBluefishClosedArea',
+                question: 'Is the vessel fishing for bluefish in a year-round or seasonal closed area?',
+                notes: 'See Northeast closed-area charts.',
+                violation: {
+                    ifTrue: 'VIOLATION: Bluefish fishing in closed area (50 CFR 648.160)'
+                }
+            },
+            {
+                field: 'locBluefishCharterBag',
+                question: 'Charter/party — is possession over 7 fish per person when bluefish on board are divided by persons aboard excluding captain and crew?',
+                applicablePermits: ['recreational-for-hire', 'charter-headboat'],
+                violation: {
+                    ifTrue: 'VIOLATION: Charter/party bluefish possession limit exceeded (50 CFR 648.160)'
+                }
+            }
+        ]
+    },
+    dogfish648: {
+        sectionTitle: 'Special location checklist — spiny dogfish',
+        intro: 'Answer based on charts, gear inspection, or vessel statement. “Yes” means the situation applies.',
+        cfr: '50 CFR Part 648 — Spiny Dogfish',
+        items: [
+            {
+                field: 'locDogfishClosedArea',
+                question: 'Is the vessel fishing for spiny dogfish in a year-round or seasonal closed area?',
+                violation: {
+                    ifTrue: 'VIOLATION: Spiny dogfish fishing in closed area (50 CFR 648.230)'
+                }
+            },
+            {
+                field: 'locDogfishSecondTripDay',
+                question: 'Commercial open access — is this a second spiny dogfish trip on the same calendar day?',
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: Only one spiny dogfish trip permitted per calendar day (50 CFR 648.230)'
+                }
+            },
+            {
+                field: 'locDogfishMeshNonCompliant',
+                question: 'Trawl or gillnet fishing for dogfish outside an exemption area without 6.5″ square or diamond mesh throughout the net?',
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: 6.5″ square or diamond mesh required in RMAs (50 CFR 648.230)'
+                }
+            },
+            {
+                field: 'locDogfishGillnetLength',
+                question: 'Gillnet gear longer than 300 feet while fishing for spiny dogfish?',
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: Gillnet may not exceed 300 feet (50 CFR 648.230)'
+                }
+            },
+            {
+                field: 'locDogfishSturgeonOvernightSoak',
+                question: 'Gillnet overnight soak in an Atlantic Sturgeon Bycatch Reduction Area (New Jersey, Delaware/Maryland, or Virginia)?',
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: Overnight gillnet soak prohibited in Atlantic Sturgeon Bycatch Reduction Areas (50 CFR 648.230)'
+                }
+            },
+            {
+                field: 'locDogfishNantucketShoals',
+                question: 'Nantucket Shoals Dogfish Exemption Area (Jun 1–Oct 15) — fishing without LOA, wrong incidental species, or transiting GOM/GB RMA with small mesh not stowed?',
+                applicablePermits: ['commercial'],
+                dateFilter: { months: [6, 7, 8, 9, 10] },
+                violation: {
+                    ifTrue: 'VIOLATION: Non-compliant Nantucket Shoals Dogfish Exemption Area fishing (50 CFR 648.230)'
+                }
+            },
+            {
+                field: 'locDogfishGomGbGillnet',
+                question: 'GOM/GB Dogfish Gillnet Exemption Area (Jul 1–Aug 31) — fishing without 6.5″ diamond mesh or possessing species other than dogfish and allowed lobster?',
+                applicablePermits: ['commercial'],
+                dateFilter: { months: [7, 8] },
+                violation: {
+                    ifTrue: 'VIOLATION: Non-compliant GOM/GB Dogfish Gillnet Exemption Area fishing (50 CFR 648.230)'
+                }
+            },
+            {
+                field: 'locDogfishCapeCodExemption',
+                question: 'Cape Cod Dogfish Exemption Area — fishing outside season, with wrong gear, or retaining Northeast multispecies?',
+                applicablePermits: ['commercial'],
+                dateFilter: { months: [6, 7, 8, 9, 10, 11, 12] },
+                notes: 'Western area Jun–Aug handgear/longline; Eastern area Jun–Aug handgear, Jun–Dec gillnet/longline.',
+                violation: {
+                    ifTrue: 'VIOLATION: Non-compliant Cape Cod Dogfish Exemption Area fishing (50 CFR 648.230)'
+                }
+            },
+            {
+                field: 'locDogfishSneGillnet',
+                question: 'Southern New England Dogfish Gillnet Exemption Area (May 1–Oct 31) — fishing without 6″ diamond mesh or retaining regulated Northeast multispecies?',
+                applicablePermits: ['commercial'],
+                dateFilter: { months: [5, 6, 7, 8, 9, 10] },
+                violation: {
+                    ifTrue: 'VIOLATION: Non-compliant SNE Dogfish Gillnet Exemption Area fishing (50 CFR 648.230)'
+                }
+            },
+            {
+                field: 'locDogfishMidAtlanticExemption',
+                question: 'Mid-Atlantic Exemption Area — gillnet fishing without monkfish DAS, or retaining regulated Northeast multispecies (other than small-mesh whiting/red hake)?',
+                applicablePermits: ['commercial'],
+                notes: 'Gillnet: 5″ minimum mesh, max 50 stand-up nets, monkfish DAS required.',
+                violation: {
+                    ifTrue: 'VIOLATION: Non-compliant Mid-Atlantic Dogfish Exemption Area fishing (50 CFR 648.230)'
+                }
+            }
+        ]
+    },
+    redcrab648: {
+        sectionTitle: 'Special location checklist — Atlantic deep sea red crab',
+        intro: 'Answer based on gear inspection or vessel statement. “Yes” means the situation applies.',
+        cfr: '50 CFR Part 648 — Atlantic Deep Sea Red Crab',
+        items: [
+            {
+                field: 'locRedCrabClosedArea',
+                question: 'Is the vessel fishing for red crab in a year-round or seasonal closed area?',
+                violation: {
+                    ifTrue: 'VIOLATION: Red crab fishing in closed area (50 CFR 648.260)'
+                }
+            },
+            {
+                field: 'locRedCrabTransferAtSea',
+                question: 'Was Atlantic deep sea red crab transferred at sea?',
+                applicablePermits: ['commercial', 'red-crab-cat-b', 'red-crab-cat-c', 'red-crab-open-incidental'],
+                violation: {
+                    ifTrue: 'VIOLATION: Transfer at sea prohibited for Atlantic deep sea red crab (50 CFR 648.260)'
+                }
+            },
+            {
+                field: 'locRedCrabFemaleOverTote',
+                question: 'Female red crabs on board in excess of one standard tote (~100 lb) of incidentally caught females?',
+                applicablePermits: ['commercial', 'red-crab-cat-b', 'red-crab-cat-c', 'red-crab-open-incidental'],
+                violation: {
+                    ifTrue: 'VIOLATION: Female red crab possession exceeds incidental tote limit (50 CFR 648.260)'
+                }
+            },
+            {
+                field: 'locRedCrabMutilation',
+                question: 'Claws/legs separate from bodies in excess of allowed mutilation limits for this permit/trip type?',
+                applicablePermits: ['commercial', 'red-crab-cat-b', 'red-crab-cat-c', 'red-crab-open-incidental'],
+                notes: 'Dedicated trip: one standard tote of separated claws/legs. Open access/incidental: no separate claws/legs; max 2 claws and 8 legs per body.',
+                violation: {
+                    ifTrue: 'VIOLATION: Red crab mutilation limits exceeded (50 CFR 648.260)'
+                }
+            },
+            {
+                field: 'locRedCrabTrapSize',
+                question: 'Red crab DAS — trap volume exceeds 18 cubic feet (without LOA for other shapes)?',
+                applicablePermits: ['commercial', 'red-crab-cat-b', 'red-crab-cat-c'],
+                violation: {
+                    ifTrue: 'VIOLATION: Red crab trap exceeds 18 cubic feet on red crab DAS (50 CFR 648.260)'
+                }
+            },
+            {
+                field: 'locRedCrabTrapLimit',
+                question: 'More than 600 red crab traps/pots aboard while fishing for red crab?',
+                applicablePermits: ['commercial', 'red-crab-cat-b', 'red-crab-cat-c'],
+                violation: {
+                    ifTrue: 'VIOLATION: Red crab trap limit is 600 traps/pots (50 CFR 648.260)'
+                }
+            },
+            {
+                field: 'locRedCrabBuoyMarkings',
+                question: 'Red crab trap buoys missing “RC” on top, permit number, trawl sequence, high flyers, or radar reflectors?',
+                applicablePermits: ['commercial', 'red-crab-cat-b', 'red-crab-cat-c'],
+                violation: {
+                    ifTrue: 'VIOLATION: Red crab trap buoy marking or reflector requirements not met (50 CFR 648.260)'
+                }
+            }
+        ]
+    },
+    lobster697: {
+        sectionTitle: 'Special location checklist — American lobster / Jonah crab',
+        intro: 'Answer based on charts, gear inspection, or vessel statement. “Yes” means the situation applies.',
+        cfr: '50 CFR Part 697',
+        items: [
+            {
+                field: 'locLobsterEggBearing',
+                question: 'Egg-bearing American lobster or Jonah crab on board?',
+                violation: {
+                    ifTrue: 'VIOLATION: Egg-bearing lobster or Jonah crab prohibited (50 CFR 697.7)'
+                }
+            },
+            {
+                field: 'locLobsterProhibitedCondition',
+                question: 'Prohibited lobster on board — scrubbed/bleached, v-notched (per area tolerance), mutilated, or speared?',
+                speciesOnly: ['american-lobster'],
+                violation: {
+                    ifTrue: 'VIOLATION: Prohibited lobster condition (50 CFR 697.7)'
+                }
+            },
+            {
+                field: 'locLobsterTransferAtSea',
+                question: 'American lobster or Jonah crab transferred at sea?',
+                violation: {
+                    ifTrue: 'VIOLATION: Transfer at sea prohibited (50 CFR 697.7)'
+                }
+            },
+            {
+                field: 'locLobsterPartialMeat',
+                question: 'Possession of lobster meat or parts (other than whole lobsters) prior to landing?',
+                speciesOnly: ['american-lobster'],
+                violation: {
+                    ifTrue: 'VIOLATION: Lobster meat or parts prohibited prior to landing — whole only (50 CFR 697.7)'
+                }
+            },
+            {
+                field: 'locLobsterOtherVesselTraps',
+                question: 'Trap gear issued to another vessel possessed, deployed, fished, hauled, or on board?',
+                applicablePermits: ['commercial', 'commercial-trap', 'commercial-non-trap'],
+                violation: {
+                    ifTrue: 'VIOLATION: Prohibited to use trap gear issued to another vessel (50 CFR 697.20)'
+                }
+            },
+            {
+                field: 'locLobsterTrapRga',
+                question: 'Mobile gear or trap/pot fishing in a Lobster Trap/Pot RGA during that gear type’s closed season (RGA I–IV)?',
+                applicablePermits: ['commercial', 'commercial-trap'],
+                notes: 'RGA I mobile Oct 1–Jun 15 / trap Jun 16–Sep 30; II mobile Nov 27–Jun 15 / trap Jun 16–Nov 26; III mobile Jun 16–Nov 26 / trap Jan 1–Apr 30; IV mobile Jun 16–Sep 30 / trap no closure.',
+                violation: {
+                    ifTrue: 'VIOLATION: Fishing prohibited in Lobster Trap/Pot RGA during closure (50 CFR 697.20)'
+                }
+            },
+            {
+                field: 'locLobsterClosedSeason',
+                question: 'Trap fishing in LMA 4 (Apr 30–May 31), LMA 5 (Feb 1–Mar 31), or Outer Cape (Feb 1–Mar 31) during closed season?',
+                speciesOnly: ['american-lobster'],
+                applicablePermits: ['commercial', 'commercial-trap'],
+                violation: {
+                    ifTrue: 'VIOLATION: Lobster trap fishery closed for management area season (50 CFR 697.17)'
+                }
+            },
+            {
+                field: 'locLobsterMraWedge',
+                question: 'MRA Wedge (Massachusetts Restricted Area) — trap/pot gear not removed Feb 1–Apr 30, or trawls reset during closure?',
+                applicablePermits: ['commercial', 'commercial-trap'],
+                dateFilter: { months: [2, 3, 4] },
+                violation: {
+                    ifTrue: 'VIOLATION: Lobster/Jonah crab trap gear must be removed during MRA Wedge closure (50 CFR 229.32)'
+                }
+            },
+            {
+                field: 'locLobsterTrapGearSpecs',
+                question: 'Trap missing parlor escape vent or ghost panel (≥3-3/4″ opening, biodegradable fastener), or exceeds area trap volume (nearshore 22,950 in³ / offshore 30,100 in³)?',
+                applicablePermits: ['commercial', 'commercial-trap'],
+                violation: {
+                    ifTrue: 'VIOLATION: Non-compliant lobster trap gear specifications (50 CFR 697.20)'
+                }
+            },
+            {
+                field: 'locLobsterTrapLimit',
+                question: 'Number of traps aboard exceeds permit/LMA trap limit for the management area?',
+                speciesOnly: ['american-lobster'],
+                applicablePermits: ['commercial', 'commercial-trap'],
+                notes: 'Area 1: 800; Area 2 max 800; Area 3 max 1,945; Areas 4/5 max 1,440; Outer Cape max 800; Area 6 state waters.',
+                violation: {
+                    ifTrue: 'VIOLATION: Trap limit exceeded for lobster management area (50 CFR 697.17)'
+                }
+            },
+            {
+                field: 'locJonahNonTrapLimit',
+                question: 'Commercial non-trap — Jonah crabs exceed 1,000 or exceed 50% by weight of all other catch on board?',
+                speciesOnly: ['jonah-crab'],
+                applicablePermits: ['commercial-non-trap'],
+                violation: {
+                    ifTrue: 'VIOLATION: Jonah crab non-trap possession limit exceeded (50 CFR 697.7)'
+                }
+            }
+        ]
+    },
+    prohib697: {
+        sectionTitle: 'Special location checklist — striped bass, sturgeon, horseshoe crab, red drum, weakfish',
+        intro: 'Answer based on charts, gear inspection, or vessel statement. “Yes” means the situation applies.',
+        cfr: '50 CFR Part 697',
+        items: [
+            {
+                field: 'locStripedBassEezPossession',
+                question: 'Atlantic striped bass possessed in the EEZ outside the Block Island Sound transit exemption corridor?',
+                speciesOnly: ['striped-bass'],
+                violation: {
+                    ifTrue: 'VIOLATION: Atlantic striped bass prohibited in the EEZ outside Block Island Sound transit exemption (50 CFR 697.7)'
+                }
+            },
+            {
+                field: 'locStripedBassEezFishing',
+                question: 'Fishing for Atlantic striped bass from the vessel while in the EEZ (including within the transit corridor)?',
+                speciesOnly: ['striped-bass'],
+                violation: {
+                    ifTrue: 'VIOLATION: Fishing for striped bass from a vessel in the EEZ prohibited (50 CFR 697.7)'
+                }
+            },
+            {
+                field: 'locSturgeonEezPossession',
+                question: 'Atlantic or shortnose sturgeon possessed or harvested in the EEZ?',
+                speciesOnly: ['atlantic-sturgeon', 'shortnose-sturgeon'],
+                violation: {
+                    ifTrue: 'VIOLATION: Sturgeon prohibited in the EEZ — release immediately (50 CFR 697.7)'
+                }
+            },
+            {
+                field: 'locHorseshoeShusterReserve',
+                question: 'Fishing for horseshoe crabs in the Carl N. Shuster Jr. Horseshoe Crab Reserve?',
+                speciesOnly: ['atlantic-coast-horseshoe-crab'],
+                violation: {
+                    ifTrue: 'VIOLATION: Fishing for horseshoe crabs prohibited in Carl N. Shuster Jr. Reserve (50 CFR 697.7)'
+                }
+            },
+            {
+                field: 'locHorseshoeTrawlDredgeClosed',
+                question: 'Horseshoe crabs on board a vessel equipped with trawl or dredge gear within the closed reserve area?',
+                speciesOnly: ['atlantic-coast-horseshoe-crab'],
+                violation: {
+                    ifTrue: 'VIOLATION: Possession of horseshoe crabs on trawl/dredge vessel in closed area prohibited (50 CFR 697.7)'
+                }
+            },
+            {
+                field: 'locRedDrumProhibitedZone',
+                question: 'Atlantic red drum harvested or possessed in the EEZ south of the NJ/NY line (40°29.6′ N, 73°54.1′ W) to the South Atlantic/Gulf council boundary?',
+                speciesOnly: ['red-drum'],
+                violation: {
+                    ifTrue: 'VIOLATION: Atlantic red drum prohibited in EEZ south of NJ/NY line — release immediately (50 CFR 697.7)'
+                }
+            },
+            {
+                field: 'locRedDrumRecFederal',
+                question: 'Recreational red drum retained or possessed in federal waters?',
+                speciesOnly: ['red-drum'],
+                applicablePermits: ['recreational'],
+                violation: {
+                    ifTrue: 'VIOLATION: Recreational red drum fishing prohibited in federal waters (50 CFR 697.7)'
+                }
+            },
+            {
+                field: 'locWeakfishRestrictedGear',
+                question: 'Weakfish possessed on board while fishing with shrimp trawls, flynet, or crab trawls in the restricted gear area (Cape Hatteras to NC/SC line)?',
+                speciesOnly: ['weakfish'],
+                violation: {
+                    ifTrue: 'VIOLATION: Weakfish possession prohibited while fishing restricted gear in closed area (50 CFR 697.7)'
+                }
+            }
+        ]
+    },
+    mps24: {
+        sectionTitle: 'Special location checklist — marine protected species (ESA)',
+        intro: 'Answer based on observation, gear inspection, or vessel statement. “Yes” means the situation applies.',
+        cfr: '50 CFR Part 17 — Endangered Species Act',
+        items: [
+            {
+                field: 'locEsaProtectedRetention',
+                question: 'ESA-listed marine species retained on board without valid permit or authorization?',
+                violation: {
+                    ifTrue: 'VIOLATION: Endangered species retention prohibited under ESA (50 CFR 17.21)'
+                }
+            },
+            {
+                field: 'locEsaTakeViolation',
+                question: 'Protected species taken, harassed, harmed, or not released immediately when required?',
+                violation: {
+                    ifTrue: 'VIOLATION: Unlawful take of protected species under ESA (50 CFR 17.21)'
+                }
+            },
+            {
+                field: 'locEsaRegulationViolation',
+                question: 'Violation of protected species regulations — e.g., TED requirements, critical habitat exclusion, or whale approach distance?',
+                violation: {
+                    ifTrue: 'VIOLATION: Protected species regulation violation (50 CFR 17.21; 50 CFR 223.206)'
+                }
+            }
+        ]
+    },
+    dolphin622: {
+        sectionTitle: 'Special location checklist — Atlantic dolphin / wahoo',
+        intro: 'Answer based on charts, gear inspection, or vessel statement. “Yes” means the situation applies.',
+        cfr: '50 CFR 622 Subpart M',
+        items: [
+            {
+                field: 'locDolphinTransferAtSea',
+                question: 'Dolphin or wahoo transferred at sea?',
+                violation: {
+                    ifTrue: 'VIOLATION: Transfer at sea prohibited (50 CFR 622.278)'
+                }
+            },
+            {
+                field: 'locDolphinLonglineClosed',
+                question: 'Longline gear used in an area closed to HMS longline gear?',
+                violation: {
+                    ifTrue: 'VIOLATION: Longline gear prohibited in HMS closed area (50 CFR 622.278)'
+                }
+            },
+            {
+                field: 'locDolphinCarcassCondition',
+                question: 'Dolphin or wahoo in Atlantic EEZ not maintained with head and fins intact (beyond evisceration, gilling, scaling)?',
+                violation: {
+                    ifTrue: 'VIOLATION: Dolphin/wahoo carcass condition requirements not met (50 CFR 622.278)'
+                }
+            },
+            {
+                field: 'locDolphinNorth39NoEndorsement',
+                question: 'North of 39° N without Dolphin/Wahoo endorsement — combined dolphin/wahoo possession exceeds 200 lb/trip or vessel lacks valid federal fishing permit?',
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: North of 39° N incidental limit exceeded or missing valid FFP (50 CFR 622.278)'
+                }
+            },
+            {
+                field: 'locDolphinVesselBagLimit',
+                question: 'Recreational or charter — dolphin on board exceed 54 per vessel per day (or headboat 10 per paying passenger)?',
+                speciesOnly: ['mahi-mahi'],
+                applicablePermits: ['recreational', 'charter-headboat', 'party-headboat'],
+                violation: {
+                    ifTrue: 'VIOLATION: Recreational dolphin vessel limit exceeded (50 CFR 622.278)'
+                }
+            }
+        ]
+    },
+    cmp622: {
+        sectionTitle: 'Special location checklist — coastal migratory pelagics',
+        intro: 'Answer based on charts, gear inspection, or vessel statement. “Yes” means the situation applies.',
+        cfr: '50 CFR 622 Subpart Q',
+        items: [
+            {
+                field: 'locCmpTransferAtSea',
+                question: 'King mackerel, Spanish mackerel, or cobia transferred at sea?',
+                violation: {
+                    ifTrue: 'VIOLATION: Transfer at sea prohibited (50 CFR 622.382)'
+                }
+            },
+            {
+                field: 'locCmpGillnetMesh',
+                question: 'Run-around gillnet mesh below minimum — king mackerel 4.75″ or Spanish mackerel 3.5″?',
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: CMP gillnet mesh below minimum requirement (50 CFR 622.382)'
+                }
+            }
+        ]
+    },
+    forage648: {
+        sectionTitle: 'Special location checklist — Mid-Atlantic unmanaged forage',
+        intro: 'Answer based on charts, gear inspection, or vessel statement. “Yes” means the situation applies.',
+        cfr: '50 CFR 648 Subpart P',
+        items: [
+            {
+                field: 'locForageCombinedLimit',
+                question: 'Commercial — combined Mid-Atlantic forage species on board exceed 1,700 lb/trip (without valid transit exemption)?',
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: Mid-Atlantic forage combined possession limit exceeded (50 CFR 648.94)'
+                }
+            },
+            {
+                field: 'locForageTransitGear',
+                question: 'Transiting management unit above possession limit with gear not stowed or available for immediate use?',
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: Forage transit — gear must be stowed and unavailable for use (50 CFR 648.94)'
+                }
+            },
+            {
+                field: 'locForageHarvestInUnit',
+                question: 'Forage species harvested inside the Mid-Atlantic Forage Species Management Unit without complying with trip limit?',
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: Forage fishing in management unit — 1,700 lb combined limit applies (50 CFR 648.94)'
+                }
+            }
+        ]
+    },
+    tilefish648: {
+        sectionTitle: 'Special location checklist — tilefish',
+        intro: 'Answer based on charts, gear inspection, or vessel statement. “Yes” means the situation applies.',
+        cfr: '50 CFR Part 648 — Tilefish',
+        items: [
+            {
+                field: 'locTilefishGraCanyon',
+                question: 'Bottom-tending mobile gear (otter trawl, beam trawl, dredge, seine) fishing in a Tilefish Gear Restricted Area (Lydonia, Norfolk, Oceanographer, or Veatch Canyon)?',
+                violation: {
+                    ifTrue: 'VIOLATION: Bottom-tending mobile gear prohibited in Tilefish GRAs (50 CFR 648.290)'
+                }
+            },
+            {
+                field: 'locTilefishBluelineRecSeason',
+                question: 'Blueline tilefish — recreational or for-hire retention outside federal season (May 15–November 14)?',
+                speciesOnly: ['blueline-tilefish'],
+                applicablePermits: ['recreational', 'charter-headboat', 'party-headboat'],
+                violation: {
+                    ifTrue: 'VIOLATION: Blueline tilefish recreational season closed (50 CFR 648.290)'
+                }
+            },
+            {
+                field: 'locTilefishClosedArea',
+                question: 'Is the vessel fishing for tilefish in a year-round or seasonal closed area?',
+                violation: {
+                    ifTrue: 'VIOLATION: Tilefish fishing in closed area (50 CFR 648.290)'
+                }
+            }
+        ]
+    },
+    skate648: {
+        sectionTitle: 'Special location checklist — Northeast skate complex',
+        intro: 'Answer based on species ID, gear inspection, or vessel statement. “Yes” means the situation applies.',
+        cfr: '50 CFR Part 648 — Northeast Skate Complex',
+        items: [
+            {
+                field: 'locSkateThornyOnBoard',
+                question: 'Thorny skate on board or landed?',
+                violation: {
+                    ifTrue: 'VIOLATION: Thorny skate possession and landing prohibited (50 CFR 648.322)'
+                }
+            },
+            {
+                field: 'locSkateBarndoorBait',
+                question: 'Skate bait LOA trip — barndoor skate on board or landed?',
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: Barndoor skate prohibited in bait fishery (50 CFR 648.322)'
+                }
+            },
+            {
+                field: 'locSkateTransferAtSea',
+                question: 'Skate transferred at sea without federal skate permit and valid LOA on the transferring vessel?',
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: Unauthorized skate transfer at sea (50 CFR 648.322)'
+                }
+            },
+            {
+                field: 'locSkateCarcassWingRatio',
+                question: 'Skate carcass weight exceeds 1.27× associated wing weight, or carcasses possessed without associated wings?',
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: Non-compliant skate carcass/wing possession (50 CFR 648.322)'
+                }
+            },
+            {
+                field: 'locSkateBaitLoa',
+                question: 'Skate bait LOA trip — fishing without LOA, whole skates under 23″, or possession over 25,000 lb whole skates?',
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: Non-compliant skate bait LOA fishing (50 CFR 648.322)'
+                }
+            },
+            {
+                field: 'locSkateClosedArea',
+                question: 'Is the vessel fishing for skate in a year-round or seasonal closed area?',
+                violation: {
+                    ifTrue: 'VIOLATION: Skate fishing in closed area (50 CFR 648.322)'
                 }
             }
         ]
@@ -361,6 +1106,9 @@ const LOCATION_CHECKLIST_TEMPLATES = {
 
 /** speciesId → template key */
 const LOCATION_CHECKLIST_BY_SPECIES = {
+    'black-sea-bass': 'bsb648',
+    'scup': 'scup648',
+    'summer-flounder': 'summerflounder648',
     'atlantic-sea-scallop': 'scallop648',
     'surf-clam': 'surfclam648',
     'ocean-quahog': 'surfclam648',
@@ -368,8 +1116,45 @@ const LOCATION_CHECKLIST_BY_SPECIES = {
     'longfin-squid': 'smb648',
     'shortfin-squid': 'smb648',
     'butterfish': 'smb648',
-    'atlantic-chub-mackerel': 'smb648',
+    'atlantic-chub-mackerel': 'forage648',
     'atlantic-herring': 'herring648',
+    'bluefish': 'bluefish648',
+    'spiny-dogfish': 'dogfish648',
+    'atlantic-deep-sea-red-crab': 'redcrab648',
+    'golden-tilefish': 'tilefish648',
+    'blueline-tilefish': 'tilefish648',
+    'skate': 'skate648',
+    'thorny-skate': 'skate648',
+    'smooth-skate': 'skate648',
+    'barndoor-skate': 'skate648',
+    'american-lobster': 'lobster697',
+    'jonah-crab': 'lobster697',
+    'striped-bass': 'prohib697',
+    'atlantic-sturgeon': 'prohib697',
+    'shortnose-sturgeon': 'prohib697',
+    'atlantic-coast-horseshoe-crab': 'prohib697',
+    'red-drum': 'prohib697',
+    'weakfish': 'prohib697',
+    'mahi-mahi': 'dolphin622',
+    'tigerfish': 'dolphin622',
+    'king-mackerel': 'cmp622',
+    'spanish-mackerel': 'cmp622',
+    'atlantic-salmon': 'mps24',
+    'anchovies': 'forage648',
+    'argentines': 'forage648',
+    'greeneyes': 'forage648',
+    'halfbeaks': 'forage648',
+    'lanternfishes': 'forage648',
+    'pearlsides': 'forage648',
+    'sand-lances': 'forage648',
+    'silversides': 'forage648',
+    'cusk-eels': 'forage648',
+    'atlantic-saury': 'forage648',
+    'pelagic-mollusks': 'forage648',
+    'species-under-1inch': 'forage648',
+    'copepod': 'forage648',
+    'krill': 'forage648',
+    'amphipods': 'forage648',
     'atlantic-cod': 'groundfish648',
     'haddock': 'groundfish648',
     'yellowtail-flounder': 'groundfish648',
