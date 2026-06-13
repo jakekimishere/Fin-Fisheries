@@ -6,7 +6,11 @@ const IMAGE_CACHE_NAME = 'fin-fisheries-images-v2';
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(APP_CACHE_NAME)
-            .then(cache => cache.addAll(APP_CACHE_URLS))
+            .then(cache => Promise.all(
+                APP_CACHE_URLS.map(url =>
+                    cache.add(url).catch(err => console.warn('SW precache skipped:', url, err))
+                )
+            ))
             .then(() => self.skipWaiting())
     );
 });
