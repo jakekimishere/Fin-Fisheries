@@ -1,7 +1,6 @@
 // 648 bluefish, scup, BSB, etc.
 // Auto-split from species-data.js — edit here for routine updates.
 
-// Add additional Northeast species with full regulations
 // Bluefish
 SPECIES_DATA['bluefish'] = {
     name: 'Bluefish',
@@ -13,7 +12,7 @@ SPECIES_DATA['bluefish'] = {
     regulations: {
         permits: {
             'commercial': {
-                name: 'Commercial Federal Permit',
+                name: 'Open Access Commercial Moratorium',
                 required: true,
                 cfr: '50 CFR 648.4'
             },
@@ -67,7 +66,7 @@ SPECIES_DATA['bluefish'] = {
             'general': {
                 name: 'General Gear',
                 cfr: '50 CFR 648.160',
-                notes: 'Check for area-specific gear restrictions'
+                notes: 'No federal gear restrictions — verify year-round closed areas.'
             }
         },
         assessmentQuestions: {
@@ -76,7 +75,7 @@ SPECIES_DATA['bluefish'] = {
                 field: 'permitType',
                 required: true,
                 options: [
-                    { value: 'commercial', label: 'Commercial Federal Permit', description: 'Commercial fishing permit' },
+                    { value: 'commercial', label: 'Open Access Commercial Moratorium', description: 'Commercial moratorium permit' },
                     { value: 'recreational', label: 'Recreational - Private Vessel', description: 'Private angler, no charter permit' },
                     { value: 'recreational-for-hire', label: 'Recreational - For-Hire / Charter', description: 'Charter or party boat with bluefish permit' }
                 ],
@@ -147,6 +146,17 @@ SPECIES_DATA['bluefish'] = {
                     ifFalse: 'VIOLATION: Commercial catch reporting required (50 CFR 648.7)'
                 },
                 cfr: '50 CFR 648.7'
+            },
+            operatorPermit: {
+                question: 'Does the operator hold a valid federal operator permit?',
+                field: 'operatorPermit',
+                required: false,
+                type: 'choice',
+                applicablePermits: ['commercial', 'recreational-for-hire'],
+                violation: {
+                    ifFalse: 'VIOLATION: Commercial or charter/party fishing requires valid operator permit (50 CFR 648.4)'
+                },
+                cfr: '50 CFR 648.4'
             }
         }
     }
@@ -163,7 +173,12 @@ SPECIES_DATA['black-sea-bass'] = {
     regulations: {
         permits: {
             'commercial': {
-                name: 'Commercial Federal Permit',
+                name: 'Commercial Moratorium Permit',
+                required: true,
+                cfr: '50 CFR 648.4'
+            },
+            'charter-headboat': {
+                name: 'Charter/Party Vessel Permit',
                 required: true,
                 cfr: '50 CFR 648.4'
             },
@@ -175,17 +190,25 @@ SPECIES_DATA['black-sea-bass'] = {
         },
         possession: {
             'commercial': {
-                name: 'Commercial',
-                limit: null, // Varies by season and area
+                name: 'Commercial Moratorium',
+                limit: null,
                 unit: 'lbs',
                 cfr: '50 CFR 648.140',
-                notes: 'Possession limits vary by season and management area. Check current regulations.'
+                notes: 'Unlimited; must be stored in standard 100 lb totes. Trawl mesh rules above 500 lb/trip Jan–Mar or 100 lb/trip Apr–Dec.'
+            },
+            'charter-headboat': {
+                name: 'Charter/Party',
+                limit: null,
+                unit: 'fish',
+                cfr: '50 CFR 648.140',
+                notes: 'Federal limits waived — state of landing applies. More restrictive of federal vs state if both apply. Exclude captain/crew from person count.'
             },
             'recreational': {
                 name: 'Recreational',
-                limit: { count: 15, unit: 'fish' },
+                limit: null,
+                unit: 'fish',
                 cfr: '50 CFR 648.140',
-                notes: 'Reference federal coastwide limit (status quo). Apr 30, 2026 rule: federal measures waived—conservation equivalency; state bag/size/season apply (~20% collective harvest increase).'
+                notes: 'Federal limits waived — verify state conservation equivalency measures.'
             }
         },
         dataSources: [
@@ -201,23 +224,33 @@ SPECIES_DATA['black-sea-bass'] = {
             }
         ],
         size: {
-            minimum: 12.5,
+            minimum: 11,
             unit: 'inches (total length)',
             cfr: '50 CFR 648.140',
-            notes: '12.5 inches total length minimum'
+            commercialMinimum: 11,
+            charterMinimum: 15,
+            notes: 'Commercial moratorium 11″ TL; charter/party 15″; recreational — state requirements.'
         },
         gear: {
-            'general': {
-                name: 'General Gear',
+            'otter-trawl': {
+                name: 'Otter Trawl',
+                mesh: {
+                    minimum: { diamond: 4.5 },
+                    cfr: '50 CFR 648.140',
+                    notes: '4.5″ diamond in codend (75 meshes) or entire net if codend <75 meshes when over seasonal lb thresholds.'
+                }
+            },
+            'trap-pot': {
+                name: 'Trap/Pot',
                 cfr: '50 CFR 648.140',
-                notes: 'Check for area-specific gear restrictions'
+                notes: 'Degradable hinges; escape vents (rect 1 3/8″×5 3/4″, square 2″, circle 2.5″, or lath spacing); state/RA ID. ALWTRP areas.'
             }
         },
         seasons: {
             federal: {
                 open: 'Seasonal with closures',
                 cfr: '50 CFR 648.140',
-                notes: '2026 specs: commercial quota 7.83M lb; recreational RHL 8.14M lb. Federal recreational measures waived—conservation equivalency (state measures apply).'
+                notes: 'Federal recreational/charter measures waived — state CE applies.'
             }
         },
         assessmentQuestions: {
@@ -226,8 +259,9 @@ SPECIES_DATA['black-sea-bass'] = {
                 field: 'permitType',
                 required: true,
                 options: [
-                    { value: 'commercial', label: 'Commercial Federal Permit', description: 'Commercial fishing permit' },
-                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing' }
+                    { value: 'commercial', label: 'Commercial Moratorium Permit', description: 'Commercial moratorium — unlimited in 100 lb totes' },
+                    { value: 'charter-headboat', label: 'Charter/Party Vessel Permit', description: 'For-hire — state CE limits apply' },
+                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational — verify state CE' }
                 ],
                 cfr: '50 CFR 648.4'
             },
@@ -235,13 +269,14 @@ SPECIES_DATA['black-sea-bass'] = {
                 question: 'What is the possession amount on board?',
                 field: 'possessionAmount',
                 required: true,
-                type: 'choice',
+                type: 'number',
                 dependsOn: ['permitType'],
                 unit: {
                     commercial: 'lbs',
-                    recreational: 'fish'
+                    recreational: 'fish',
+                    'charter-headboat': 'fish'
                 },
-                notes: 'Record total weight in pounds (commercial) or number of fish (recreational)',
+                notes: 'Commercial: pounds (standard 100 lb totes). Recreational/charter: number of fish.',
                 cfr: '50 CFR 648.140'
             },
             possessionLimitCheck: {
@@ -249,45 +284,79 @@ SPECIES_DATA['black-sea-bass'] = {
                 field: 'exceedsLimit',
                 required: false,
                 type: 'auto',
-                dependsOn: ['permitType', 'possessionAmount', 'dateOfCatch'],
+                dependsOn: ['permitType', 'possessionAmount', 'dateOfCatch', 'meshSize', 'gearType'],
                 autoCheck: true,
                 useAssessmentDate: true,
                 limits: {
-                    'commercial': null, // Varies by season and area - check current regulations
-                    'recreational': null // Conservation equivalency — verify state bag limit
+                    commercial: null,
+                    recreational: null,
+                    'charter-headboat': null
                 },
-                notes: 'Commercial limits vary by season and area. Recreational: verify state/region measures under conservation equivalency (federal coastwide waived Apr 2026).',
+                notes: 'Commercial unlimited with compliant storage/mesh. Recreational/charter: verify state measures.',
                 violation: {
                     ifExceeds: 'VIOLATION: Possession amount exceeds permit limit (50 CFR 648.140)'
                 },
                 cfr: '50 CFR 648.140'
             },
-            sizeCompliance: {
-                question: 'What is the total length of the fish?',
-                field: 'totalLength',
-                required: true,
-                type: 'number',
-                unit: 'inches',
-                minimum: 12.5,
-                notes: 'Minimum size: 12.5" total length. Measure from tip of snout to tip of tail.',
+            gearType: {
+                question: 'What gear is being used?',
+                field: 'gearType',
+                required: false,
+                type: 'choice',
+                applicablePermits: ['commercial'],
+                options: [
+                    { value: 'otter-trawl', label: 'Otter Trawl' },
+                    { value: 'trap-pot', label: 'Trap/Pot' },
+                    { value: 'other', label: 'Other gear' }
+                ],
+                cfr: '50 CFR 648.140'
+            },
+            meshSize: {
+                question: 'Trawl mesh compliance (4.5″ diamond, 75 meshes forward of codend)?',
+                field: 'meshSize',
+                required: false,
+                type: 'choice',
+                dependsOn: ['gearType'],
+                applicableGear: ['otter-trawl'],
+                options: [
+                    { value: 'compliant-mesh', label: 'Compliant — 4.5″ diamond (75 meshes or full net)' },
+                    { value: 'non-compliant-mesh', label: 'Non-compliant mesh' }
+                ],
+                cfr: '50 CFR 648.140'
+            },
+            toteStorage: {
+                question: 'Is commercial catch stored in standard 100 lb totes?',
+                field: 'toteStorage',
+                required: false,
+                type: 'choice',
+                applicablePermits: ['commercial'],
                 violation: {
-                    ifBelow: 'VIOLATION: Black sea bass below minimum size must be released (50 CFR 648.140)'
+                    ifFalse: 'VIOLATION: Commercial black sea bass must be stored in standard 100 lb totes (50 CFR 648.140)'
                 },
                 cfr: '50 CFR 648.140'
             },
-            recreationalBagLimit: {
-                question: 'How many black sea bass are on board (recreational)?',
-                field: 'numberOfFish',
-                required: false,
-                type: 'number',
-                dependsOn: ['permitType'],
-                applicablePermits: ['recreational'],
-                limit: { count: 15, unit: 'fish per person per day' },
-                notes: 'Recreational limit: 15 fish per person per day (varies by state and season)',
+            sizeCompliance: {
+                question: 'Do black sea bass meet minimum size (11″ commercial / 15″ charter / state recreational)?',
+                field: 'size-compliant',
+                required: true,
+                type: 'choice',
                 violation: {
-                    ifExceeds: 'VIOLATION: Recreational bag limit is 15 fish per person per day (50 CFR 648.140)'
+                    ifEquals: 'no',
+                    message: 'VIOLATION: Black sea bass below minimum size must be released (50 CFR 648.140)'
                 },
                 cfr: '50 CFR 648.140'
+            },
+            operatorPermit: {
+                question: 'Does the operator hold a valid federal operator permit?',
+                field: 'operatorPermit',
+                required: false,
+                type: 'choice',
+                applicablePermits: ['commercial', 'charter-headboat'],
+                violation: {
+                    ifEquals: 'no',
+                    message: 'VIOLATION: Commercial or charter/party fishing requires valid operator permit (50 CFR 648.4)'
+                },
+                cfr: '50 CFR 648.4'
             },
             seasonStatus: {
                 question: 'Is the fishery open for this date and area?',
@@ -297,7 +366,7 @@ SPECIES_DATA['black-sea-bass'] = {
                 dependsOn: ['permitType', 'dateOfCatch'],
                 useAssessmentDate: true,
                 autoCheck: true,
-                notes: 'Check current season dates and closures - seasonal with closures',
+                notes: 'Verify state season for recreational/charter; commercial seasonal closures.',
                 cfr: '50 CFR 648.140'
             },
             reportingStatus: {
@@ -328,7 +397,12 @@ SPECIES_DATA['scup'] = {
     regulations: {
         permits: {
             'commercial': {
-                name: 'Commercial Federal Permit',
+                name: 'Commercial Moratorium Permit',
+                required: true,
+                cfr: '50 CFR 648.4'
+            },
+            'charter-headboat': {
+                name: 'Charter/Party Vessel Permit',
                 required: true,
                 cfr: '50 CFR 648.4'
             },
@@ -340,17 +414,23 @@ SPECIES_DATA['scup'] = {
         },
         possession: {
             'commercial': {
-                name: 'Commercial',
-                limit: null, // Varies by season
+                name: 'Commercial Moratorium',
+                limit: null,
                 unit: 'lbs',
                 cfr: '50 CFR 648.121',
-                notes: 'Possession limits vary by season. Check current regulations.'
+                notes: 'Winter I (Jan 1–Apr 30) closed in EEZ. Summer (May–Sep): state regulations. Winter II (Oct–Dec): 12,000 lb/trip with compliant mesh.'
+            },
+            'charter-headboat': {
+                name: 'Charter/Party',
+                limit: { count: 40, unit: 'fish per person' },
+                cfr: '50 CFR 648.121',
+                notes: '40 fish per person; captain and crew do not count. Verify state CE.'
             },
             'recreational': {
                 name: 'Recreational',
-                limit: { count: 30, unit: 'fish' },
+                limit: { count: 40, unit: 'fish per person' },
                 cfr: '50 CFR 648.121',
-                notes: 'Status quo federal coastwide: 30 fish per person per day (2026–2027 rec measures rule, Apr 30, 2026). Verify state measures.'
+                notes: 'Federal reference 40 fish/person — verify state conservation equivalency measures.'
             }
         },
         dataSources: [
@@ -369,20 +449,32 @@ SPECIES_DATA['scup'] = {
             minimum: 9,
             unit: 'inches (total length)',
             cfr: '50 CFR 648.121',
-            notes: '9 inches total length minimum'
+            commercialMinimum: 9,
+            recreationalMinimum: 10,
+            charterMinimum: 10,
+            notes: 'Commercial moratorium 9″ TL; charter/party and recreational 10″ TL.'
         },
         gear: {
-            'general': {
-                name: 'General Gear',
+            'otter-trawl': {
+                name: 'Otter Trawl',
+                mesh: {
+                    minimum: { diamond: 5.0 },
+                    cfr: '50 CFR 648.121',
+                    notes: '>5″ diamond for 75 continuous meshes forward of codend (entire net ≥5″ if codend <75 meshes). Reduced limits if non-compliant.'
+                },
+                rollerMax: { diameter: 18, unit: 'inches', cfr: '50 CFR 648.121' }
+            },
+            'trap-pot': {
+                name: 'Trap/Pot',
                 cfr: '50 CFR 648.121',
-                notes: 'Check for area-specific gear restrictions'
+                notes: 'Degradable hinges, escape vents (≥3.1″ circle or equivalent), state/RA ID. See ALWTRP trap/pot areas.'
             }
         },
         seasons: {
             federal: {
                 open: 'Seasonal with closures',
                 cfr: '50 CFR 648.121',
-                notes: '2026 specs: commercial quota 17.70M lb; recreational RHL 13.17M lb. Status quo federal recreational measures (30 fish) for 2026–2027.'
+                notes: 'Winter I closed Jan–Apr EEZ; Winter II Oct–Dec 12,000 lb/trip; summer state-managed.'
             }
         },
         assessmentQuestions: {
@@ -391,8 +483,9 @@ SPECIES_DATA['scup'] = {
                 field: 'permitType',
                 required: true,
                 options: [
-                    { value: 'commercial', label: 'Commercial Federal Permit', description: 'Commercial fishing permit' },
-                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing' }
+                    { value: 'commercial', label: 'Commercial Moratorium Permit', description: 'Commercial moratorium permit' },
+                    { value: 'charter-headboat', label: 'Charter/Party Vessel Permit', description: 'For-hire — 40 fish/person (exclude captain/crew)' },
+                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational — verify state CE' }
                 ],
                 cfr: '50 CFR 648.4'
             },
@@ -400,13 +493,14 @@ SPECIES_DATA['scup'] = {
                 question: 'What is the possession amount on board?',
                 field: 'possessionAmount',
                 required: true,
-                type: 'choice',
+                type: 'number',
                 dependsOn: ['permitType'],
                 unit: {
                     commercial: 'lbs',
-                    recreational: 'fish'
+                    recreational: 'fish',
+                    'charter-headboat': 'fish'
                 },
-                notes: 'Record total weight in pounds (commercial) or number of fish (recreational)',
+                notes: 'Commercial: pounds. Recreational/charter: number of fish.',
                 cfr: '50 CFR 648.121'
             },
             possessionLimitCheck: {
@@ -414,45 +508,68 @@ SPECIES_DATA['scup'] = {
                 field: 'exceedsLimit',
                 required: false,
                 type: 'auto',
-                dependsOn: ['permitType', 'possessionAmount', 'dateOfCatch'],
+                dependsOn: ['permitType', 'possessionAmount', 'dateOfCatch', 'meshSize'],
                 autoCheck: true,
                 useAssessmentDate: true,
                 limits: {
-                    'commercial': null, // Varies by season - check current regulations
-                    'recreational': { count: 30, unit: 'fish per person per day' }
+                    commercial: null,
+                    recreational: { count: 40, unit: 'fish per person' },
+                    'charter-headboat': { count: 40, unit: 'fish per person' }
                 },
-                notes: 'Commercial limits vary by season - check current regulations. Recreational: 30 fish per person per day (varies by state and season).',
+                notes: 'Commercial limits vary by season and mesh. Winter I closed in EEZ.',
                 violation: {
                     ifExceeds: 'VIOLATION: Possession amount exceeds permit limit (50 CFR 648.121)'
                 },
                 cfr: '50 CFR 648.121'
             },
+            gearType: {
+                question: 'What gear is being used?',
+                field: 'gearType',
+                required: false,
+                type: 'choice',
+                applicablePermits: ['commercial'],
+                options: [
+                    { value: 'otter-trawl', label: 'Otter Trawl' },
+                    { value: 'trap-pot', label: 'Trap/Pot' },
+                    { value: 'other', label: 'Other gear' }
+                ],
+                cfr: '50 CFR 648.121'
+            },
+            meshSize: {
+                question: 'Trawl mesh compliance (>5″ diamond, 75 meshes forward of codend)?',
+                field: 'meshSize',
+                required: false,
+                type: 'choice',
+                dependsOn: ['gearType'],
+                applicableGear: ['otter-trawl'],
+                options: [
+                    { value: 'compliant-mesh', label: 'Compliant — >5″ diamond (75 meshes or full net)' },
+                    { value: 'reduced-mesh', label: 'Non-compliant — reduced possession limits apply' }
+                ],
+                cfr: '50 CFR 648.121'
+            },
             sizeCompliance: {
-                question: 'What is the total length of the fish?',
-                field: 'totalLength',
+                question: 'Do scup meet minimum size (9″ commercial / 10″ charter or recreational)?',
+                field: 'size-compliant',
                 required: true,
-                type: 'number',
-                unit: 'inches',
-                minimum: 9,
-                notes: 'Minimum size: 9" total length. Measure from tip of snout to tip of tail.',
+                type: 'choice',
                 violation: {
-                    ifBelow: 'VIOLATION: Scup below minimum size must be released (50 CFR 648.121)'
+                    ifEquals: 'no',
+                    message: 'VIOLATION: Scup below minimum size must be released (50 CFR 648.121)'
                 },
                 cfr: '50 CFR 648.121'
             },
-            recreationalBagLimit: {
-                question: 'How many scup are on board (recreational)?',
-                field: 'numberOfFish',
+            operatorPermit: {
+                question: 'Does the operator hold a valid federal operator permit?',
+                field: 'operatorPermit',
                 required: false,
-                type: 'number',
-                dependsOn: ['permitType'],
-                applicablePermits: ['recreational'],
-                limit: { count: 30, unit: 'fish per person per day' },
-                notes: 'Recreational limit: 30 fish per person per day (varies by state and season)',
+                type: 'choice',
+                applicablePermits: ['commercial', 'charter-headboat'],
                 violation: {
-                    ifExceeds: 'VIOLATION: Recreational bag limit is 30 fish per person per day (50 CFR 648.121)'
+                    ifEquals: 'no',
+                    message: 'VIOLATION: Commercial or charter/party fishing requires valid operator permit (50 CFR 648.4)'
                 },
-                cfr: '50 CFR 648.121'
+                cfr: '50 CFR 648.4'
             },
             seasonStatus: {
                 question: 'Is the fishery open for this date and area?',
@@ -462,7 +579,7 @@ SPECIES_DATA['scup'] = {
                 dependsOn: ['permitType', 'dateOfCatch'],
                 useAssessmentDate: true,
                 autoCheck: true,
-                notes: 'Check current season dates and closures - seasonal with closures',
+                notes: 'Winter I closed Jan 1–Apr 30 in EEZ for commercial moratorium.',
                 cfr: '50 CFR 648.121'
             },
             reportingStatus: {
@@ -645,7 +762,7 @@ SPECIES_DATA['spiny-dogfish'] = {
     regulations: {
         permits: {
             'commercial': {
-                name: 'Commercial Federal Permit',
+                name: 'Open Access — General',
                 required: true,
                 cfr: '50 CFR 648.4'
             },
@@ -657,30 +774,30 @@ SPECIES_DATA['spiny-dogfish'] = {
         },
         possession: {
             'commercial': {
-                name: 'Commercial',
-                limit: null, // Varies by quota
-                unit: 'lbs',
+                name: 'Open Access — General',
+                limit: { count: 7500, unit: 'lbs per trip' },
                 cfr: '50 CFR 648.230',
-                notes: 'Possession limits based on quota. Check current regulations.'
+                notes: '7,500 lb/trip; only one spiny dogfish trip per calendar day.'
             },
             'recreational': {
                 name: 'Recreational',
-                limit: { count: 0, unit: 'fish' },
+                limit: null,
+                unit: 'lbs',
                 cfr: '50 CFR 648.230',
-                notes: 'Recreational retention prohibited in federal waters'
+                notes: 'No federal possession limit — comply with state size and possession rules.'
             }
         },
         size: {
             minimum: null,
             unit: 'No federal minimum size',
             cfr: '50 CFR 648.230',
-            notes: 'Check state regulations for size limits'
+            notes: 'States may set more restrictive size and possession limits.'
         },
         gear: {
-            'general': {
-                name: 'General Gear',
+            'trawl-gillnet': {
+                name: 'Trawl or Gillnet',
                 cfr: '50 CFR 648.230',
-                notes: 'Check for area-specific gear restrictions'
+                notes: '6.5″ square or diamond mesh in all RMAs unless in exemption area. Gillnet max 300 feet.'
             }
         },
         assessmentQuestions: {
@@ -689,8 +806,8 @@ SPECIES_DATA['spiny-dogfish'] = {
                 field: 'permitType',
                 required: true,
                 options: [
-                    { value: 'commercial', label: 'Commercial Federal Permit', description: 'Commercial fishing permit' },
-                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing' }
+                    { value: 'commercial', label: 'Open Access — General', description: '7,500 lb/trip; one trip per calendar day' },
+                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Verify state regulations' }
                 ],
                 cfr: '50 CFR 648.4'
             },
@@ -705,34 +822,59 @@ SPECIES_DATA['spiny-dogfish'] = {
                 cfr: '50 CFR 648.230'
             },
             recreationalRetention: {
-                question: 'Is this recreational retention in federal waters?',
-                field: 'recreationalRetention',
+                question: 'Does recreational catch comply with applicable state size and possession rules?',
+                field: 'stateRegulationsChecked',
                 required: false,
                 type: 'boolean',
                 dependsOn: ['permitType'],
                 applicablePermits: ['recreational'],
-                notes: 'Recreational retention of spiny dogfish is PROHIBITED in federal waters',
+                notes: 'No federal recreational possession limit — state rules apply.',
                 violation: {
-                    ifTrue: 'VIOLATION: Recreational retention of spiny dogfish is PROHIBITED in federal waters (50 CFR 648.230)'
+                    ifFalse: 'VIOLATION: Recreational spiny dogfish must comply with state regulations (50 CFR 648.230)'
                 },
                 cfr: '50 CFR 648.230'
             },
             possessionLimitCheck: {
-                question: 'Does the possession amount exceed the permit limit or quota?',
+                question: 'Does the possession amount exceed the permit limit?',
                 field: 'exceedsLimit',
                 required: false,
                 type: 'auto',
                 dependsOn: ['permitType', 'possessionAmount'],
                 autoCheck: true,
                 limits: {
-                    'commercial': null, // Varies by quota - check current regulations
-                    'recreational': { count: 0, prohibited: true }
+                    'commercial': { count: 7500, unit: 'lbs per trip' },
+                    'recreational': null
                 },
-                notes: 'Commercial limits based on quota - check current regulations. Recreational: PROHIBITED in federal waters.',
+                notes: 'Commercial: 7,500 lb/trip; one trip per calendar day. Recreational: verify state rules.',
                 violation: {
-                    ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or quota (50 CFR 648.230)',
-                    ifProhibited: 'VIOLATION: Recreational retention of spiny dogfish is PROHIBITED in federal waters (50 CFR 648.230)'
+                    ifExceeds: 'VIOLATION: Spiny dogfish possession exceeds 7,500 lb/trip limit (50 CFR 648.230)'
                 },
+                cfr: '50 CFR 648.230'
+            },
+            operatorPermit: {
+                question: 'Does the operator hold a valid federal operator permit?',
+                field: 'operatorPermit',
+                required: false,
+                type: 'choice',
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifFalse: 'VIOLATION: Commercial spiny dogfish fishing requires valid operator permit (50 CFR 648.4)'
+                },
+                cfr: '50 CFR 648.4'
+            },
+            gearType: {
+                question: 'What gear is being used?',
+                field: 'gearType',
+                required: false,
+                type: 'choice',
+                dependsOn: ['permitType'],
+                applicablePermits: ['commercial'],
+                options: [
+                    { value: 'otter-trawl', label: 'Otter Trawl', notes: '6.5″ square or diamond mesh unless in exemption area' },
+                    { value: 'gillnet', label: 'Gillnet', notes: '6.5″ mesh; max 300 feet; overnight soak rules in sturgeon areas' },
+                    { value: 'hand-gear', label: 'Hand Gear', notes: 'Allowed in some exemption areas' },
+                    { value: 'longline', label: 'Longline', notes: 'Allowed in some exemption areas' }
+                ],
                 cfr: '50 CFR 648.230'
             },
             quotaStatus: {
@@ -763,7 +905,7 @@ SPECIES_DATA['spiny-dogfish'] = {
     }
 };
 
-// Striped Bass (Federal waters - note: primarily state managed)
+// Striped Bass (50 CFR Part 697 — prohibited in EEZ except Block Island Sound transit)
 SPECIES_DATA['striped-bass'] = {
     name: 'Striped Bass',
     commonName: 'Striped Bass',
@@ -774,49 +916,51 @@ SPECIES_DATA['striped-bass'] = {
     regulations: {
         permits: {
             'commercial': {
-                name: 'Commercial Federal Permit',
-                required: false, // Primarily state managed
-                cfr: '50 CFR 648.4',
-                notes: 'Striped bass is primarily managed by states in federal waters'
+                name: 'Not Regulated (Federal EEZ)',
+                required: false,
+                cfr: '50 CFR 697.7',
+                notes: 'Prohibited in the EEZ except Block Island Sound transit exemption. State waters managed by states.'
             },
             'recreational': {
                 name: 'Recreational (No Federal Permit Required)',
                 required: false,
-                cfr: null
+                cfr: '50 CFR 697.7',
+                notes: 'Prohibited in the EEZ except Block Island Sound transit exemption.'
             }
         },
         possession: {
             'commercial': {
                 name: 'Commercial',
-                limit: null,
-                unit: 'varies by state',
-                cfr: '50 CFR 648.4',
-                notes: 'Striped bass is primarily managed by individual states. Check state regulations.'
+                limit: { count: 0 },
+                unit: 'fish',
+                cfr: '50 CFR 697.7',
+                notes: 'PROHIBITED in the EEZ except Block Island Sound continuous transit (no fishing from vessel in EEZ).'
             },
             'recreational': {
                 name: 'Recreational',
-                limit: { count: 1, unit: 'fish' },
-                cfr: '50 CFR 648.4',
-                notes: '1 fish per person per day in federal waters (varies by state)'
+                limit: { count: 0 },
+                unit: 'fish',
+                cfr: '50 CFR 697.7',
+                notes: 'PROHIBITED in the EEZ except Block Island Sound continuous transit (no fishing from vessel in EEZ).'
             }
         },
         size: {
-            minimum: 28,
-            unit: 'inches (total length)',
-            cfr: '50 CFR 648.4',
-            notes: '28 inches total length minimum in federal waters (varies by state)'
+            minimum: null,
+            unit: 'N/A in prohibited EEZ',
+            cfr: '50 CFR 697.7',
+            notes: 'Harvest prohibited in EEZ outside transit exemption. State waters — verify state rules.'
         },
         gear: {
             'general': {
                 name: 'General Gear',
-                cfr: '50 CFR 648.4',
-                notes: 'Striped bass is primarily managed by states. Check state regulations.'
+                cfr: '50 CFR 697.7',
+                notes: 'Fishing for striped bass from a vessel in the EEZ is prohibited.'
             }
         },
         areas: {
             restrictions: true,
-            cfr: '50 CFR 648.4',
-            notes: 'Striped bass is primarily managed by individual states. Check state regulations for federal waters.'
+            cfr: '50 CFR 697.7',
+            notes: 'EEZ prohibited except Block Island Sound transit: north of Montauk–Block Island line and west of Point Judith–Block Island line; continuous transit only, no fishing from vessel in EEZ.'
         },
         assessmentQuestions: {
             permitType: {
@@ -824,71 +968,56 @@ SPECIES_DATA['striped-bass'] = {
                 field: 'permitType',
                 required: false,
                 options: [
-                    { value: 'commercial', label: 'Commercial Federal Permit', description: 'Commercial fishing permit (primarily state managed)' },
-                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing' }
+                    { value: 'commercial', label: 'Commercial', description: 'Commercial fishing — EEZ prohibition applies' },
+                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing — EEZ prohibition applies' }
                 ],
-                notes: 'Striped bass is primarily managed by states in federal waters',
-                cfr: '50 CFR 648.4'
-            },
-            possessionAmount: {
-                question: 'What is the possession amount on board?',
-                field: 'possessionAmount',
-                required: true,
-                type: 'choice',
-                dependsOn: ['permitType'],
-                unit: {
-                    commercial: 'varies by state',
-                    recreational: 'fish'
-                },
-                notes: 'Striped bass is primarily managed by individual states. Check state regulations.',
-                cfr: '50 CFR 648.4'
-            },
-            recreationalBagLimit: {
-                question: 'How many striped bass are on board (recreational)?',
-                field: 'numberOfFish',
-                required: false,
-                type: 'number',
-                dependsOn: ['permitType'],
-                applicablePermits: ['recreational'],
-                limit: { count: 1, unit: 'fish per person per day' },
-                notes: 'Recreational limit: 1 fish per person per day in federal waters (varies by state)',
-                violation: {
-                    ifExceeds: 'VIOLATION: Recreational bag limit is 1 fish per person per day in federal waters (50 CFR 648.4)'
-                },
-                cfr: '50 CFR 648.4'
-            },
-            sizeCompliance: {
-                question: 'What is the total length of the fish?',
-                field: 'totalLength',
-                required: true,
-                type: 'number',
-                unit: 'inches',
-                minimum: 28,
-                notes: 'Minimum size: 28" total length in federal waters (varies by state). Measure from tip of snout to tip of tail.',
-                violation: {
-                    ifBelow: 'VIOLATION: Striped bass below minimum size must be released (50 CFR 648.4)'
-                },
-                cfr: '50 CFR 648.4'
-            },
-            stateRegulations: {
-                question: 'Have state regulations been checked?',
-                field: 'stateRegulationsChecked',
-                required: true,
-                type: 'boolean',
-                notes: 'Striped bass is primarily managed by individual states. State regulations may be more restrictive than federal regulations.',
-                cfr: '50 CFR 648.4'
+                notes: 'Atlantic striped bass is prohibited in the EEZ except Block Island Sound transit exemption.',
+                cfr: '50 CFR 697.7'
             },
             fishingArea: {
-                question: 'What area was the vessel fishing in?',
+                question: 'Where is the vessel / catch relative to federal waters?',
                 field: 'fishingArea',
                 required: true,
                 type: 'choice',
                 options: [
-                    { value: 'federal-waters', label: 'Federal Waters', notes: 'Federal waters - check state regulations' },
-                    { value: 'state-waters', label: 'State Waters', notes: 'State waters - state regulations apply' }
+                    { value: 'eez', label: 'EEZ (outside transit exemption)', notes: 'Possession prohibited — release immediately' },
+                    { value: 'block-island-transit', label: 'Block Island Sound EEZ transit corridor', notes: 'Possession permitted only in continuous transit; no fishing from vessel in EEZ' },
+                    { value: 'state-waters', label: 'State waters', notes: 'State regulations apply' }
                 ],
-                notes: 'Striped bass is primarily managed by states. Check state regulations for both federal and state waters.',
-                cfr: '50 CFR 648.4'
+                notes: 'Transit exemption: EEZ within Block Island Sound north of Montauk–Block Island line and west of Point Judith–Block Island line.',
+                cfr: '50 CFR 697.7'
+            },
+            possessionAmount: {
+                question: 'How many striped bass are on board?',
+                field: 'possessionAmount',
+                required: true,
+                type: 'number',
+                unit: 'fish',
+                dependsOn: ['fishingArea'],
+                notes: 'Any striped bass on board in the EEZ outside the transit corridor is a violation.',
+                cfr: '50 CFR 697.7'
+            },
+            possessionLimitCheck: {
+                question: 'Does possession comply with EEZ rules?',
+                field: 'exceedsLimit',
+                required: false,
+                type: 'auto',
+                dependsOn: ['fishingArea', 'possessionAmount'],
+                autoCheck: true,
+                notes: 'Prohibited in EEZ except Block Island Sound continuous transit.',
+                violation: {
+                    ifExceeds: 'VIOLATION: Atlantic striped bass prohibited in the EEZ (50 CFR 697.7)',
+                    ifProhibited: 'VIOLATION: Atlantic striped bass prohibited in the EEZ (50 CFR 697.7)'
+                },
+                cfr: '50 CFR 697.7'
+            },
+            stateRegulations: {
+                question: 'Have state regulations been checked (if in state waters)?',
+                field: 'stateRegulationsChecked',
+                required: false,
+                type: 'boolean',
+                notes: 'Striped bass is primarily managed by individual states in state waters.',
+                cfr: null
             }
         }
     }

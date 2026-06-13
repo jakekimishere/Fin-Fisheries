@@ -2,7 +2,7 @@
  * Application script inventory — keep in sync with index.html load order.
  * Used by service-worker.js (importScripts) for offline precaching.
  */
-const APP_CACHE_NAME = 'fin-fisheries-v24';
+const APP_CACHE_NAME = 'fin-fisheries-v33';
 
 /** Must match scripts/load-species-data.js SPECIES_DATA_FILES */
 const SPECIES_DATA_URLS = [
@@ -35,6 +35,21 @@ const APP_SCRIPT_URLS = [
     './SALMON648_POLICY_CONFIG.js',
     './SCALLOP648_POLICY_CONFIG.js',
     './SURFCLAM648_POLICY_CONFIG.js',
+    './SUMMERFLOUNDER648_POLICY_CONFIG.js',
+    './SCUP648_POLICY_CONFIG.js',
+    './BSB648_POLICY_CONFIG.js',
+    './BLUEFISH648_POLICY_CONFIG.js',
+    './HERRING648_POLICY_CONFIG.js',
+    './DOGFISH648_POLICY_CONFIG.js',
+    './REDFCRAB648_POLICY_CONFIG.js',
+    './TILEFISH648_POLICY_CONFIG.js',
+    './SKATE648_POLICY_CONFIG.js',
+    './LOBSTER697_POLICY_CONFIG.js',
+    './PROHIB697_POLICY_CONFIG.js',
+    './MPS24_POLICY_CONFIG.js',
+    './DOLPHIN622_POLICY_CONFIG.js',
+    './CMP622_POLICY_CONFIG.js',
+    './FORAGE648_POLICY_CONFIG.js',
     './NMS648_POLICY_CONFIG.js',
     './MONKFISH648_POLICY_CONFIG.js',
     './FISHERY_QUOTA_STATUS_CONFIG.js',

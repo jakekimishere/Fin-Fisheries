@@ -447,8 +447,33 @@ SPECIES_DATA['atlantic-herring'] = {
     color: '#95e1d3',
     regulations: {
         permits: {
+            'herring-cat-a': {
+                name: 'Category A — Limited Access (All Areas)',
+                required: true,
+                cfr: '50 CFR 648.4'
+            },
+            'herring-cat-b': {
+                name: 'Category B — Limited Access (Areas 2 & 3)',
+                required: true,
+                cfr: '50 CFR 648.4'
+            },
+            'herring-cat-c': {
+                name: 'Category C — Limited Access (Incidental)',
+                required: true,
+                cfr: '50 CFR 648.4'
+            },
+            'herring-cat-d': {
+                name: 'Category D — Open Access',
+                required: true,
+                cfr: '50 CFR 648.4'
+            },
+            'herring-cat-e': {
+                name: 'Category E — Open Access (Areas 2 & 3)',
+                required: true,
+                cfr: '50 CFR 648.4'
+            },
             'commercial': {
-                name: 'Atlantic Herring Commercial Permit',
+                name: 'Atlantic Herring Commercial Permit (unspecified category)',
                 required: true,
                 cfr: '50 CFR 648.4'
             },
@@ -459,12 +484,42 @@ SPECIES_DATA['atlantic-herring'] = {
             }
         },
         possession: {
+            'herring-cat-a': {
+                name: 'Category A',
+                limit: null,
+                unit: 'lbs',
+                cfr: '50 CFR 648.201',
+                notes: 'Unlimited — verify area-specific adjustments (Areas 1B/3 may be 2,000 lb/trip/day).'
+            },
+            'herring-cat-b': {
+                name: 'Category B',
+                limit: null,
+                unit: 'lbs',
+                cfr: '50 CFR 648.201',
+                notes: 'Unlimited in Areas 2–3 — verify bulletin.'
+            },
+            'herring-cat-c': {
+                name: 'Category C Incidental',
+                limit: { count: 55000, unit: 'lbs per trip/day' },
+                cfr: '50 CFR 648.201',
+                notes: '55,000 lb/trip/day — area adjustments may be more restrictive.'
+            },
+            'herring-cat-d': {
+                name: 'Category D Open Access',
+                limit: { count: 6600, unit: 'lbs per trip/day' },
+                cfr: '50 CFR 648.201'
+            },
+            'herring-cat-e': {
+                name: 'Category E Open Access (Areas 2 & 3)',
+                limit: { count: 20000, unit: 'lbs per trip/day' },
+                cfr: '50 CFR 648.201'
+            },
             'commercial': {
                 name: 'Commercial',
                 limit: null,
                 unit: 'lbs',
-                cfr: '50 CFR 648.200',
-                notes: 'Area 1A/1B: 2,000 lb per trip/day when 92% sub-ACL projected (verify NOAA bulletin). Areas 2–3: phase limits per 50 CFR 648.201.'
+                cfr: '50 CFR 648.201',
+                notes: 'Select permit category for accurate limits. Area 1B/1A: 2,000 lb/trip/day when adjustment active.'
             },
             'recreational': {
                 name: 'Recreational',
@@ -481,15 +536,25 @@ SPECIES_DATA['atlantic-herring'] = {
             notes: 'No federal minimum size for Atlantic herring.'
         },
         gear: {
+            'midwater-trawl': {
+                name: 'Midwater Trawl',
+                cfr: '50 CFR 648.201',
+                notes: 'No minimum mesh; LOA required. Prohibited in Area 1A Jun 1–Sep 30.'
+            },
             'purse-seine': {
                 name: 'Purse Seine',
-                cfr: '50 CFR 648.200',
-                notes: 'Purse seine gear authorized'
+                cfr: '50 CFR 648.201',
+                notes: 'LOA required on board.'
             },
-            'otter-trawl': {
-                name: 'Otter Trawl',
-                cfr: '50 CFR 648.200',
-                notes: 'Otter trawl gear authorized'
+            'pelagic-gillnet': {
+                name: 'Single Pelagic Gillnet',
+                cfr: '50 CFR 648.201',
+                notes: 'Maximum 3″ mesh — herring as bait only.'
+            },
+            'bottom-trawl': {
+                name: 'Bottom Trawl',
+                cfr: '50 CFR 648.201',
+                notes: 'See small-mesh exemption areas for additional rules.'
             }
         },
         seasons: {
@@ -505,7 +570,12 @@ SPECIES_DATA['atlantic-herring'] = {
                 field: 'permitType',
                 required: true,
                 options: [
-                    { value: 'commercial', label: 'Atlantic Herring Commercial Permit', description: 'Commercial fishing permit' },
+                    { value: 'herring-cat-a', label: 'Category A — Limited Access (All Areas)', description: 'Unlimited; VMS and operator permit required' },
+                    { value: 'herring-cat-b', label: 'Category B — Limited Access (Areas 2 & 3)', description: 'Unlimited in Areas 2–3; VMS and operator permit required' },
+                    { value: 'herring-cat-c', label: 'Category C — Limited Access (Incidental)', description: '55,000 lb/trip/day' },
+                    { value: 'herring-cat-d', label: 'Category D — Open Access', description: '6,600 lb/trip/day; no VMS/operator permit' },
+                    { value: 'herring-cat-e', label: 'Category E — Open Access (Areas 2 & 3)', description: '20,000 lb/trip/day; VMS and operator permit required' },
+                    { value: 'commercial', label: 'Atlantic Herring Commercial (unspecified category)', description: 'Select category for accurate limits' },
                     { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing' }
                 ],
                 cfr: '50 CFR 648.4'
@@ -528,10 +598,15 @@ SPECIES_DATA['atlantic-herring'] = {
                 dependsOn: ['permitType', 'possessionAmount'],
                 autoCheck: true,
                 limits: {
+                    'herring-cat-a': null,
+                    'herring-cat-b': null,
+                    'herring-cat-c': { count: 55000, unit: 'lbs per trip/day' },
+                    'herring-cat-d': { count: 6600, unit: 'lbs per trip/day' },
+                    'herring-cat-e': { count: 20000, unit: 'lbs per trip/day' },
                     'commercial': null,
                     'recreational': null
                 },
-                notes: 'Commercial: 2,000 lb/trip/day in Areas 1A/1B when in-season adjustment active. Recreational: state measures.',
+                notes: 'Category limits; Areas 1B/3 may be 2,000 lb/trip/day when adjustment active. Area 1A closed to directed fishery.',
                 violation: {
                     ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or quota (50 CFR 648.200)'
                 },
@@ -543,12 +618,12 @@ SPECIES_DATA['atlantic-herring'] = {
                 required: true,
                 type: 'choice',
                 dependsOn: ['permitType'],
-                applicablePermits: ['commercial'],
+                applicablePermits: ['commercial', 'herring-cat-a', 'herring-cat-b', 'herring-cat-c', 'herring-cat-d', 'herring-cat-e'],
                 options: [
-                    { value: 'area-1a', label: 'Area 1A', notes: '2,000 lb/trip/day when 92% sub-ACL adjustment active (2026)' },
+                    { value: 'area-1a', label: 'Area 1A', notes: 'CLOSED to directed Atlantic herring fishery — transit with gear stowed only' },
                     { value: 'area-1b', label: 'Area 1B', notes: '2,000 lb/trip/day effective Jan 9, 2026 per NOAA bulletin' },
                     { value: 'area-2', label: 'Area 2', notes: 'Area 2 specific limits apply' },
-                    { value: 'area-3', label: 'Area 3', notes: 'Area 3 specific limits apply' },
+                    { value: 'area-3', label: 'Area 3', notes: '2,000 lb/trip/day when adjustment active' },
                     { value: 'closed-area', label: 'Closed Area', violation: true, notes: 'VIOLATION: Fishing prohibited in closed areas' }
                 ],
                 violation: {
@@ -564,8 +639,10 @@ SPECIES_DATA['atlantic-herring'] = {
                 type: 'choice',
                 dependsOn: ['permitType'],
                 options: [
-                    { value: 'purse-seine', label: 'Purse Seine', notes: 'Purse seine gear authorized' },
-                    { value: 'otter-trawl', label: 'Otter Trawl', notes: 'Otter trawl gear authorized' },
+                    { value: 'midwater-trawl', label: 'Midwater Trawl', notes: 'LOA required; prohibited in Area 1A Jun 1–Sep 30' },
+                    { value: 'purse-seine', label: 'Purse Seine', notes: 'LOA required on board' },
+                    { value: 'pelagic-gillnet', label: 'Single Pelagic Gillnet', notes: 'Max 3″ mesh — herring as bait only' },
+                    { value: 'bottom-trawl', label: 'Bottom Trawl', notes: 'See small-mesh exemption areas' },
                     { value: 'rod-reel', label: 'Rod and Reel', notes: 'Recreational gear' }
                 ],
                 cfr: '50 CFR 648.200'
@@ -609,7 +686,7 @@ SPECIES_DATA['skate'] = {
     regulations: {
         permits: {
             'commercial': {
-                name: 'Skate Commercial Permit',
+                name: 'Open Access — General',
                 required: true,
                 cfr: '50 CFR 648.4'
             },
@@ -621,11 +698,11 @@ SPECIES_DATA['skate'] = {
         },
         possession: {
             'commercial': {
-                name: 'Commercial',
+                name: 'Open Access — General',
                 limit: null,
                 unit: 'lbs',
-                cfr: '50 CFR 648.320',
-                notes: 'Skate wing DAS limits: 4,000 lb (May 1–Aug 31) or 6,000 lb (Sep 1–Apr 30); incidental 500 lb when reduced (50 CFR 648.322).'
+                cfr: '50 CFR 648.322',
+                notes: 'Trip limits vary by DAS type and season — see chart (wings or whole).'
             },
             'recreational': {
                 name: 'Recreational',
@@ -654,10 +731,38 @@ SPECIES_DATA['skate'] = {
                 field: 'permitType',
                 required: true,
                 options: [
-                    { value: 'commercial', label: 'Skate Commercial Permit', description: 'Commercial fishing permit' },
-                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing' }
+                    { value: 'commercial', label: 'Open Access — General', description: 'Skate commercial permit' },
+                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Unlimited federally — verify state rules' }
                 ],
                 cfr: '50 CFR 648.4'
+            },
+            dasTripType: {
+                question: 'What DAS/trip type applies?',
+                field: 'dasTripType',
+                required: false,
+                type: 'choice',
+                dependsOn: ['permitType'],
+                applicablePermits: ['commercial'],
+                options: [
+                    { value: 'nms-a-scallop-monkfish', label: 'NMS A, scallop, or monkfish DAS', notes: '4,000/6,000 lb wings by season' },
+                    { value: 'nms-b', label: 'NMS B DAS', notes: '275 lb wings / 625 lb whole' },
+                    { value: 'non-das', label: 'Non-DAS', notes: '625 lb wings / 1,419 lb whole' },
+                    { value: 'skate-bait-loa', label: 'Skate bait LOA', notes: '25,000 lb whole; min 23″; LOA required' }
+                ],
+                cfr: '50 CFR 648.322'
+            },
+            skateProductForm: {
+                question: 'Skate product form on board?',
+                field: 'skateProductForm',
+                required: false,
+                type: 'choice',
+                dependsOn: ['permitType'],
+                applicablePermits: ['commercial'],
+                options: [
+                    { value: 'wings', label: 'Skate wings (carcasses may be separate)' },
+                    { value: 'whole', label: 'Whole skates' }
+                ],
+                cfr: '50 CFR 648.322'
             },
             skateSpecies: {
                 question: 'What species of skate is on board?',
@@ -702,7 +807,19 @@ SPECIES_DATA['skate'] = {
                 unit: 'inches',
                 dependsOn: ['skateSpecies'],
                 notes: 'Size requirements vary by skate species. Check species-specific size requirements.',
-                cfr: '50 CFR 648.320'
+                cfr: '50 CFR 648.322'
+            },
+            operatorPermit: {
+                question: 'Does the operator hold a valid federal operator permit?',
+                field: 'operatorPermit',
+                required: false,
+                type: 'choice',
+                dependsOn: ['permitType'],
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifFalse: 'VIOLATION: Commercial skate fishing requires valid operator permit (50 CFR 648.4)'
+                },
+                cfr: '50 CFR 648.4'
             },
             quotaStatus: {
                 question: 'Is the fishery open or closed due to quota?',
@@ -712,8 +829,8 @@ SPECIES_DATA['skate'] = {
                 dependsOn: ['permitType'],
                 applicablePermits: ['commercial'],
                 autoCheck: true,
-                notes: 'Check current quota status - fishery may close when quota is reached',
-                cfr: '50 CFR 648.320'
+                notes: 'Quota trigger may reduce wing limit to 500 lb — verify NOAA bulletin.',
+                cfr: '50 CFR 648.322'
             },
             reportingStatus: {
                 question: 'Has the catch been reported?',
@@ -963,8 +1080,23 @@ SPECIES_DATA['atlantic-deep-sea-red-crab'] = {
     color: '#ff6b6b',
     regulations: {
         permits: {
+            'red-crab-cat-b': {
+                name: 'Limited Access — Category B',
+                required: true,
+                cfr: '50 CFR 648.4'
+            },
+            'red-crab-cat-c': {
+                name: 'Limited Access — Category C',
+                required: true,
+                cfr: '50 CFR 648.4'
+            },
+            'red-crab-open-incidental': {
+                name: 'Open Access — Incidental',
+                required: true,
+                cfr: '50 CFR 648.4'
+            },
             'commercial': {
-                name: 'Deep Sea Red Crab Commercial Permit',
+                name: 'Deep Sea Red Crab Commercial Permit (unspecified category)',
                 required: true,
                 cfr: '50 CFR 648.4'
             },
@@ -975,32 +1107,51 @@ SPECIES_DATA['atlantic-deep-sea-red-crab'] = {
             }
         },
         possession: {
+            'red-crab-cat-b': {
+                name: 'Category B',
+                limit: null,
+                unit: 'lbs',
+                cfr: '50 CFR 648.260',
+                notes: 'Unlimited possession on dedicated red crab trip.'
+            },
+            'red-crab-cat-c': {
+                name: 'Category C',
+                limit: null,
+                unit: 'lbs',
+                cfr: '50 CFR 648.260',
+                notes: 'Unlimited possession on dedicated red crab trip.'
+            },
+            'red-crab-open-incidental': {
+                name: 'Open Access Incidental',
+                limit: { count: 500, unit: 'lbs per trip' },
+                cfr: '50 CFR 648.260'
+            },
             'commercial': {
                 name: 'Commercial',
                 limit: null,
                 unit: 'lbs',
                 cfr: '50 CFR 648.260',
-                notes: 'Subject to quota and trip limits. Check current regulations.'
+                notes: 'Select permit category — LA unlimited; open access incidental 500 lb/trip.'
             },
             'recreational': {
                 name: 'Recreational',
                 limit: null,
                 unit: 'lbs',
                 cfr: null,
-                notes: 'Check state regulations'
+                notes: 'Verify state regulations'
             }
         },
         size: {
-            minimum: 4.75,
-            unit: 'inches (carapace width)',
+            minimum: null,
+            unit: 'No federal minimum size',
             cfr: '50 CFR 648.260',
-            notes: '4.75" minimum carapace width'
+            notes: 'No federal minimum size for Atlantic deep sea red crab.'
         },
         gear: {
             'trap': {
-                name: 'Trap',
+                name: 'Trap/Pot',
                 cfr: '50 CFR 648.260',
-                notes: 'Trap gear authorized'
+                notes: '≤18 cu ft on red crab DAS; max 600 traps/pots. Buoy markings RC, permit number, trawl sequence; high flyers and radar reflectors.'
             }
         },
         seasons: {
@@ -1016,8 +1167,11 @@ SPECIES_DATA['atlantic-deep-sea-red-crab'] = {
                 field: 'permitType',
                 required: true,
                 options: [
-                    { value: 'commercial', label: 'Deep Sea Red Crab Commercial Permit', description: 'Commercial fishing permit' },
-                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing' }
+                    { value: 'red-crab-cat-b', label: 'Limited Access — Category B', description: 'Unlimited possession' },
+                    { value: 'red-crab-cat-c', label: 'Limited Access — Category C', description: 'Unlimited possession' },
+                    { value: 'red-crab-open-incidental', label: 'Open Access — Incidental', description: '500 lb/trip' },
+                    { value: 'commercial', label: 'Deep Sea Red Crab Commercial (unspecified)', description: 'Select category for limits' },
+                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Verify state regulations' }
                 ],
                 cfr: '50 CFR 648.4'
             },
@@ -1039,26 +1193,72 @@ SPECIES_DATA['atlantic-deep-sea-red-crab'] = {
                 dependsOn: ['permitType', 'possessionAmount'],
                 autoCheck: true,
                 limits: {
-                    'commercial': null, // Subject to quota and trip limits
-                    'recreational': null // Check state regulations
+                    'red-crab-cat-b': null,
+                    'red-crab-cat-c': null,
+                    'red-crab-open-incidental': { count: 500, unit: 'lbs per trip' },
+                    'commercial': null,
+                    'recreational': null
                 },
-                notes: 'Commercial limits subject to quota and trip limits - check current regulations. Recreational: Check state regulations.',
+                notes: 'LA Category B/C unlimited; open access incidental 500 lb/trip. Female and mutilation limits apply.',
                 violation: {
                     ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or quota (50 CFR 648.260)'
                 },
                 cfr: '50 CFR 648.260'
             },
-            sizeCompliance: {
-                question: 'What is the carapace width of the crabs?',
-                field: 'carapaceWidth',
-                required: true,
-                type: 'number',
-                unit: 'inches',
-                minimum: 4.75,
-                notes: 'Minimum size: 4.75" carapace width. Measure across the widest part of the carapace.',
+            transferAtSea: {
+                question: 'Was Atlantic deep sea red crab transferred at sea?',
+                field: 'transferAtSea',
+                required: false,
+                type: 'boolean',
+                dependsOn: ['permitType'],
+                applicablePermits: ['commercial', 'red-crab-cat-b', 'red-crab-cat-c', 'red-crab-open-incidental'],
                 violation: {
-                    ifBelow: 'VIOLATION: Atlantic deep sea red crab below minimum size must be released (50 CFR 648.260)'
+                    ifTrue: 'VIOLATION: Transfer at sea prohibited for Atlantic deep sea red crab (50 CFR 648.260)'
                 },
+                cfr: '50 CFR 648.260'
+            },
+            femaleCrabLimit: {
+                question: 'Are female red crabs within the incidental limit (one standard tote ~100 lb)?',
+                field: 'femaleCrabCompliant',
+                required: false,
+                type: 'choice',
+                dependsOn: ['permitType'],
+                applicablePermits: ['commercial', 'red-crab-cat-b', 'red-crab-cat-c', 'red-crab-open-incidental'],
+                violation: {
+                    ifFalse: 'VIOLATION: Female red crab possession exceeds one standard tote (~100 lb) incidental limit (50 CFR 648.260)'
+                },
+                cfr: '50 CFR 648.260'
+            },
+            mutilationCompliance: {
+                question: 'Are claws/legs within mutilation limits for this permit and trip type?',
+                field: 'mutilationCompliant',
+                required: false,
+                type: 'choice',
+                dependsOn: ['permitType'],
+                applicablePermits: ['commercial', 'red-crab-cat-b', 'red-crab-cat-c', 'red-crab-open-incidental'],
+                notes: 'Dedicated trip: one tote separated claws/legs. Open access/incidental: no separate claws/legs; max 2 claws and 8 legs per body.',
+                violation: {
+                    ifFalse: 'VIOLATION: Red crab mutilation limits exceeded (50 CFR 648.260)'
+                },
+                cfr: '50 CFR 648.260'
+            },
+            operatorPermit: {
+                question: 'Does the operator hold a valid federal operator permit?',
+                field: 'operatorPermit',
+                required: false,
+                type: 'choice',
+                applicablePermits: ['commercial', 'red-crab-cat-b', 'red-crab-cat-c', 'red-crab-open-incidental'],
+                violation: {
+                    ifFalse: 'VIOLATION: Commercial red crab fishing requires valid operator permit (50 CFR 648.4)'
+                },
+                cfr: '50 CFR 648.4'
+            },
+            sizeCompliance: {
+                question: 'Does catch comply with applicable state size requirements (if any)?',
+                field: 'stateSizeCompliant',
+                required: false,
+                type: 'choice',
+                notes: 'No federal minimum size — verify state rules if landing in state waters.',
                 cfr: '50 CFR 648.260'
             },
             gearType: {
@@ -1110,37 +1310,55 @@ SPECIES_DATA['golden-tilefish'] = {
     regulations: {
         permits: {
             'commercial': {
-                name: 'Golden Tilefish Commercial Permit',
+                name: 'Open Access — Commercial/Incidental',
+                required: true,
+                cfr: '50 CFR 648.4'
+            },
+            'charter-headboat': {
+                name: 'Open Access — Charter/Party',
+                required: true,
+                cfr: '50 CFR 648.4'
+            },
+            'party-headboat': {
+                name: 'Open Access — Party Vessel',
                 required: true,
                 cfr: '50 CFR 648.4'
             },
             'recreational': {
-                name: 'Recreational (No Federal Permit Required)',
-                required: false,
-                cfr: null
+                name: 'Recreational Tilefish Vessel Permit',
+                required: true,
+                cfr: '50 CFR 648.4',
+                notes: 'Federal private recreational tilefish vessel permit required.'
             }
         },
         possession: {
             'commercial': {
-                name: 'Commercial',
-                limit: null,
-                unit: 'lbs',
+                name: 'Commercial/Incidental',
+                limit: { count: 500, unit: 'lbs per trip' },
                 cfr: '50 CFR 648.290',
-                notes: 'Subject to quota and trip limits. Check current regulations.'
+                notes: 'Lesser of 500 lb or 50% by weight of all fish on board.'
+            },
+            'charter-headboat': {
+                name: 'Charter',
+                limit: { count: 8, unit: 'fish per person' },
+                cfr: '50 CFR 648.290'
+            },
+            'party-headboat': {
+                name: 'Party',
+                limit: { count: 8, unit: 'fish per person' },
+                cfr: '50 CFR 648.290'
             },
             'recreational': {
                 name: 'Recreational',
-                limit: null,
-                unit: 'fish',
-                cfr: null,
-                notes: 'Check state regulations'
+                limit: { count: 8, unit: 'fish per person per trip' },
+                cfr: '50 CFR 648.290'
             }
         },
         size: {
-            minimum: 19,
-            unit: 'inches (total length)',
+            minimum: null,
+            unit: 'No federal minimum size',
             cfr: '50 CFR 648.290',
-            notes: '19" minimum total length'
+            notes: 'Commercial: head and fins attached; may be gutted.'
         },
         seasons: {
             federal: {
@@ -1155,8 +1373,10 @@ SPECIES_DATA['golden-tilefish'] = {
                 field: 'permitType',
                 required: true,
                 options: [
-                    { value: 'commercial', label: 'Golden Tilefish Commercial Permit', description: 'Commercial fishing permit' },
-                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing' }
+                    { value: 'commercial', label: 'Open Access — Commercial/Incidental', description: '500 lb or 50% of all fish on board' },
+                    { value: 'charter-headboat', label: 'Open Access — Charter', description: '8 fish per person' },
+                    { value: 'party-headboat', label: 'Open Access — Party', description: '8 fish per person' },
+                    { value: 'recreational', label: 'Recreational Tilefish Vessel Permit', description: '8 fish per person; federal permit required' }
                 ],
                 cfr: '50 CFR 648.4'
             },
@@ -1165,39 +1385,99 @@ SPECIES_DATA['golden-tilefish'] = {
                 field: 'possessionAmount',
                 required: true,
                 type: 'number',
+                unit: {
+                    commercial: 'lbs',
+                    'charter-headboat': 'fish',
+                    'party-headboat': 'fish',
+                    recreational: 'fish'
+                },
+                dependsOn: ['permitType'],
+                notes: 'Commercial: pounds. For-hire/recreational: number of fish.',
+                cfr: '50 CFR 648.290'
+            },
+            totalCatchWeightLb: {
+                question: 'Total weight of all fish on board (commercial golden tilefish 50% rule)?',
+                field: 'totalCatchWeightLb',
+                required: false,
+                type: 'number',
                 unit: 'lbs',
                 dependsOn: ['permitType'],
-                notes: 'Record total weight in pounds',
+                applicablePermits: ['commercial'],
+                notes: 'Limit is lesser of 500 lb or 50% of total fish weight.',
                 cfr: '50 CFR 648.290'
             },
             possessionLimitCheck: {
-                question: 'Does the possession amount exceed the permit limit or quota?',
+                question: 'Does the possession amount exceed the permit limit?',
                 field: 'exceedsLimit',
                 required: false,
                 type: 'auto',
-                dependsOn: ['permitType', 'possessionAmount'],
+                dependsOn: ['permitType', 'possessionAmount', 'totalCatchWeightLb'],
                 autoCheck: true,
                 limits: {
-                    'commercial': null, // Subject to quota and trip limits
-                    'recreational': null // Check state regulations
+                    'commercial': { count: 500, unit: 'lbs per trip' },
+                    'charter-headboat': { count: 8, unit: 'fish per person' },
+                    'party-headboat': { count: 8, unit: 'fish per person' },
+                    'recreational': { count: 8, unit: 'fish per person per trip' }
                 },
-                notes: 'Commercial limits subject to quota and trip limits - check current regulations. Recreational: Check state regulations.',
+                notes: 'Commercial golden: lesser of 500 lb or 50% of all fish on board. Exclude captain/crew from person count.',
                 violation: {
-                    ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or quota (50 CFR 648.290)'
+                    ifExceeds: 'VIOLATION: Golden tilefish possession exceeds limit (50 CFR 648.290)'
                 },
                 cfr: '50 CFR 648.290'
             },
-            sizeCompliance: {
-                question: 'What is the total length of the fish?',
-                field: 'totalLength',
-                required: true,
-                type: 'number',
-                unit: 'inches',
-                minimum: 19,
-                notes: 'Minimum size: 19" total length. Measure from tip of snout to tip of tail.',
+            carcassCondition: {
+                question: 'Commercial catch — head and fins attached (may be gutted)?',
+                field: 'carcassCompliant',
+                required: false,
+                type: 'choice',
+                dependsOn: ['permitType'],
+                applicablePermits: ['commercial'],
                 violation: {
-                    ifBelow: 'VIOLATION: Golden tilefish below minimum size must be released (50 CFR 648.290)'
+                    ifFalse: 'VIOLATION: Commercial tilefish must have head and fins attached (50 CFR 648.290)'
                 },
+                cfr: '50 CFR 648.290'
+            },
+            recreationalGearHooks: {
+                question: 'Recreational golden tilefish — rod and reel with no more than 5 hooks per rod?',
+                field: 'recGearCompliant',
+                required: false,
+                type: 'choice',
+                dependsOn: ['permitType'],
+                applicablePermits: ['recreational', 'charter-headboat', 'party-headboat'],
+                violation: {
+                    ifFalse: 'VIOLATION: Golden tilefish recreational gear — rod and reel, max 5 hooks per rod (50 CFR 648.290)'
+                },
+                cfr: '50 CFR 648.290'
+            },
+            ifqDiscard: {
+                question: 'IFQ allocation permit — tilefish discarded at sea?',
+                field: 'ifqDiscard',
+                required: false,
+                type: 'boolean',
+                dependsOn: ['permitType'],
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: Discarding tilefish prohibited under IFQ allocation permit (50 CFR 648.290)'
+                },
+                cfr: '50 CFR 648.290'
+            },
+            operatorPermit: {
+                question: 'Does the operator hold a valid federal operator permit?',
+                field: 'operatorPermit',
+                required: false,
+                type: 'choice',
+                applicablePermits: ['commercial', 'charter-headboat', 'party-headboat'],
+                violation: {
+                    ifFalse: 'VIOLATION: Commercial or for-hire tilefish fishing requires valid operator permit (50 CFR 648.4)'
+                },
+                cfr: '50 CFR 648.4'
+            },
+            sizeCompliance: {
+                question: 'Does catch comply with applicable state size requirements (if any)?',
+                field: 'stateSizeCompliant',
+                required: false,
+                type: 'choice',
+                notes: 'No federal minimum size.',
                 cfr: '50 CFR 648.290'
             },
             gearType: {
@@ -1207,8 +1487,8 @@ SPECIES_DATA['golden-tilefish'] = {
                 type: 'choice',
                 dependsOn: ['permitType'],
                 options: [
-                    { value: 'hook-line', label: 'Hook and Line', notes: 'Hook and line gear authorized' },
-                    { value: 'longline', label: 'Longline', notes: 'Longline gear authorized' }
+                    { value: 'hook-line', label: 'Hook and Line / Rod and Reel', notes: 'Recreational golden: max 5 hooks per rod' },
+                    { value: 'longline', label: 'Longline', notes: 'Commercial authorized' }
                 ],
                 cfr: '50 CFR 648.290'
             },
@@ -1250,43 +1530,61 @@ SPECIES_DATA['blueline-tilefish'] = {
     regulations: {
         permits: {
             'commercial': {
-                name: 'Blueline Tilefish Commercial Permit',
+                name: 'Open Access — Commercial/Incidental',
+                required: true,
+                cfr: '50 CFR 648.4'
+            },
+            'charter-headboat': {
+                name: 'Open Access — Charter',
+                required: true,
+                cfr: '50 CFR 648.4'
+            },
+            'party-headboat': {
+                name: 'Open Access — Party',
                 required: true,
                 cfr: '50 CFR 648.4'
             },
             'recreational': {
-                name: 'Recreational (No Federal Permit Required)',
-                required: false,
-                cfr: null
+                name: 'Recreational Tilefish Vessel Permit',
+                required: true,
+                cfr: '50 CFR 648.4',
+                notes: 'Federal private recreational tilefish vessel permit required.'
             }
         },
         possession: {
             'commercial': {
-                name: 'Commercial',
-                limit: null,
-                unit: 'lbs',
-                cfr: '50 CFR 648.290',
-                notes: 'Subject to quota and trip limits. Check current regulations.'
+                name: 'Commercial/Incidental',
+                limit: { count: 500, unit: 'lbs per trip' },
+                cfr: '50 CFR 648.290'
+            },
+            'charter-headboat': {
+                name: 'Charter',
+                limit: { count: 5, unit: 'fish per person per trip' },
+                cfr: '50 CFR 648.290'
+            },
+            'party-headboat': {
+                name: 'Party',
+                limit: { count: 7, unit: 'fish per person per trip' },
+                cfr: '50 CFR 648.290'
             },
             'recreational': {
                 name: 'Recreational',
-                limit: null,
-                unit: 'fish',
-                cfr: null,
-                notes: 'Check state regulations'
+                limit: { count: 3, unit: 'fish per person per trip' },
+                cfr: '50 CFR 648.290',
+                notes: 'Federal season May 15–November 14.'
             }
         },
         size: {
-            minimum: 19,
-            unit: 'inches (total length)',
+            minimum: null,
+            unit: 'No federal minimum size',
             cfr: '50 CFR 648.290',
-            notes: '19" minimum total length'
+            notes: 'Commercial: head and fins attached; may be gutted.'
         },
         seasons: {
             federal: {
-                open: 'Year-round',
+                open: 'May 15 – November 14 (recreational)',
                 cfr: '50 CFR 648.290',
-                notes: 'Subject to quota closures'
+                notes: 'Federal recreational blueline season; commercial year-round subject to quota.'
             }
         },
         assessmentQuestions: {
@@ -1295,8 +1593,10 @@ SPECIES_DATA['blueline-tilefish'] = {
                 field: 'permitType',
                 required: true,
                 options: [
-                    { value: 'commercial', label: 'Blueline Tilefish Commercial Permit', description: 'Commercial fishing permit' },
-                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing' }
+                    { value: 'commercial', label: 'Open Access — Commercial/Incidental', description: '500 lb/trip' },
+                    { value: 'charter-headboat', label: 'Open Access — Charter', description: '5 fish per person per trip' },
+                    { value: 'party-headboat', label: 'Open Access — Party', description: '7 fish per person per trip' },
+                    { value: 'recreational', label: 'Recreational Tilefish Vessel Permit', description: '3 fish per person; May 15–Nov 14' }
                 ],
                 cfr: '50 CFR 648.4'
             },
@@ -1305,39 +1605,76 @@ SPECIES_DATA['blueline-tilefish'] = {
                 field: 'possessionAmount',
                 required: true,
                 type: 'number',
-                unit: 'lbs',
+                unit: {
+                    commercial: 'lbs',
+                    'charter-headboat': 'fish',
+                    'party-headboat': 'fish',
+                    recreational: 'fish'
+                },
                 dependsOn: ['permitType'],
-                notes: 'Record total weight in pounds',
+                notes: 'Commercial: pounds. For-hire/recreational: number of fish.',
                 cfr: '50 CFR 648.290'
             },
             possessionLimitCheck: {
-                question: 'Does the possession amount exceed the permit limit or quota?',
+                question: 'Does the possession amount exceed the permit limit?',
                 field: 'exceedsLimit',
                 required: false,
                 type: 'auto',
                 dependsOn: ['permitType', 'possessionAmount'],
                 autoCheck: true,
                 limits: {
-                    'commercial': null, // Subject to quota and trip limits
-                    'recreational': null // Check state regulations
+                    'commercial': { count: 500, unit: 'lbs per trip' },
+                    'charter-headboat': { count: 5, unit: 'fish per person per trip' },
+                    'party-headboat': { count: 7, unit: 'fish per person per trip' },
+                    'recreational': { count: 3, unit: 'fish per person per trip' }
                 },
-                notes: 'Commercial limits subject to quota and trip limits - check current regulations. Recreational: Check state regulations.',
+                notes: 'Blueline recreational federal season May 15–November 14. Exclude captain/crew from person count.',
                 violation: {
-                    ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or quota (50 CFR 648.290)'
+                    ifExceeds: 'VIOLATION: Blueline tilefish possession exceeds limit (50 CFR 648.290)'
                 },
                 cfr: '50 CFR 648.290'
             },
-            sizeCompliance: {
-                question: 'What is the total length of the fish?',
-                field: 'totalLength',
-                required: true,
-                type: 'number',
-                unit: 'inches',
-                minimum: 14,
-                notes: 'Minimum size: 14" total length. Measure from tip of snout to tip of tail.',
+            carcassCondition: {
+                question: 'Commercial catch — head and fins attached (may be gutted)?',
+                field: 'carcassCompliant',
+                required: false,
+                type: 'choice',
+                dependsOn: ['permitType'],
+                applicablePermits: ['commercial'],
                 violation: {
-                    ifBelow: 'VIOLATION: Blueline tilefish below minimum size must be released (50 CFR 648.290)'
+                    ifFalse: 'VIOLATION: Commercial tilefish must have head and fins attached (50 CFR 648.290)'
                 },
+                cfr: '50 CFR 648.290'
+            },
+            ifqDiscard: {
+                question: 'IFQ allocation permit — tilefish discarded at sea?',
+                field: 'ifqDiscard',
+                required: false,
+                type: 'boolean',
+                dependsOn: ['permitType'],
+                applicablePermits: ['commercial'],
+                violation: {
+                    ifTrue: 'VIOLATION: Discarding tilefish prohibited under IFQ allocation permit (50 CFR 648.290)'
+                },
+                cfr: '50 CFR 648.290'
+            },
+            operatorPermit: {
+                question: 'Does the operator hold a valid federal operator permit?',
+                field: 'operatorPermit',
+                required: false,
+                type: 'choice',
+                applicablePermits: ['commercial', 'charter-headboat', 'party-headboat'],
+                violation: {
+                    ifFalse: 'VIOLATION: Commercial or for-hire tilefish fishing requires valid operator permit (50 CFR 648.4)'
+                },
+                cfr: '50 CFR 648.4'
+            },
+            sizeCompliance: {
+                question: 'Does catch comply with applicable state size requirements (if any)?',
+                field: 'stateSizeCompliant',
+                required: false,
+                type: 'choice',
+                notes: 'No federal minimum size.',
                 cfr: '50 CFR 648.290'
             },
             gearType: {
@@ -1347,8 +1684,8 @@ SPECIES_DATA['blueline-tilefish'] = {
                 type: 'choice',
                 dependsOn: ['permitType'],
                 options: [
-                    { value: 'hook-line', label: 'Hook and Line', notes: 'Hook and line gear authorized' },
-                    { value: 'longline', label: 'Longline', notes: 'Longline gear authorized' }
+                    { value: 'hook-line', label: 'Hook and Line / Rod and Reel', notes: 'Authorized gear' },
+                    { value: 'longline', label: 'Longline', notes: 'Commercial authorized' }
                 ],
                 cfr: '50 CFR 648.290'
             },
@@ -1387,10 +1724,16 @@ SPECIES_DATA['thorny-skate'] = {
     image: null,
     imagePath: 'images/fish/Thorny_Skate.webp',
     color: '#a8dadc',
+    prohibited: true,
     regulations: {
+        protectedSpecies: {
+            prohibited: true,
+            cfr: '50 CFR 648.322',
+            notes: 'Thorny skate possession and landing prohibited.'
+        },
         permits: {
             'commercial': {
-                name: 'Skate Commercial Permit',
+                name: 'Open Access — General',
                 required: true,
                 cfr: '50 CFR 648.4'
             },
@@ -1402,18 +1745,18 @@ SPECIES_DATA['thorny-skate'] = {
         },
         possession: {
             'commercial': {
-                name: 'Commercial',
-                limit: null,
-                unit: 'lbs',
-                cfr: '50 CFR 648.320',
-                notes: 'Skate wing DAS limits: 4,000 lb (May 1–Aug 31) or 6,000 lb (Sep 1–Apr 30); incidental 500 lb when reduced (50 CFR 648.322).'
+                name: 'Prohibited',
+                limit: { count: 0, unit: 'lbs' },
+                prohibited: true,
+                cfr: '50 CFR 648.322',
+                notes: 'Thorny skate possession and landing prohibited.'
             },
             'recreational': {
-                name: 'Recreational',
-                limit: null,
-                unit: 'fish',
-                cfr: null,
-                notes: 'No federal recreational skate limit — verify state measures.'
+                name: 'Prohibited',
+                limit: { count: 0, unit: 'fish' },
+                prohibited: true,
+                cfr: '50 CFR 648.322',
+                notes: 'Thorny skate possession and landing prohibited.'
             }
         },
         size: {
@@ -1458,14 +1801,15 @@ SPECIES_DATA['thorny-skate'] = {
                 dependsOn: ['permitType', 'possessionAmount'],
                 autoCheck: true,
                 limits: {
-                    'commercial': null, // Subject to quota and trip limits
-                    'recreational': null // Check state regulations
+                    'commercial': { count: 0, prohibited: true },
+                    'recreational': { count: 0, prohibited: true }
                 },
-                notes: 'Commercial wing trip limits enforced by season (see 50 CFR 648.322). Recreational: state measures.',
+                notes: 'Thorny skate possession and landing prohibited.',
                 violation: {
-                    ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or quota (50 CFR 648.320)'
+                    ifExceeds: 'VIOLATION: Thorny skate possession and landing prohibited (50 CFR 648.322)',
+                    ifProhibited: 'VIOLATION: Thorny skate possession and landing prohibited (50 CFR 648.322)'
                 },
-                cfr: '50 CFR 648.320'
+                cfr: '50 CFR 648.322'
             },
             quotaStatus: {
                 question: 'Is the fishery open or closed due to quota?',
@@ -1475,8 +1819,8 @@ SPECIES_DATA['thorny-skate'] = {
                 dependsOn: ['permitType'],
                 applicablePermits: ['commercial'],
                 autoCheck: true,
-                notes: 'Quota trigger may reduce wing limit to 500 lb — verify NOAA bulletin.',
-                cfr: '50 CFR 648.320'
+                notes: 'Thorny skate prohibited — not applicable.',
+                cfr: '50 CFR 648.322'
             },
             reportingStatus: {
                 question: 'Has the catch been reported?',
@@ -1505,7 +1849,7 @@ SPECIES_DATA['smooth-skate'] = {
     regulations: {
         permits: {
             'commercial': {
-                name: 'Skate Commercial Permit',
+                name: 'Open Access — General',
                 required: true,
                 cfr: '50 CFR 648.4'
             },
@@ -1517,11 +1861,11 @@ SPECIES_DATA['smooth-skate'] = {
         },
         possession: {
             'commercial': {
-                name: 'Commercial',
+                name: 'Open Access — General',
                 limit: null,
                 unit: 'lbs',
-                cfr: '50 CFR 648.320',
-                notes: 'Skate wing DAS limits: 4,000 lb (May 1–Aug 31) or 6,000 lb (Sep 1–Apr 30); incidental 500 lb when reduced (50 CFR 648.322).'
+                cfr: '50 CFR 648.322',
+                notes: 'Trip limits vary by DAS type and season — see chart (wings or whole).'
             },
             'recreational': {
                 name: 'Recreational',
@@ -1620,7 +1964,7 @@ SPECIES_DATA['barndoor-skate'] = {
     regulations: {
         permits: {
             'commercial': {
-                name: 'Skate Commercial Permit',
+                name: 'Open Access — General',
                 required: true,
                 cfr: '50 CFR 648.4'
             },
@@ -1632,11 +1976,11 @@ SPECIES_DATA['barndoor-skate'] = {
         },
         possession: {
             'commercial': {
-                name: 'Commercial',
+                name: 'Open Access — General',
                 limit: null,
                 unit: 'lbs',
-                cfr: '50 CFR 648.320',
-                notes: 'Skate wing DAS limits: 4,000 lb (May 1–Aug 31) or 6,000 lb (Sep 1–Apr 30); incidental 500 lb when reduced (50 CFR 648.322).'
+                cfr: '50 CFR 648.322',
+                notes: 'Trip limits vary by DAS type and season — see chart (wings or whole).'
             },
             'recreational': {
                 name: 'Recreational',
@@ -1734,8 +2078,23 @@ SPECIES_DATA['american-lobster'] = {
     color: '#ff6b6b',
     regulations: {
         permits: {
+            'commercial-trap': {
+                name: 'Commercial Trap (Areas 1–6 & Outer Cape)',
+                required: true,
+                cfr: '50 CFR 697.4'
+            },
+            'commercial-non-trap': {
+                name: 'Commercial Non-Trap',
+                required: true,
+                cfr: '50 CFR 697.4'
+            },
+            'charter-party-non-trap': {
+                name: 'Charter/Party Non-Trap',
+                required: true,
+                cfr: '50 CFR 697.4'
+            },
             'commercial': {
-                name: 'American Lobster Commercial Permit',
+                name: 'American Lobster Commercial (unspecified type)',
                 required: true,
                 cfr: '50 CFR 697.4'
             },
@@ -1746,26 +2105,43 @@ SPECIES_DATA['american-lobster'] = {
             }
         },
         possession: {
+            'commercial-trap': {
+                name: 'Commercial Trap',
+                limit: null,
+                unit: 'lobsters',
+                cfr: '50 CFR 697.17',
+                notes: 'Unlimited — LMA trap limits and area measures apply.'
+            },
+            'commercial-non-trap': {
+                name: 'Commercial Non-Trap',
+                limit: { count: 100, unit: 'lobsters per day' },
+                cfr: '50 CFR 697.17',
+                notes: '100/day; max 500 on trips ≥5 days.'
+            },
+            'charter-party-non-trap': {
+                name: 'Charter/Party Non-Trap',
+                limit: { count: 6, unit: 'lobsters per person' },
+                cfr: '50 CFR 697.17'
+            },
             'commercial': {
                 name: 'Commercial',
                 limit: null,
-                unit: 'lbs',
+                unit: 'lobsters',
                 cfr: '50 CFR 697.17',
-                notes: 'Subject to trap limits and area restrictions. Check current regulations.'
+                notes: 'Select trap vs non-trap permit for limits.'
             },
             'recreational': {
                 name: 'Recreational',
-                limit: null,
-                unit: 'lobsters',
-                cfr: null,
-                notes: 'Check state regulations'
+                limit: { count: 6, unit: 'lobsters per person per day' },
+                cfr: '50 CFR 697.17',
+                notes: 'Not for sale, barter, or trade — verify state of landing.'
             }
         },
         size: {
             minimum: 3.25,
             unit: 'inches (carapace length)',
             cfr: '50 CFR 697.17',
-            notes: '3.25" minimum carapace length. Maximum size varies by area.'
+            notes: 'Min/max varies by LMA (3-1/4″ to 3-17/32″ min; 5″ to 6-3/4″ max).'
         },
         gear: {
             'trap': {
@@ -1787,8 +2163,11 @@ SPECIES_DATA['american-lobster'] = {
                 field: 'permitType',
                 required: true,
                 options: [
-                    { value: 'commercial', label: 'American Lobster Commercial Permit', description: 'Commercial fishing permit' },
-                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing' }
+                    { value: 'commercial-trap', label: 'Commercial Trap (Areas 1–6 & Outer Cape)', description: 'Unlimited possession' },
+                    { value: 'commercial-non-trap', label: 'Commercial Non-Trap', description: '100/day; 500 max on trips ≥5 days' },
+                    { value: 'charter-party-non-trap', label: 'Charter/Party Non-Trap', description: '6 lobsters per person' },
+                    { value: 'commercial', label: 'Commercial (unspecified)', description: 'Select trap vs non-trap' },
+                    { value: 'recreational', label: 'Recreational (No Federal Permit)', description: '6 lobsters per person per day' }
                 ],
                 cfr: '50 CFR 697.4'
             },
@@ -1797,9 +2176,15 @@ SPECIES_DATA['american-lobster'] = {
                 field: 'possessionAmount',
                 required: true,
                 type: 'number',
-                unit: 'lbs',
+                unit: {
+                    'commercial-trap': 'lobsters',
+                    'commercial-non-trap': 'lobsters',
+                    'charter-party-non-trap': 'lobsters',
+                    commercial: 'lobsters',
+                    recreational: 'lobsters'
+                },
                 dependsOn: ['permitType'],
-                notes: 'Record total weight in pounds (commercial) or number of lobsters (recreational)',
+                notes: 'Record number of lobsters (or weight if incidental context).',
                 cfr: '50 CFR 697.17'
             },
             possessionLimitCheck: {
@@ -1807,57 +2192,99 @@ SPECIES_DATA['american-lobster'] = {
                 field: 'exceedsLimit',
                 required: false,
                 type: 'auto',
-                dependsOn: ['permitType', 'possessionAmount'],
+                dependsOn: ['permitType', 'possessionAmount', 'tripLengthDays'],
                 autoCheck: true,
                 limits: {
-                    'commercial': null, // Subject to trap limits and area restrictions
-                    'recreational': null // Check state regulations
+                    'commercial-trap': null,
+                    'commercial-non-trap': { count: 100, unit: 'lobsters per day' },
+                    'charter-party-non-trap': { count: 6, unit: 'lobsters per person' },
+                    'commercial': null,
+                    'recreational': { count: 6, unit: 'lobsters per person per day' }
                 },
-                notes: 'Commercial limits subject to trap limits and area restrictions - check current regulations. Recreational: Check state regulations.',
+                notes: 'Non-trap: 500 max on trips ≥5 days. Trap: unlimited — verify LMA measures.',
                 violation: {
-                    ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or trap allocation (50 CFR 697.17)'
+                    ifExceeds: 'VIOLATION: Lobster possession exceeds permit limit (50 CFR 697.17)'
                 },
                 cfr: '50 CFR 697.17'
             },
-            sizeCompliance: {
-                question: 'What is the carapace length of the lobsters?',
-                field: 'carapaceLength',
-                required: true,
+            tripLengthDays: {
+                question: 'Trip length in calendar days (commercial non-trap 500-lobster rule)?',
+                field: 'tripLengthDays',
+                required: false,
                 type: 'number',
-                unit: 'inches',
-                minimum: 3.25,
-                notes: 'Minimum size: 3.25" carapace length. Maximum size varies by area. Measure from rear of eye socket to rear of carapace.',
+                dependsOn: ['permitType'],
+                applicablePermits: ['commercial-non-trap'],
+                cfr: '50 CFR 697.17'
+            },
+            operatorPermit: {
+                question: 'Does the operator hold a valid federal operator permit?',
+                field: 'operatorPermit',
+                required: false,
+                type: 'choice',
+                applicablePermits: ['commercial', 'commercial-trap', 'commercial-non-trap', 'charter-party-non-trap'],
                 violation: {
-                    ifBelow: 'VIOLATION: Lobsters below minimum size must be released (50 CFR 697.17)'
+                    ifFalse: 'VIOLATION: Commercial or for-hire lobster fishing requires valid operator permit (50 CFR 697.4)'
+                },
+                cfr: '50 CFR 697.4'
+            },
+            eggBearingLobster: {
+                question: 'Any egg-bearing lobsters on board?',
+                field: 'eggBearingPresent',
+                required: false,
+                type: 'boolean',
+                violation: {
+                    ifTrue: 'VIOLATION: Egg-bearing lobster prohibited (50 CFR 697.7)'
+                },
+                cfr: '50 CFR 697.7'
+            },
+            vNotchCompliance: {
+                question: 'Any v-notched or mutilated lobsters on board (per area v-notch tolerance)?',
+                field: 'vNotchCompliant',
+                required: false,
+                type: 'choice',
+                notes: 'Area 1: zero tolerance. Other areas: 1/8″ notch prohibited.',
+                violation: {
+                    ifFalse: 'VIOLATION: V-notched or prohibited lobster on board (50 CFR 697.7)'
+                },
+                cfr: '50 CFR 697.7'
+            },
+            sizeCompliance: {
+                question: 'Are lobsters within LMA minimum and maximum carapace size?',
+                field: 'sizeCompliant',
+                required: false,
+                type: 'choice',
+                dependsOn: ['fishingArea'],
+                notes: 'Measure rear of eye socket to rear of carapace. Limits vary by LMA.',
+                violation: {
+                    ifFalse: 'VIOLATION: Lobster outside LMA size limits (50 CFR 697.17)'
                 },
                 cfr: '50 CFR 697.17'
             },
             maximumSizeCheck: {
-                question: 'What is the maximum size limit for this area?',
-                field: 'maximumSize',
+                question: 'Are any lobsters above the maximum carapace size for this LMA?',
+                field: 'overMaxSize',
                 required: false,
-                type: 'number',
-                unit: 'inches',
+                type: 'boolean',
                 dependsOn: ['fishingArea'],
-                notes: 'Maximum size varies by area. Check area-specific regulations.',
                 violation: {
-                    ifExceeds: 'VIOLATION: Lobsters above maximum size must be released (50 CFR 697.17)'
+                    ifTrue: 'VIOLATION: Lobsters above maximum size must be released (50 CFR 697.17)'
                 },
                 cfr: '50 CFR 697.17'
             },
             fishingArea: {
-                question: 'What area was the vessel fishing in?',
+                question: 'What lobster management area (LMA) applies?',
                 field: 'fishingArea',
                 required: true,
                 type: 'choice',
                 options: [
-                    { value: 'area-1', label: 'Area 1', notes: 'Area 1 specific regulations apply' },
-                    { value: 'area-2', label: 'Area 2', notes: 'Area 2 specific regulations apply' },
-                    { value: 'area-3', label: 'Area 3', notes: 'Area 3 specific regulations apply' },
-                    { value: 'area-4', label: 'Area 4', notes: 'Area 4 specific regulations apply' },
-                    { value: 'area-5', label: 'Area 5', notes: 'Area 5 specific regulations apply' },
-                    { value: 'area-6', label: 'Area 6', notes: 'Area 6 specific regulations apply' },
-                    { value: 'closed-area', label: 'Closed Area', violation: true, notes: 'VIOLATION: Fishing prohibited in closed areas' }
+                    { value: 'area-1', label: 'LMA 1 (Nearshore ME/NH)', notes: 'Min 3-1/4″; max 5″; trap limit 800; v-notch zero tolerance' },
+                    { value: 'area-2', label: 'LMA 2', notes: 'Min 3-3/8″; max 5-1/4″; trap limit permit-specific max 800' },
+                    { value: 'area-3', label: 'LMA 3 (Offshore)', notes: 'Min 3-17/32″; max 6-3/4″; trap limit max 1,945' },
+                    { value: 'area-4', label: 'LMA 4', notes: 'Closed Apr 30–May 31; min 3-3/8″; max 5-1/4″; trap max 1,440' },
+                    { value: 'area-5', label: 'LMA 5', notes: 'Closed Feb 1–Mar 31; min 3-3/8″; max 5-1/4″; trap max 1,440' },
+                    { value: 'area-6', label: 'LMA 6 (Long Island Sound)', notes: 'State waters only; min 3-1/4″; max 5-3/8″' },
+                    { value: 'outer-cape', label: 'Outer Cape', notes: 'Closed Feb 1–Mar 31; min 3-3/8″; max 6-3/4″; trap max 800' },
+                    { value: 'closed-area', label: 'Closed Area', violation: true }
                 ],
                 violation: {
                     ifValue: 'closed-area',
@@ -1866,13 +2293,13 @@ SPECIES_DATA['american-lobster'] = {
                 cfr: '50 CFR 697.17'
             },
             trapCompliance: {
-                question: 'How many traps are being used?',
+                question: 'How many traps are aboard?',
                 field: 'numberOfTraps',
                 required: false,
                 type: 'number',
                 dependsOn: ['permitType'],
-                applicablePermits: ['commercial'],
-                notes: 'Trap limits vary by area and permit. Check current trap allocation.',
+                applicablePermits: ['commercial', 'commercial-trap'],
+                notes: 'Verify trap limit for LMA and permit.',
                 cfr: '50 CFR 697.20'
             },
             gearCompliance: {
@@ -1882,8 +2309,9 @@ SPECIES_DATA['american-lobster'] = {
                 type: 'choice',
                 dependsOn: ['permitType'],
                 options: [
-                    { value: 'trap', label: 'Lobster Trap', notes: 'Trap gear authorized - check area-specific restrictions' },
-                    { value: 'diving', label: 'Diving', notes: 'Recreational diving gear' }
+                    { value: 'trap', label: 'Lobster Trap', notes: 'Escape vent, ghost panel, trap tags required' },
+                    { value: 'non-trap', label: 'Non-Trap (hand, dive, etc.)', notes: 'Non-trap possession limits apply' },
+                    { value: 'diving', label: 'Diving', notes: 'Recreational/non-trap' }
                 ],
                 cfr: '50 CFR 697.20'
             },
@@ -1913,8 +2341,23 @@ SPECIES_DATA['jonah-crab'] = {
     color: '#ff8787',
     regulations: {
         permits: {
+            'commercial-trap': {
+                name: 'Commercial Trap (Lobster Areas 1–6 & Outer Cape)',
+                required: true,
+                cfr: '50 CFR 697.4'
+            },
+            'commercial-non-trap': {
+                name: 'Commercial Non-Trap (Lobster Permit)',
+                required: true,
+                cfr: '50 CFR 697.4'
+            },
+            'charter-party-non-trap': {
+                name: 'Charter/Party Non-Trap (Lobster Permit)',
+                required: true,
+                cfr: '50 CFR 697.4'
+            },
             'commercial': {
-                name: 'Jonah Crab Commercial Permit',
+                name: 'Jonah Crab / Lobster Commercial (unspecified)',
                 required: true,
                 cfr: '50 CFR 697.4'
             },
@@ -1925,19 +2368,35 @@ SPECIES_DATA['jonah-crab'] = {
             }
         },
         possession: {
+            'commercial-trap': {
+                name: 'Commercial Trap',
+                limit: null,
+                unit: 'crabs',
+                cfr: '50 CFR 697.7',
+                notes: 'Unlimited — follow lobster trap area rules.'
+            },
+            'commercial-non-trap': {
+                name: 'Commercial Non-Trap',
+                limit: { count: 1000, unit: 'crabs' },
+                cfr: '50 CFR 697.7',
+                notes: 'Must not exceed 50% by weight of all other catch.'
+            },
+            'charter-party-non-trap': {
+                name: 'Charter/Party Non-Trap',
+                limit: { count: 50, unit: 'crabs per person' },
+                cfr: '50 CFR 697.7'
+            },
             'commercial': {
                 name: 'Commercial',
                 limit: null,
-                unit: 'lbs',
-                cfr: '50 CFR 697.7',
-                notes: 'Subject to trap limits and area restrictions. Check current regulations.'
+                unit: 'crabs',
+                cfr: '50 CFR 697.7'
             },
             'recreational': {
                 name: 'Recreational',
-                limit: null,
-                unit: 'crabs',
-                cfr: null,
-                notes: 'Check state regulations'
+                limit: { count: 50, unit: 'crabs per person per day' },
+                cfr: '50 CFR 697.7',
+                notes: 'Not for sale, barter, or trade — verify state of landing.'
             }
         },
         size: {
@@ -1966,8 +2425,11 @@ SPECIES_DATA['jonah-crab'] = {
                 field: 'permitType',
                 required: true,
                 options: [
-                    { value: 'commercial', label: 'Jonah Crab Commercial Permit', description: 'Commercial fishing permit' },
-                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing' }
+                    { value: 'commercial-trap', label: 'Commercial Trap (Lobster trap areas)', description: 'Unlimited' },
+                    { value: 'commercial-non-trap', label: 'Commercial Non-Trap', description: '1,000 crabs; ≤50% of other catch weight' },
+                    { value: 'charter-party-non-trap', label: 'Charter/Party Non-Trap', description: '50 crabs per person' },
+                    { value: 'commercial', label: 'Commercial (unspecified)', description: 'Select permit type' },
+                    { value: 'recreational', label: 'Recreational (No Federal Permit)', description: '50 crabs per person per day' }
                 ],
                 cfr: '50 CFR 697.4'
             },
@@ -1976,9 +2438,9 @@ SPECIES_DATA['jonah-crab'] = {
                 field: 'possessionAmount',
                 required: true,
                 type: 'number',
-                unit: 'lbs',
+                unit: 'crabs',
                 dependsOn: ['permitType'],
-                notes: 'Record total weight in pounds',
+                notes: 'Record number of Jonah crabs.',
                 cfr: '50 CFR 697.7'
             },
             possessionLimitCheck: {
@@ -1989,25 +2451,47 @@ SPECIES_DATA['jonah-crab'] = {
                 dependsOn: ['permitType', 'possessionAmount'],
                 autoCheck: true,
                 limits: {
+                    'commercial-trap': null,
+                    'commercial-non-trap': { count: 1000, unit: 'crabs' },
+                    'charter-party-non-trap': { count: 50, unit: 'crabs per person' },
                     'commercial': null,
-                    'recreational': null
+                    'recreational': { count: 50, unit: 'crabs per person per day' }
                 },
-                notes: 'Commercial limits subject to trap limits and area restrictions - check current regulations. Recreational: Check state regulations.',
+                notes: 'Non-trap: must not exceed 50% by weight of all other catch on board.',
                 violation: {
-                    ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or quota (50 CFR 697.7)'
+                    ifExceeds: 'VIOLATION: Jonah crab possession exceeds permit limit (50 CFR 697.7)'
                 },
                 cfr: '50 CFR 697.7'
             },
-            sizeCompliance: {
-                question: 'What is the carapace width of the crabs?',
-                field: 'carapaceWidth',
-                required: true,
-                type: 'number',
-                unit: 'inches',
-                minimum: 4.75,
-                notes: 'Minimum size: 4.75" carapace width. Measure across the widest part of the carapace.',
+            eggBearingCrab: {
+                question: 'Any egg-bearing Jonah crabs on board?',
+                field: 'eggBearingPresent',
+                required: false,
+                type: 'boolean',
                 violation: {
-                    ifBelow: 'VIOLATION: Jonah crab below minimum size must be released (50 CFR 697.7)'
+                    ifTrue: 'VIOLATION: Egg-bearing Jonah crab prohibited (50 CFR 697.7)'
+                },
+                cfr: '50 CFR 697.7'
+            },
+            operatorPermit: {
+                question: 'Does the operator hold a valid federal operator permit?',
+                field: 'operatorPermit',
+                required: false,
+                type: 'choice',
+                applicablePermits: ['commercial', 'commercial-trap', 'commercial-non-trap', 'charter-party-non-trap'],
+                violation: {
+                    ifFalse: 'VIOLATION: Commercial or for-hire fishing requires valid operator permit (50 CFR 697.4)'
+                },
+                cfr: '50 CFR 697.4'
+            },
+            sizeCompliance: {
+                question: 'Are crabs at least 4.75″ carapace width?',
+                field: 'sizeCompliant',
+                required: false,
+                type: 'choice',
+                notes: 'Measure straight line across widest part of shell including posterior spine tips.',
+                violation: {
+                    ifFalse: 'VIOLATION: Jonah crab below 4.75″ minimum carapace width (50 CFR 697.7)'
                 },
                 cfr: '50 CFR 697.7'
             },
@@ -2018,7 +2502,8 @@ SPECIES_DATA['jonah-crab'] = {
                 type: 'choice',
                 dependsOn: ['permitType'],
                 options: [
-                    { value: 'trap', label: 'Crab Trap', notes: 'Trap gear authorized' }
+                    { value: 'trap', label: 'Trap/Pot', notes: 'Follow American lobster trap/pot regulations' },
+                    { value: 'non-trap', label: 'Non-Trap', notes: 'Non-trap possession limits apply' }
                 ],
                 cfr: '50 CFR 697.7'
             },
@@ -2066,8 +2551,8 @@ SPECIES_DATA['atlantic-sturgeon'] = {
                 name: 'Commercial',
                 limit: { count: 0 },
                 unit: 'fish',
-                cfr: '50 CFR 223.102',
-                notes: 'PROHIBITED - No retention allowed. Listed under Endangered Species Act.'
+                cfr: '50 CFR 223.102; 50 CFR 697.7',
+                notes: 'PROHIBITED - No retention allowed. EEZ prohibition (697) and ESA listing (223.102).'
             },
             'recreational': {
                 name: 'Recreational',
@@ -2178,8 +2663,8 @@ SPECIES_DATA['shortnose-sturgeon'] = {
                 name: 'Commercial',
                 limit: { count: 0 },
                 unit: 'fish',
-                cfr: '50 CFR 223.102',
-                notes: 'PROHIBITED - No retention allowed. Listed under Endangered Species Act.'
+                cfr: '50 CFR 223.102; 50 CFR 697.7',
+                notes: 'PROHIBITED - No retention allowed. EEZ prohibition (697) and ESA listing (223.102).'
             },
             'recreational': {
                 name: 'Recreational',
@@ -2263,7 +2748,7 @@ SPECIES_DATA['shortnose-sturgeon'] = {
     }
 };
 
-// Atlantic Coast Horseshoe Crab
+// Atlantic Coast Horseshoe Crab (50 CFR Part 697)
 SPECIES_DATA['atlantic-coast-horseshoe-crab'] = {
     name: 'Atlantic Coast Horseshoe Crab',
     commonName: 'Horseshoe Crab',
@@ -2273,9 +2758,10 @@ SPECIES_DATA['atlantic-coast-horseshoe-crab'] = {
     regulations: {
         permits: {
             'commercial': {
-                name: 'Horseshoe Crab Commercial Permit',
-                required: true,
-                cfr: '50 CFR 697.4'
+                name: 'Not Regulated (Federal)',
+                required: false,
+                cfr: '50 CFR 697.7',
+                notes: 'Permits not federally regulated under current chart — verify state rules.'
             },
             'recreational': {
                 name: 'Recreational (No Federal Permit Required)',
@@ -2289,7 +2775,7 @@ SPECIES_DATA['atlantic-coast-horseshoe-crab'] = {
                 limit: null,
                 unit: 'crabs',
                 cfr: '50 CFR 697.7',
-                notes: 'Subject to quota and area restrictions. Check current regulations.'
+                notes: 'No federal possession limit on chart — Carl N. Shuster Jr. Reserve and trawl/dredge area rules apply.'
             },
             'recreational': {
                 name: 'Recreational',
@@ -2301,15 +2787,15 @@ SPECIES_DATA['atlantic-coast-horseshoe-crab'] = {
         },
         size: {
             minimum: null,
-            unit: 'varies',
+            unit: 'not regulated federally',
             cfr: '50 CFR 697.7',
-            notes: 'Check current size requirements'
+            notes: 'No federal minimum size on chart'
         },
         seasons: {
             federal: {
                 open: 'Year-round',
                 cfr: '50 CFR 697.7',
-                notes: 'Subject to area closures'
+                notes: 'Carl N. Shuster Jr. Horseshoe Crab Reserve closed to fishing'
             }
         },
         assessmentQuestions: {
@@ -2318,10 +2804,19 @@ SPECIES_DATA['atlantic-coast-horseshoe-crab'] = {
                 field: 'permitType',
                 required: true,
                 options: [
-                    { value: 'commercial', label: 'Commercial - Horseshoe Crab Commercial Permit', description: 'Commercial fishing - Horseshoe Crab Commercial Permit required' },
-                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing - No federal permit required' }
+                    { value: 'commercial', label: 'Commercial', description: 'Commercial fishing — area closures apply' },
+                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing' }
                 ],
-                cfr: '50 CFR 697.4'
+                cfr: '50 CFR 697.7'
+            },
+            gearType: {
+                question: 'Does the vessel have trawl or dredge gear on board?',
+                field: 'hasTrawlOrDredge',
+                required: false,
+                type: 'boolean',
+                applicablePermits: ['commercial'],
+                notes: 'Possession on trawl/dredge vessels prohibited in Carl N. Shuster Jr. Reserve closed area',
+                cfr: '50 CFR 697.7'
             },
             possessionAmount: {
                 question: 'How many horseshoe crabs are on board?',
@@ -2333,43 +2828,16 @@ SPECIES_DATA['atlantic-coast-horseshoe-crab'] = {
                 notes: 'Record total number of horseshoe crabs on board',
                 cfr: '50 CFR 697.7'
             },
-            possessionLimitCheck: {
-                question: 'Does the possession amount comply with permit limits?',
-                field: 'exceedsLimit',
-                required: false,
-                type: 'auto',
-                dependsOn: ['permitType', 'numberOfCrabs'],
-                autoCheck: true,
-                limits: {
-                    'commercial': null, // Subject to quota
-                    'recreational': null // Check state regulations
-                },
-                notes: 'Commercial limits subject to quota and area restrictions - check current regulations. Recreational: Check state regulations.',
-                cfr: '50 CFR 697.7'
-            },
             areaRestrictions: {
-                question: 'Was fishing conducted in a closed or restricted area?',
+                question: 'Was fishing conducted in the Carl N. Shuster Jr. Horseshoe Crab Reserve or other closed area?',
                 field: 'closedArea',
                 required: false,
                 type: 'boolean',
                 dependsOn: ['permitType'],
                 applicablePermits: ['commercial'],
-                notes: 'Horseshoe crab fishing subject to area closures and restrictions',
+                notes: 'Reserve closed to horseshoe crab fishing; crabs caught must be returned immediately',
                 violation: {
-                    ifTrue: 'VIOLATION: Fishing in closed or restricted area (50 CFR 697.7)'
-                },
-                cfr: '50 CFR 697.7'
-            },
-            reportingStatus: {
-                question: 'Has the catch been reported?',
-                field: 'reported',
-                required: true,
-                type: 'boolean',
-                dependsOn: ['permitType'],
-                applicablePermits: ['commercial'],
-                notes: 'Commercial catch must be reported as required',
-                violation: {
-                    ifFalse: 'VIOLATION: Commercial catch reporting required (50 CFR 697.7)'
+                    ifTrue: 'VIOLATION: Fishing in Carl N. Shuster Jr. Horseshoe Crab Reserve or closed area (50 CFR 697.7)'
                 },
                 cfr: '50 CFR 697.7'
             }
@@ -2377,7 +2845,7 @@ SPECIES_DATA['atlantic-coast-horseshoe-crab'] = {
     }
 };
 
-// Red Drum
+// Red Drum (50 CFR Part 697)
 SPECIES_DATA['red-drum'] = {
     name: 'Red Drum',
     commonName: 'Redfish',
@@ -2387,15 +2855,16 @@ SPECIES_DATA['red-drum'] = {
     regulations: {
         permits: {
             'commercial': {
-                name: 'Red Drum Commercial Permit',
-                required: true,
-                cfr: '50 CFR 622.4',
-                notes: 'Check for specific permit requirements'
+                name: 'Not Regulated (North of Prohibited Zone)',
+                required: false,
+                cfr: '50 CFR 697.7',
+                notes: 'No federal permit required north of prohibited EEZ zone'
             },
             'recreational': {
-                name: 'Recreational (No Federal Permit Required)',
+                name: 'Recreational (Prohibited in Federal Waters)',
                 required: false,
-                cfr: null
+                cfr: '50 CFR 697.7',
+                notes: 'Recreational red drum fishing prohibited in federal waters'
             }
         },
         possession: {
@@ -2403,27 +2872,28 @@ SPECIES_DATA['red-drum'] = {
                 name: 'Commercial',
                 limit: null,
                 unit: 'fish',
-                cfr: '50 CFR 622.42',
-                notes: 'Check current regulations and quotas'
+                cfr: '50 CFR 697.7',
+                notes: 'No federal possession limit north of prohibited zone. Prohibited south of NJ/NY line in EEZ.'
             },
             'recreational': {
                 name: 'Recreational',
-                limit: null,
+                limit: { count: 0 },
                 unit: 'fish',
-                cfr: null,
-                notes: 'Check state regulations'
+                cfr: '50 CFR 697.7',
+                notes: 'PROHIBITED in federal waters. Check state regulations in state waters.'
             }
         },
         size: {
-            minimum: 18,
-            unit: 'inches (total length)',
-            cfr: '50 CFR 622.42',
-            notes: '18" minimum total length. Check for slot limits.'
+            minimum: null,
+            unit: 'not regulated federally (north of zone)',
+            cfr: '50 CFR 697.7',
+            notes: 'No federal minimum size north of prohibited EEZ zone'
         },
         seasons: {
             federal: {
-                open: 'Check current regulations',
-                notes: 'Regulations vary by area and season'
+                open: 'Area-dependent',
+                cfr: '50 CFR 697.7',
+                notes: 'Prohibited in EEZ south of 40°29.6′ N, 73°54.1′ W line to council boundary'
             }
         },
         assessmentQuestions: {
@@ -2432,10 +2902,22 @@ SPECIES_DATA['red-drum'] = {
                 field: 'permitType',
                 required: true,
                 options: [
-                    { value: 'commercial', label: 'Red Drum Commercial Permit', description: 'Commercial fishing permit' },
-                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing' }
+                    { value: 'commercial', label: 'Commercial', description: 'Commercial fishing — zone rules apply' },
+                    { value: 'recreational', label: 'Recreational', description: 'Recreational — prohibited in federal waters' }
                 ],
-                cfr: '50 CFR 622.4'
+                cfr: '50 CFR 697.7'
+            },
+            fishingArea: {
+                question: 'Where was fishing conducted?',
+                field: 'fishingArea',
+                required: true,
+                type: 'choice',
+                options: [
+                    { value: 'prohibited-south', label: 'EEZ south of NJ/NY line (prohibited zone)', notes: 'Harvest and possession prohibited — release immediately' },
+                    { value: 'north-allowed', label: 'EEZ north of prohibited zone', notes: 'No federal permit, limit, or min size for allowed fisheries' },
+                    { value: 'state-waters', label: 'State waters', notes: 'State regulations apply' }
+                ],
+                cfr: '50 CFR 697.7'
             },
             possessionAmount: {
                 question: 'What is the possession amount on board?',
@@ -2443,67 +2925,29 @@ SPECIES_DATA['red-drum'] = {
                 required: true,
                 type: 'number',
                 unit: 'fish',
-                dependsOn: ['permitType'],
-                notes: 'Record number of fish',
-                cfr: '50 CFR 622.42'
+                dependsOn: ['permitType', 'fishingArea'],
+                notes: 'Prohibited in EEZ south of NJ/NY line. Recreational prohibited in all federal waters.',
+                cfr: '50 CFR 697.7'
             },
             possessionLimitCheck: {
-                question: 'Does the possession amount exceed the permit limit?',
+                question: 'Does possession comply with zone and permit rules?',
                 field: 'exceedsLimit',
                 required: false,
                 type: 'auto',
-                dependsOn: ['permitType', 'possessionAmount'],
+                dependsOn: ['permitType', 'fishingArea', 'possessionAmount'],
                 autoCheck: true,
-                limits: {
-                    'commercial': null, // Check current regulations and quotas
-                    'recreational': null // Check state regulations
-                },
-                notes: 'Commercial limits subject to quotas - check current regulations. Recreational: Check state regulations.',
+                notes: 'Prohibited zone and recreational federal rules apply.',
                 violation: {
-                    ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or quota (50 CFR 622.42)'
+                    ifExceeds: 'VIOLATION: Atlantic red drum possession not permitted (50 CFR 697.7)',
+                    ifProhibited: 'VIOLATION: Atlantic red drum prohibited in this area (50 CFR 697.7)'
                 },
-                cfr: '50 CFR 622.42'
-            },
-            sizeCompliance: {
-                question: 'What is the total length of the fish?',
-                field: 'totalLength',
-                required: true,
-                type: 'number',
-                unit: 'inches',
-                minimum: 18,
-                notes: 'Minimum size: 18" total length. Check for slot limits. Measure from tip of snout to tip of tail.',
-                violation: {
-                    ifBelow: 'VIOLATION: Red drum below minimum size must be released (50 CFR 622.42)'
-                },
-                cfr: '50 CFR 622.42'
-            },
-            slotLimitCheck: {
-                question: 'Does the fish fall within the slot limit (if applicable)?',
-                field: 'slotLimitCompliance',
-                required: false,
-                type: 'auto',
-                dependsOn: ['totalLength'],
-                notes: 'Check for area-specific slot limits (minimum and maximum size restrictions)',
-                cfr: '50 CFR 622.42'
-            },
-            reportingStatus: {
-                question: 'Has the catch been reported?',
-                field: 'reported',
-                required: true,
-                type: 'boolean',
-                dependsOn: ['permitType'],
-                applicablePermits: ['commercial'],
-                notes: 'Commercial catch must be reported as required',
-                violation: {
-                    ifFalse: 'VIOLATION: Commercial catch reporting required (50 CFR 622.7)'
-                },
-                cfr: '50 CFR 622.7'
+                cfr: '50 CFR 697.7'
             }
         }
     }
 };
 
-// Weakfish
+// Weakfish (50 CFR Part 697)
 SPECIES_DATA['weakfish'] = {
     name: 'Weakfish',
     commonName: 'Sea Trout',
@@ -2513,10 +2957,10 @@ SPECIES_DATA['weakfish'] = {
     regulations: {
         permits: {
             'commercial': {
-                name: 'Weakfish Commercial Permit',
-                required: true,
-                cfr: '50 CFR 648.4',
-                notes: 'Check for specific permit requirements'
+                name: 'Not Regulated (Federal)',
+                required: false,
+                cfr: '50 CFR 697.7',
+                notes: 'Permits not federally regulated under current chart'
             },
             'recreational': {
                 name: 'Recreational (No Federal Permit Required)',
@@ -2527,29 +2971,42 @@ SPECIES_DATA['weakfish'] = {
         possession: {
             'commercial': {
                 name: 'Commercial',
-                limit: null,
+                limit: { count: 150, unit: 'lbs' },
                 unit: 'lbs',
-                cfr: '50 CFR 648.4',
-                notes: 'Check current regulations and quotas'
+                cfr: '50 CFR 697.7',
+                notes: '150 lb possession limit. Restricted gear area rules apply.'
             },
             'recreational': {
                 name: 'Recreational',
                 limit: null,
                 unit: 'fish',
-                cfr: null,
-                notes: 'Check state regulations'
+                cfr: '50 CFR 697.7',
+                notes: 'No federal recreational possession limit'
             }
         },
         size: {
-            minimum: 13,
+            minimum: 12,
             unit: 'inches (total length)',
-            cfr: null,
-            notes: '13" minimum total length. Check state regulations.'
+            cfr: '50 CFR 697.7',
+            notes: '12″ minimum total length (commercial and recreational)'
+        },
+        gear: {
+            'trawl': {
+                name: 'Trawl',
+                cfr: '50 CFR 697.7',
+                notes: '≥3¼″ square stretched mesh or ≥3¾″ diamond stretch mesh'
+            },
+            'gillnet': {
+                name: 'Gillnet',
+                cfr: '50 CFR 697.7',
+                notes: '≥2⅞″ stretch mesh'
+            }
         },
         seasons: {
             federal: {
-                open: 'Check current regulations',
-                notes: 'Regulations vary by area and season'
+                open: 'Year-round',
+                cfr: '50 CFR 697.7',
+                notes: 'Restricted gear area near Cape Hatteras — weakfish possession prohibited while fishing shrimp trawls, flynet, or crab trawls'
             }
         },
         assessmentQuestions: {
@@ -2558,10 +3015,10 @@ SPECIES_DATA['weakfish'] = {
                 field: 'permitType',
                 required: true,
                 options: [
-                    { value: 'commercial', label: 'Weakfish Commercial Permit', description: 'Commercial fishing permit' },
-                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing' }
+                    { value: 'commercial', label: 'Commercial', description: 'Commercial fishing — 150 lb limit' },
+                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing — unlimited federally' }
                 ],
-                cfr: '50 CFR 648.4'
+                cfr: '50 CFR 697.7'
             },
             possessionAmount: {
                 question: 'What is the possession amount on board?',
@@ -2570,8 +3027,8 @@ SPECIES_DATA['weakfish'] = {
                 type: 'number',
                 unit: 'lbs',
                 dependsOn: ['permitType'],
-                notes: 'Record total weight in pounds (commercial) or number of fish (recreational)',
-                cfr: '50 CFR 648.4'
+                notes: 'Commercial: record weight in pounds. Recreational: record number of fish if applicable.',
+                cfr: '50 CFR 697.7'
             },
             possessionLimitCheck: {
                 question: 'Does the possession amount exceed the permit limit?',
@@ -2581,14 +3038,14 @@ SPECIES_DATA['weakfish'] = {
                 dependsOn: ['permitType', 'possessionAmount'],
                 autoCheck: true,
                 limits: {
-                    'commercial': null, // Check current regulations and quotas
-                    'recreational': null // Check state regulations
+                    'commercial': { count: 150, unit: 'lbs' },
+                    'recreational': null
                 },
-                notes: 'Commercial limits subject to quotas - check current regulations. Recreational: Check state regulations.',
+                notes: 'Commercial limit 150 lb. Recreational — no federal limit.',
                 violation: {
-                    ifExceeds: 'VIOLATION: Possession amount exceeds permit limit or quota (50 CFR 648.4)'
+                    ifExceeds: 'VIOLATION: Weakfish possession exceeds 150 lb commercial limit (50 CFR 697.7)'
                 },
-                cfr: '50 CFR 648.4'
+                cfr: '50 CFR 697.7'
             },
             sizeCompliance: {
                 question: 'What is the total length of the fish?',
@@ -2596,33 +3053,24 @@ SPECIES_DATA['weakfish'] = {
                 required: true,
                 type: 'number',
                 unit: 'inches',
-                minimum: 13,
-                notes: 'Minimum size: 13" total length. Check state regulations. Measure from tip of snout to tip of tail.',
+                minimum: 12,
+                notes: 'Minimum size: 12″ total length. Measure from tip of snout to tip of tail.',
                 violation: {
-                    ifBelow: 'VIOLATION: Weakfish below minimum size must be released'
+                    ifBelow: 'VIOLATION: Weakfish below minimum size must be released (50 CFR 697.7)'
                 },
-                cfr: null
+                cfr: '50 CFR 697.7'
             },
-            stateRegulations: {
-                question: 'Have state regulations been checked?',
-                field: 'stateRegulationsChecked',
-                required: true,
+            meshCompliance: {
+                question: 'Does trawl/gillnet mesh meet minimum requirements (trawl ≥3¼″ square or ≥3¾″ diamond; gillnet ≥2⅞″)?',
+                field: 'meshCompliant',
+                required: false,
                 type: 'boolean',
-                notes: 'Weakfish regulations vary by state. Check state-specific limits and seasons.',
-                cfr: null
-            },
-            reportingStatus: {
-                question: 'Has the catch been reported?',
-                field: 'reported',
-                required: true,
-                type: 'boolean',
-                dependsOn: ['permitType'],
                 applicablePermits: ['commercial'],
-                notes: 'Commercial catch must be reported as required',
+                notes: 'Gear mesh requirements for trawl and gillnet fisheries',
                 violation: {
-                    ifFalse: 'VIOLATION: Commercial catch reporting required (50 CFR 648.7)'
+                    ifFalse: 'VIOLATION: Weakfish gear mesh below minimum requirement (50 CFR 697.7)'
                 },
-                cfr: '50 CFR 648.7'
+                cfr: '50 CFR 697.7'
             }
         }
     }
@@ -2631,50 +3079,56 @@ SPECIES_DATA['weakfish'] = {
 // Mahi-Mahi (Dorado)
 SPECIES_DATA['mahi-mahi'] = {
     name: 'Mahi-Mahi',
-    commonName: 'Dorado',
+    commonName: 'Dorado / Atlantic Dolphin',
     image: null,
     imagePath: 'images/fish/Mahi-Mahi.webp',
     color: '#ffd93d',
     regulations: {
         permits: {
             'commercial': {
-                name: 'Atlantic HMS Commercial Permit',
+                name: 'Atlantic Dolphin/Wahoo Commercial Permit',
                 required: true,
-                cfr: '50 CFR 635.4'
+                cfr: '50 CFR 622.4',
+                notes: 'Operator permit required for commercial fishing.'
             },
             'recreational': {
                 name: 'Recreational (No Federal Permit Required)',
                 required: false,
-                cfr: null
+                cfr: '50 CFR 622.278'
+            },
+            'charter-headboat': {
+                name: 'Charter/Headboat',
+                required: false,
+                cfr: '50 CFR 622.278',
+                notes: '10 dolphin per person per day; max 54 per vessel (headboat: 10 per paying passenger).'
             }
         },
         possession: {
             'commercial': {
                 name: 'Commercial',
-                limit: null,
+                limit: { count: 500, unit: 'lbs per trip' },
                 unit: 'lbs',
-                cfr: '50 CFR 635.21',
-                notes: 'No federal possession limit. Check state regulations.'
+                cfr: '50 CFR 622.278',
+                notes: '500 lb/trip (gutted weight permitted). North of 39° N without endorsement: 200 lb combined dolphin/wahoo.'
             },
             'recreational': {
                 name: 'Recreational',
-                limit: null,
-                unit: 'fish',
-                cfr: null,
-                notes: 'No federal possession limit. Check state regulations.'
+                limit: { count: 10, unit: 'fish per person per day', vesselMax: 54 },
+                cfr: '50 CFR 622.278',
+                notes: '10 per person per day; not to exceed 54 per vessel per day.'
             }
         },
         size: {
-            minimum: null,
-            unit: 'varies',
-            cfr: null,
-            notes: 'No federal size limit. Check state regulations.'
+            minimum: 20,
+            unit: 'inches (fork length)',
+            cfr: '50 CFR 622.278',
+            notes: '20″ minimum fork length.'
         },
         seasons: {
             federal: {
                 open: 'Year-round',
-                cfr: '50 CFR 635.21',
-                notes: 'No federal season restrictions'
+                cfr: '50 CFR 622.278',
+                notes: 'Head and fins intact in EEZ; transfer at sea prohibited.'
             }
         },
         assessmentQuestions: {
@@ -2683,10 +3137,11 @@ SPECIES_DATA['mahi-mahi'] = {
                 field: 'permitType',
                 required: true,
                 options: [
-                    { value: 'commercial', label: 'Atlantic HMS Commercial Permit', description: 'Commercial fishing permit' },
-                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing' }
+                    { value: 'commercial', label: 'Atlantic Dolphin/Wahoo Commercial', description: 'Commercial — operator permit required' },
+                    { value: 'charter-headboat', label: 'Charter/Headboat', description: '10/person; 54/vessel max' },
+                    { value: 'recreational', label: 'Recreational', description: '10/person; 54/vessel max' }
                 ],
-                cfr: '50 CFR 635.4'
+                cfr: '50 CFR 622.278'
             },
             possessionAmount: {
                 question: 'What is the possession amount on board?',
@@ -2695,29 +3150,33 @@ SPECIES_DATA['mahi-mahi'] = {
                 type: 'number',
                 unit: 'lbs',
                 dependsOn: ['permitType'],
-                notes: 'Record total weight in pounds (commercial) or number of fish (recreational)',
-                cfr: '50 CFR 635.21'
+                notes: 'Commercial: pounds. Recreational/charter: number of fish.',
+                cfr: '50 CFR 622.278'
             },
-            stateRegulations: {
-                question: 'Have state regulations been checked?',
-                field: 'stateRegulationsChecked',
-                required: true,
-                type: 'boolean',
-                notes: 'No federal possession limit or size limit for mahi-mahi. Check state regulations for limits.',
-                cfr: '50 CFR 635.21'
-            },
-            reportingStatus: {
-                question: 'Has the catch been reported?',
-                field: 'reported',
-                required: true,
-                type: 'boolean',
-                dependsOn: ['permitType'],
-                applicablePermits: ['commercial'],
-                notes: 'Commercial catch must be reported as required',
+            possessionLimitCheck: {
+                question: 'Does possession comply with dolphin/wahoo limits?',
+                field: 'exceedsLimit',
+                required: false,
+                type: 'auto',
+                dependsOn: ['permitType', 'possessionAmount'],
+                autoCheck: true,
                 violation: {
-                    ifFalse: 'VIOLATION: Commercial catch reporting required (50 CFR 648.7)'
+                    ifExceeds: 'VIOLATION: Dolphin possession exceeds federal limit (50 CFR 622.278)'
                 },
-                cfr: '50 CFR 648.7'
+                cfr: '50 CFR 622.278'
+            },
+            sizeCompliance: {
+                question: 'What is the fork length of the fish?',
+                field: 'forkLength',
+                required: true,
+                type: 'number',
+                unit: 'inches',
+                minimum: 20,
+                notes: 'Minimum 20″ fork length.',
+                violation: {
+                    ifBelow: 'VIOLATION: Dolphin below minimum fork length (50 CFR 622.278)'
+                },
+                cfr: '50 CFR 622.278'
             }
         }
     }
@@ -2816,53 +3275,54 @@ SPECIES_DATA['ocean-barracuda'] = {
     }
 };
 
-// Tigerfish (Note: This may refer to a different species - adding as requested)
+// Wahoo (tigerfish id — 50 CFR 622 Subpart M)
 SPECIES_DATA['tigerfish'] = {
-    name: 'Tigerfish',
-    commonName: 'Tigerfish',
+    name: 'Wahoo',
+    commonName: 'Tigerfish / Ocean Barracuda',
     image: null,
     imagePath: 'images/fish/Tigerfish.webp',
     color: '#ff8787',
     regulations: {
         permits: {
             'commercial': {
-                name: 'Commercial Permit',
-                required: false,
-                cfr: null,
-                notes: 'Check for specific permit requirements'
+                name: 'Atlantic Dolphin/Wahoo Commercial Permit',
+                required: true,
+                cfr: '50 CFR 622.4',
+                notes: 'Operator permit required. 500 lb/trip; north of 39° N without endorsement: 200 lb combined.'
             },
             'recreational': {
                 name: 'Recreational (No Federal Permit Required)',
                 required: false,
-                cfr: null
+                cfr: '50 CFR 622.278',
+                notes: '2 wahoo per person per day.'
             }
         },
         possession: {
             'commercial': {
                 name: 'Commercial',
-                limit: null,
+                limit: { count: 500, unit: 'lbs per trip' },
                 unit: 'lbs',
-                cfr: null,
-                notes: 'No federal NE multispecies limit — verify state and local rules.'
+                cfr: '50 CFR 622.278',
+                notes: '500 lb/trip. North of 39° N without endorsement: 200 lb combined dolphin/wahoo.'
             },
             'recreational': {
                 name: 'Recreational',
-                limit: null,
-                unit: 'fish',
-                cfr: null,
-                notes: 'No federal limit — verify state measures.'
+                limit: { count: 2, unit: 'fish per person per day' },
+                cfr: '50 CFR 622.278',
+                notes: '2 wahoo per person per day.'
             }
         },
         size: {
             minimum: null,
-            unit: 'n/a',
-            cfr: null,
-            notes: 'No federal minimum size.'
+            unit: 'no federal minimum',
+            cfr: '50 CFR 622.278',
+            notes: 'No federal minimum size for wahoo.'
         },
         seasons: {
             federal: {
-                open: 'State-managed',
-                notes: 'No federal FMP entry for tigerfish in Northeast — verify state regulations.'
+                open: 'Year-round',
+                cfr: '50 CFR 622.278',
+                notes: 'Head and fins intact in EEZ; transfer at sea prohibited.'
             }
         },
         assessmentQuestions: {
@@ -2871,42 +3331,31 @@ SPECIES_DATA['tigerfish'] = {
                 field: 'permitType',
                 required: true,
                 options: [
-                    { value: 'commercial', label: 'Commercial Permit', description: 'Commercial fishing - verify state permit requirements' },
-                    { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing - No federal permit required' }
+                    { value: 'commercial', label: 'Atlantic Dolphin/Wahoo Commercial', description: 'Commercial — operator permit required' },
+                    { value: 'recreational', label: 'Recreational', description: '2 wahoo per person per day' }
                 ],
-                cfr: null
+                cfr: '50 CFR 622.278'
             },
             possessionAmount: {
-                question: 'How many tigerfish are on board?',
-                field: 'numberOfFish',
+                question: 'What is the possession amount on board?',
+                field: 'possessionAmount',
                 required: true,
                 type: 'number',
-                unit: 'fish',
                 dependsOn: ['permitType'],
-                notes: 'Record total number of tigerfish on board',
-                cfr: null
+                notes: 'Commercial: pounds. Recreational: number of fish.',
+                cfr: '50 CFR 622.278'
             },
-            stateRegulationsCheck: {
-                question: 'Have state regulations been checked?',
-                field: 'stateRegsChecked',
-                required: true,
-                type: 'boolean',
-                dependsOn: ['permitType'],
-                notes: 'Tigerfish is state-managed in the Northeast — verify applicable state regulations.',
-                violation: {
-                    ifFalse: 'WARNING: Verify compliance with state and federal regulations'
-                },
-                cfr: null
-            },
-            reportingStatus: {
-                question: 'Has the catch been reported if required?',
-                field: 'reported',
+            possessionLimitCheck: {
+                question: 'Does possession comply with wahoo limits?',
+                field: 'exceedsLimit',
                 required: false,
-                type: 'boolean',
-                dependsOn: ['permitType'],
-                applicablePermits: ['commercial'],
-                notes: 'Check if commercial catch reporting is required',
-                cfr: null
+                type: 'auto',
+                dependsOn: ['permitType', 'possessionAmount'],
+                autoCheck: true,
+                violation: {
+                    ifExceeds: 'VIOLATION: Wahoo possession exceeds federal limit (50 CFR 622.278)'
+                },
+                cfr: '50 CFR 622.278'
             }
         }
     }
@@ -2922,9 +3371,10 @@ SPECIES_DATA['king-mackerel'] = {
     regulations: {
         permits: {
             'commercial': {
-                name: 'King Mackerel Commercial Permit',
+                name: 'Limited Access — King Mackerel',
                 required: true,
-                cfr: '50 CFR 622.4'
+                cfr: '50 CFR 622.4',
+                notes: '3,500 lb/trip commercial limit.'
             },
             'recreational': {
                 name: 'Recreational (No Federal Permit Required)',
@@ -2935,10 +3385,10 @@ SPECIES_DATA['king-mackerel'] = {
         possession: {
             'commercial': {
                 name: 'Commercial',
-                limit: null,
+                limit: { count: 3500, unit: 'lbs per trip' },
                 unit: 'lbs',
-                cfr: '50 CFR 622.38',
-                notes: 'Commercial trip limits and quota — verify NOAA Southeast bulletin.'
+                cfr: '50 CFR 622.382',
+                notes: 'Limited Access — 3,500 lb/trip.'
             },
             'recreational': {
                 name: 'Recreational',
@@ -2948,10 +3398,10 @@ SPECIES_DATA['king-mackerel'] = {
             }
         },
         size: {
-            minimum: 23,
+            minimum: 24,
             unit: 'inches (fork length)',
-            cfr: '50 CFR 622.38',
-            notes: '23" minimum fork length'
+            cfr: '50 CFR 622.382',
+            notes: '24″ minimum fork length'
         },
         seasons: {
             federal: {
@@ -3018,8 +3468,8 @@ SPECIES_DATA['king-mackerel'] = {
                 required: true,
                 type: 'number',
                 unit: 'inches',
-                minimum: 23,
-                notes: 'Minimum size: 23" fork length. Measure from tip of snout to fork of tail.',
+                minimum: 24,
+                notes: 'Minimum size: 24″ fork length. Measure from tip of snout to fork of tail.',
                 violation: {
                     ifBelow: 'VIOLATION: King mackerel below minimum size must be released (50 CFR 622.38)'
                 },
@@ -3063,9 +3513,10 @@ SPECIES_DATA['spanish-mackerel'] = {
     regulations: {
         permits: {
             'commercial': {
-                name: 'Spanish Mackerel Commercial Permit',
+                name: 'Open Access — Spanish Mackerel',
                 required: true,
-                cfr: '50 CFR 622.4'
+                cfr: '50 CFR 622.4',
+                notes: '3,500 lb/trip commercial limit.'
             },
             'recreational': {
                 name: 'Recreational (No Federal Permit Required)',
@@ -3076,10 +3527,10 @@ SPECIES_DATA['spanish-mackerel'] = {
         possession: {
             'commercial': {
                 name: 'Commercial',
-                limit: null,
+                limit: { count: 3500, unit: 'lbs per trip' },
                 unit: 'lbs',
-                cfr: '50 CFR 622.38',
-                notes: 'Commercial trip limits and quota — verify NOAA Southeast bulletin.'
+                cfr: '50 CFR 622.382',
+                notes: 'Open Access — 3,500 lb/trip.'
             },
             'recreational': {
                 name: 'Recreational',
@@ -3089,10 +3540,10 @@ SPECIES_DATA['spanish-mackerel'] = {
             }
         },
         size: {
-            minimum: 14,
+            minimum: 12,
             unit: 'inches (fork length)',
-            cfr: '50 CFR 622.38',
-            notes: '14" minimum fork length'
+            cfr: '50 CFR 622.382',
+            notes: '12″ minimum fork length'
         },
         seasons: {
             federal: {
@@ -3159,8 +3610,8 @@ SPECIES_DATA['spanish-mackerel'] = {
                 required: true,
                 type: 'number',
                 unit: 'inches',
-                minimum: 14,
-                notes: 'Minimum size: 14" fork length. Measure from tip of snout to fork of tail.',
+                minimum: 12,
+                notes: 'Minimum size: 12″ fork length. Measure from tip of snout to fork of tail.',
                 violation: {
                     ifBelow: 'VIOLATION: Spanish mackerel below minimum size must be released (50 CFR 622.38)'
                 },
@@ -3194,7 +3645,7 @@ SPECIES_DATA['spanish-mackerel'] = {
     }
 };
 
-// Atlantic Chub Mackerel
+// Atlantic Chub Mackerel (648 Subpart P forage)
 SPECIES_DATA['atlantic-chub-mackerel'] = {
     name: 'Atlantic Chub Mackerel',
     commonName: 'Chub Mackerel',
@@ -3204,38 +3655,39 @@ SPECIES_DATA['atlantic-chub-mackerel'] = {
     regulations: {
         permits: {
             'commercial': {
-                name: 'Commercial Permit',
-                required: false,
-                cfr: null,
-                notes: 'Check for specific permit requirements'
+                name: 'Mid-Atlantic Forage Commercial',
+                required: true,
+                cfr: '50 CFR 648.94',
+                notes: 'Operator permit required. 1,700 lb/trip all forage species combined.'
             },
             'recreational': {
                 name: 'Recreational (No Federal Permit Required)',
                 required: false,
-                cfr: null
+                cfr: '50 CFR 648.94',
+                notes: 'No federal recreational possession limit.'
             }
         },
         possession: {
             'commercial': {
                 name: 'Commercial',
-                limit: null,
+                limit: { count: 1700, unit: 'lbs combined forage per trip' },
                 unit: 'lbs',
-                cfr: null,
-                notes: 'No federal possession limit. Check state regulations.'
+                cfr: '50 CFR 648.94',
+                notes: '1,700 lb/trip all Mid-Atlantic forage species combined.'
             },
             'recreational': {
                 name: 'Recreational',
                 limit: null,
                 unit: 'fish',
-                cfr: null,
-                notes: 'No federal possession limit. Check state regulations.'
+                cfr: '50 CFR 648.94',
+                notes: 'No federal recreational possession limit.'
             }
         },
         size: {
             minimum: null,
-            unit: 'varies',
-            cfr: null,
-            notes: 'No federal size limit. Check state regulations.'
+            unit: 'not regulated federally',
+            cfr: '50 CFR 648.94',
+            notes: 'No federal minimum size for forage species.'
         },
         seasons: {
             federal: {

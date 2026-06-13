@@ -88,6 +88,105 @@
             const sf = resolveSummerFlounderCommercialLimit(speciesData, plc);
             return { ...sf, message: plc.violation?.ifExceeds || null };
         }
+        if (speciesId === 'scup' && permitType === 'commercial' && speciesData && typeof getScup648PossessionLimit === 'function') {
+            const scup = getScup648PossessionLimit(permitType, speciesData);
+            return {
+                count: scup.count,
+                prohibited: !!scup.prohibited,
+                message: scup.message || plc.violation?.ifExceeds || null
+            };
+        }
+        if (speciesId === 'atlantic-herring' && permitType && permitType !== 'recreational' && typeof getHerring648PossessionLimit === 'function') {
+            const herring = getHerring648PossessionLimit(permitType, speciesData);
+            return {
+                count: herring.count,
+                prohibited: !!herring.prohibited,
+                message: herring.message || herring.notes || plc?.violation?.ifExceeds || null
+            };
+        }
+        if (speciesId === 'spiny-dogfish' && permitType === 'commercial' && typeof getDogfish648PossessionLimit === 'function') {
+            const dogfish = getDogfish648PossessionLimit(permitType, speciesData);
+            return {
+                count: dogfish.count,
+                prohibited: !!dogfish.prohibited,
+                message: dogfish.notes || plc?.violation?.ifExceeds || null
+            };
+        }
+        if (speciesId === 'atlantic-deep-sea-red-crab' && permitType && permitType !== 'recreational' && typeof getRedCrab648PossessionLimit === 'function') {
+            const redCrab = getRedCrab648PossessionLimit(permitType, speciesData);
+            return {
+                count: redCrab.count,
+                prohibited: !!redCrab.prohibited,
+                message: redCrab.notes || plc?.violation?.ifExceeds || null
+            };
+        }
+        if ((speciesId === 'golden-tilefish' || speciesId === 'blueline-tilefish') && permitType && typeof getTilefish648PossessionLimit === 'function') {
+            const tilefish = getTilefish648PossessionLimit(speciesId, permitType, speciesData);
+            return {
+                count: tilefish.count,
+                prohibited: !!tilefish.prohibited,
+                message: tilefish.notes || plc?.violation?.ifExceeds || null
+            };
+        }
+        if (['skate', 'thorny-skate', 'smooth-skate', 'barndoor-skate'].includes(speciesId) && permitType && typeof getSkate648PossessionLimit === 'function') {
+            const skateLim = getSkate648PossessionLimit(speciesId, permitType, speciesData);
+            return {
+                count: skateLim.count,
+                prohibited: !!skateLim.prohibited,
+                message: skateLim.message || skateLim.notes || plc?.violation?.ifExceeds || plc?.violation?.ifProhibited || null
+            };
+        }
+        if ((speciesId === 'american-lobster' || speciesId === 'jonah-crab') && permitType && typeof getLobster697PossessionLimit === 'function') {
+            const lobsterLim = getLobster697PossessionLimit(speciesId, permitType, speciesData);
+            return {
+                count: lobsterLim.count,
+                prohibited: !!lobsterLim.prohibited,
+                message: lobsterLim.notes || plc?.violation?.ifExceeds || null
+            };
+        }
+        if (typeof getProhib697PossessionLimit === 'function' &&
+            ['weakfish', 'striped-bass', 'red-drum', 'atlantic-sturgeon', 'shortnose-sturgeon'].includes(speciesId) &&
+            (permitType || speciesData?.fishingArea || speciesData?.['fishing-area'])) {
+            const prohibLim = getProhib697PossessionLimit(speciesId, permitType, speciesData);
+            if (prohibLim?.count != null || prohibLim?.prohibited) {
+                return {
+                    count: prohibLim.count,
+                    prohibited: !!prohibLim.prohibited,
+                    message: prohibLim.notes || plc?.violation?.ifExceeds || plc?.violation?.ifProhibited || null
+                };
+            }
+        }
+        if ((speciesId === 'mahi-mahi' || speciesId === 'tigerfish') && permitType && typeof getDolphin622PossessionLimit === 'function') {
+            const dolphinLim = getDolphin622PossessionLimit(speciesId, permitType, speciesData);
+            if (dolphinLim?.count != null || dolphinLim?.vesselMax != null) {
+                return {
+                    count: dolphinLim.count,
+                    prohibited: !!dolphinLim.prohibited,
+                    message: dolphinLim.notes || plc?.violation?.ifExceeds || null
+                };
+            }
+        }
+        if ((speciesId === 'king-mackerel' || speciesId === 'spanish-mackerel') && permitType && typeof getCmp622PossessionLimit === 'function') {
+            const cmpLim = getCmp622PossessionLimit(speciesId, permitType, speciesData);
+            if (cmpLim?.count != null) {
+                return {
+                    count: cmpLim.count,
+                    prohibited: !!cmpLim.prohibited,
+                    message: cmpLim.notes || plc?.violation?.ifExceeds || null
+                };
+            }
+        }
+        if (typeof isForage648Species === 'function' && isForage648Species(speciesId) && permitType === 'commercial' &&
+            typeof getForage648PossessionLimit === 'function') {
+            const forageLim = getForage648PossessionLimit(permitType, speciesData);
+            if (forageLim?.count != null) {
+                return {
+                    count: forageLim.count,
+                    prohibited: !!forageLim.prohibited,
+                    message: forageLim.notes || plc?.violation?.ifExceeds || null
+                };
+            }
+        }
         if (speciesId === 'bluefin-tuna' && permitType && typeof getBFTRecreationalVesselLimit === 'function') {
             const bftRec = getBFTRecreationalVesselLimit(permitType);
             if (bftRec?.count != null) {

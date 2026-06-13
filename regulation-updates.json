@@ -12,6 +12,69 @@
   "changes": [
     {
       "date": "2026-06-13",
+      "title": "Misc. species (25) and marine protected species (24) — dolphin/wahoo, CMP, forage, ESA",
+      "description": "DOLPHIN622_POLICY_CONFIG for mahi-mahi and wahoo (tigerfish) commercial/recreational limits, carcass rules, and north-of-39° N endorsement. CMP622_POLICY_CONFIG for king and Spanish mackerel 3,500 lb/trip and bag limits with updated minimum sizes (24″ and 12″ FL). FORAGE648_POLICY_CONFIG for Mid-Atlantic unmanaged forage 1,700 lb combined trip limit and transit rules. MPS24_POLICY_CONFIG and location checklist for ESA marine protected species. Species data updated from HMS/placeholder references.",
+      "affectedSpecies": ["mahi-mahi", "tigerfish", "king-mackerel", "spanish-mackerel", "atlantic-chub-mackerel", "anchovies", "argentines", "greeneyes", "halfbeaks", "lanternfishes", "pearlsides", "sand-lances", "silversides", "cusk-eels", "atlantic-saury", "pelagic-mollusks", "species-under-1inch", "copepod", "krill", "amphipods", "atlantic-salmon"],
+      "sources": ["50 CFR 622 Subpart M — Dolphin/Wahoo", "50 CFR 622 Subpart Q — Coastal Migratory Pelagics", "50 CFR 648 Subpart P — Mid-Atlantic Unmanaged Forage", "50 CFR Part 17 — Endangered Species Act"]
+    },
+    {
+      "date": "2026-06-13",
+      "title": "Striped bass, sturgeon, horseshoe crab, red drum, weakfish (697) policy and location checklist",
+      "description": "PROHIB697_POLICY_CONFIG for EEZ-prohibited striped bass (Block Island Sound transit exemption), sturgeon, red drum zone rules, horseshoe crab Shuster Reserve closure, and weakfish 150 lb commercial limit with gear mesh and restricted gear area. Location attestation for all five species groups. Species data updated from outdated 648/622 references to 50 CFR Part 697.",
+      "affectedSpecies": ["striped-bass", "atlantic-sturgeon", "shortnose-sturgeon", "atlantic-coast-horseshoe-crab", "red-drum", "weakfish"],
+      "sources": ["50 CFR Part 697 — Striped Bass, Sturgeon, Horseshoe Crab, Red Drum, Weakfish"]
+    },
+    {
+      "date": "2026-06-13",
+      "title": "American lobster and Jonah crab (697) policy and location checklist",
+      "description": "LOBSTER697_POLICY_CONFIG for commercial trap/non-trap and charter/party limits, LMA min/max size and trap limits, prohibited conditions (egg-bearing, v-notch, mutilated, transfer at sea, partial meat), trap gear specs, Lobster Trap/Pot RGAs, area closed seasons, and MRA Wedge emergency closure. Jonah crab non-trap 1,000/50% rule and 4.75″ minimum. Location attestation for both species.",
+      "affectedSpecies": ["american-lobster", "jonah-crab"],
+      "sources": ["50 CFR Part 697 — American Lobster and Jonah Crab", "50 CFR 229.32 — MRA Wedge"]
+    },
+    {
+      "date": "2026-06-13",
+      "title": "Tilefish and Northeast skate complex (648) policy and location checklists",
+      "description": "TILEFISH648_POLICY_CONFIG for golden/blueline commercial and for-hire limits, recreational tilefish permit, carcass rules, IFQ discard, blueline rec season, and Tilefish GRAs (Lydonia, Norfolk, Oceanographer, Veatch). SKATE648_POLICY_CONFIG for DAS trip limits, skate bait LOA, thorny prohibited, barndoor bait rules, carcass/wing ratio, and transfer at sea. Thorny skate marked prohibited. Location attestation for both fisheries.",
+      "affectedSpecies": ["golden-tilefish", "blueline-tilefish", "skate", "thorny-skate", "smooth-skate", "barndoor-skate"],
+      "sources": ["50 CFR Part 648 — Tilefish", "50 CFR Part 648 — Northeast Skate Complex"]
+    },
+    {
+      "date": "2026-06-13",
+      "title": "Spiny dogfish and Atlantic deep sea red crab (648) policy and location checklists",
+      "description": "DOGFISH648_POLICY_CONFIG for open access 7,500 lb/trip (one trip/day), recreational unlimited with state rules, 6.5″ mesh, gillnet length, sturgeon overnight soak areas, and exemption areas (Nantucket Shoals, GOM/GB, Cape Cod, SNE, Mid-Atlantic). REDFCRAB648_POLICY_CONFIG for LA Categories B/C unlimited, open access incidental 500 lb/trip, female tote limit, mutilation rules, trap/buoy requirements, and transfer prohibition. Location attestation for both fisheries.",
+      "affectedSpecies": ["spiny-dogfish", "atlantic-deep-sea-red-crab"],
+      "sources": ["50 CFR Part 648 — Spiny Dogfish", "50 CFR Part 648 — Atlantic Deep Sea Red Crab"]
+    },
+    {
+      "date": "2026-06-13",
+      "title": "Atlantic bluefish and herring (648) policy and location checklists",
+      "description": "BLUEFISH648_POLICY_CONFIG for commercial moratorium unlimited possession, charter 7/person and recreational 5/person, operator permit, no min size/gear, charter person-count rule, and closed areas. HERRING648_POLICY_CONFIG for permit categories A–E, gear, Area 1A closure, transfer at sea, carriers, DOF, observer areas, and exempted fishing areas. Expanded herring648 and new bluefish648 location attestation. Herring permit categories and possession checks integrated.",
+      "affectedSpecies": ["bluefish", "atlantic-herring"],
+      "sources": ["50 CFR Part 648 — Atlantic Bluefish", "50 CFR Part 648 — Atlantic Herring"]
+    },
+    {
+      "date": "2026-06-13",
+      "title": "Black sea bass (648 Subpart I) policy and location checklist",
+      "description": "BSB648_POLICY_CONFIG for commercial unlimited in 100 lb totes, trawl 4.5″ mesh thresholds, trap/pot specs, transfer at sea prohibited, charter/rec conservation equivalency, and Scup GRA mesh rules. Location attestation for transfer at sea, trawl mesh, and Northern/Southern GRAs.",
+      "affectedSpecies": ["black-sea-bass"],
+      "sources": ["50 CFR Part 648 Subpart I — Black Sea Bass"]
+    },
+    {
+      "date": "2026-06-13",
+      "title": "Scup (648 Subpart H) policy and location checklist",
+      "description": "SCUP648_POLICY_CONFIG for moratorium seasons (Winter I closed, Winter II 12,000 lb), charter/rec 40 fish, mesh tiers, trap/pot rules, transfer at sea, and Scup GRAs. Location attestation for Winter I, transfer at sea, Northern/Southern GRAs, reduced mesh trawl, and skin-off landing. Charter/party permit and possession checks added.",
+      "affectedSpecies": ["scup"],
+      "sources": ["50 CFR Part 648 Subpart H — Scup"]
+    },
+    {
+      "date": "2026-06-13",
+      "title": "Summer flounder (648 Subpart G) policy and location checklist",
+      "description": "SUMMERFLOUNDER648_POLICY_CONFIG for commercial moratorium, charter/party, conservation equivalency, mesh thresholds, small mesh LOA, TED sea turtle protection area, and sizes. Location attestation for TED, small mesh LOA east of 72°30′ W, and mesh-over-threshold. Charter/party permit added; federal recreational limit checks deferred to state CE.",
+      "affectedSpecies": ["summer-flounder"],
+      "sources": ["50 CFR Part 648 Subpart G — Summer Flounder", "50 CFR 223.206 — TED requirements"]
+    },
+    {
+      "date": "2026-06-13",
       "title": "Monkfish (648) policy and location checklist",
       "description": "MONKFISH648_POLICY_CONFIG for permit categories A–H and E, VMS/IVR, NFMA/SFMA, DAS limits, gear, sizes, offshore program, and exemption areas. New monkfish species data with assessment questions. Location attestation for canyon closures, GOM/GB gillnet, SNE trawl/gillnet, Mid-Atlantic exemption, NJ sturgeon area, and NFMA letter/VMS.",
       "affectedSpecies": ["monkfish"],

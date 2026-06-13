@@ -25,10 +25,10 @@ zooplanktonSpecies.forEach(species => {
         regulations: {
             permits: {
                 'commercial': {
-                    name: 'Commercial Permit',
-                    required: false,
-                    cfr: null,
-                    notes: 'No federal permit required. Check state regulations.'
+                    name: 'Mid-Atlantic Forage Commercial',
+                    required: true,
+                    cfr: '50 CFR 648.94',
+                    notes: 'Operator permit required. 1,700 lb/trip all forage species combined.'
                 },
                 'recreational': {
                     name: 'Recreational (No Federal Permit Required)',
@@ -39,10 +39,10 @@ zooplanktonSpecies.forEach(species => {
             possession: {
                 'commercial': {
                     name: 'Commercial',
-                    limit: null,
+                    limit: { count: 1700, unit: 'lbs combined forage per trip' },
                     unit: 'lbs',
-                    cfr: null,
-                    notes: 'No federal possession limit. Check state regulations.'
+                    cfr: '50 CFR 648.94',
+                    notes: '1,700 lb/trip all Mid-Atlantic forage species combined.'
                 },
                 'recreational': {
                     name: 'Recreational',

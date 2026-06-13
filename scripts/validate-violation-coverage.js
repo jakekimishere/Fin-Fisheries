@@ -71,7 +71,7 @@ function main() {
 
     const sampleOverLimit = [
         ['swordfish', { permitType: 'recreational', numberOfFish: 5 }],
-        ['summer-flounder', { 'permit-type': 'recreational', possessionAmount: 50 }],
+        ['summer-flounder', { 'permit-type': 'commercial', 'mesh-compliant': 'no', possessionAmount: 150, dateOfCatch: '2026-07-01' }],
         ['atlantic-salmon', { permitType: 'recreational', numberOfFish: 1 }],
         ['king-mackerel', { permitType: 'recreational', numberOfFish: 5 }],
         ['atlantic-herring', { permitType: 'commercial', fishingArea: 'area-1b', possessionAmount: 3000, dateOfCatch: '2026-05-21' }],

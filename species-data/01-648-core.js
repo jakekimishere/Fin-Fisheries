@@ -13,7 +13,12 @@ const SPECIES_DATA = {
         regulations: {
             permits: {
                 'commercial': {
-                    name: 'Commercial Federal Permit',
+                    name: 'Commercial Moratorium Permit',
+                    required: true,
+                    cfr: '50 CFR 648.4'
+                },
+                'charter-headboat': {
+                    name: 'Charter/Party Vessel Permit',
                     required: true,
                     cfr: '50 CFR 648.4'
                 },
@@ -26,26 +31,34 @@ const SPECIES_DATA = {
             possession: {
                 'commercial-large-mesh': {
                     name: 'Commercial - Large Mesh Gear (≥5.5" diamond or 6" square)',
-                    limit: null, // No limit with compliant mesh
+                    limit: null,
                     unit: 'lbs',
                     cfr: '50 CFR 648.106',
-                    notes: 'No possession limit when using compliant mesh size gear'
+                    notes: 'No possession limit when using compliant mesh throughout entire net'
                 },
                 'commercial-small-mesh': {
-                    name: 'Commercial - Small Mesh Gear or Exemption',
+                    name: 'Commercial - Small Mesh or Below Threshold',
                     seasonal: {
-                        'may-oct': { limit: 100, months: [5,6,7,8,9,10] },
-                        'nov-apr': { limit: 200, months: [11,12,1,2,3,4] }
+                        'may-oct': { limit: 100, months: [5, 6, 7, 8, 9, 10] },
+                        'nov-apr': { limit: 200, months: [11, 12, 1, 2, 3, 4] }
                     },
                     unit: 'lbs',
                     cfr: '50 CFR 648.106(b)',
-                    notes: '100 lbs May 1 - Oct 31; 200 lbs Nov 1 - Apr 30'
+                    notes: '100 lbs/trip May 1–Oct 31; 200 lbs/trip Nov 1–Apr 30 when mesh below minimum or possession under threshold without compliant mesh'
+                },
+                'charter-headboat': {
+                    name: 'Charter/Party',
+                    limit: null,
+                    unit: 'fish',
+                    cfr: '50 CFR 648.105',
+                    notes: 'Federal limits waived — state conservation equivalency applies. Divide fish on board by paying persons (exclude captain/crew).'
                 },
                 'recreational': {
                     name: 'Recreational',
-                    limit: { count: 4, unit: 'fish' },
+                    limit: null,
+                    unit: 'fish',
                     cfr: '50 CFR 648.105',
-                    notes: '4 fish per person per day (varies by state)'
+                    notes: 'Federal limits waived — state conservation equivalency applies (reference 4 fish federal baseline may not apply).'
                 }
             },
             size: {
@@ -105,9 +118,10 @@ const SPECIES_DATA = {
             },
             protectedSpecies: {
                 ted: {
-                    required: false,
-                    area: 'Summer Flounder Fishery Sea Turtle Protection Area',
-                    cfr: '50 CFR 223.206'
+                    required: true,
+                    area: 'Summer Flounder Fishery Sea Turtle Protection Area (VA/NC south of Cape Charles)',
+                    cfr: '50 CFR 223.206',
+                    notes: 'Approved TED required in TED extension (≤3.5″ mesh). Exempt north of 35°46.1′ N Jan 15–Mar 15.'
                 }
             },
             assessmentQuestions: {
@@ -116,8 +130,9 @@ const SPECIES_DATA = {
                     field: 'permitType',
                     required: true,
                     options: [
-                        { value: 'commercial', label: 'Commercial Federal Permit', description: 'Commercial fishing permit' },
-                        { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing' }
+                        { value: 'commercial', label: 'Commercial Moratorium Permit', description: 'Commercial moratorium permit' },
+                        { value: 'charter-headboat', label: 'Charter/Party Vessel Permit', description: 'For-hire — state CE limits apply' },
+                        { value: 'recreational', label: 'Recreational (No Federal Permit Required)', description: 'Recreational fishing — state CE limits apply' }
                     ],
                     cfr: '50 CFR 648.4'
                 },
@@ -141,7 +156,8 @@ const SPECIES_DATA = {
                     useAssessmentDate: true,
                     limits: {
                         commercial: null,
-                        recreational: { count: 4, unit: 'fish' },
+                        recreational: null,
+                        'charter-headboat': null,
                         'commercial-large-mesh': null,
                         'commercial-small-mesh': {
                             seasonal: {
@@ -196,7 +212,7 @@ const SPECIES_DATA = {
                     options: [
                         { value: 'large-mesh', label: 'Large Mesh (≥5.5" diamond or 6" square)', notes: 'Compliant mesh - no possession limit' },
                         { value: 'small-mesh', label: 'Small Mesh (<5.5" diamond or <6" square)', notes: 'Small mesh - seasonal possession limits apply' },
-                        { value: 'exemption', label: 'Exemption', notes: 'Exemption - seasonal possession limits apply' }
+                        { value: 'exemption', label: 'Small Mesh LOA (east of 72°30′ W)', notes: 'Valid small mesh LOA — exempt from min mesh May 1–Oct 31 east of 72°30′ W; seasonal possession limits may still apply' }
                     ],
                     meshRequirements: {
                         minimum: { diamond: 5.5, square: 6.0 },
@@ -247,6 +263,18 @@ const SPECIES_DATA = {
                         ifFalse: 'VIOLATION: Commercial catch reporting required (50 CFR 648.7)'
                     },
                     cfr: '50 CFR 648.7'
+                },
+                operatorPermit: {
+                    question: 'Does the operator hold a valid federal operator permit?',
+                    field: 'operatorPermit',
+                    required: false,
+                    type: 'choice',
+                    applicablePermits: ['commercial', 'charter-headboat'],
+                    violation: {
+                        ifEquals: 'no',
+                        message: 'VIOLATION: Commercial or charter/party fishing requires valid operator permit (50 CFR 648.4)'
+                    },
+                    cfr: '50 CFR 648.4'
                 }
             }
         }

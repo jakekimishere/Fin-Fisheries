@@ -11,7 +11,7 @@ const SpeciesPolicyAdvisor = (function () {
         'scup', 'black-sea-bass', 'atlantic-herring', 'king-mackerel',
         'spanish-mackerel', 'thorny-skate', 'smooth-skate', 'barndoor-skate',
         'atlantic-mackerel', 'longfin-squid', 'shortfin-squid', 'butterfish', 'atlantic-chub-mackerel',
-        'surf-clam', 'ocean-quahog',
+        'surf-clam', 'ocean-quahog', 'scup', 'black-sea-bass',
         'atlantic-cod', 'haddock', 'yellowtail-flounder', 'monkfish'
     ]);
 
@@ -19,7 +19,7 @@ const SpeciesPolicyAdvisor = (function () {
         'bluefin-tuna', 'swordfish', 'billfish', 'atlantic-sea-scallop',
         'summer-flounder', 'atlantic-cod', 'haddock', 'yellowtail-flounder',
         'atlantic-mackerel', 'longfin-squid', 'shortfin-squid',
-        'winter-flounder', 'pollock', 'atlantic-halibut', 'monkfish'
+        'winter-flounder', 'pollock', 'atlantic-halibut', 'monkfish', 'scup', 'black-sea-bass', 'atlantic-herring', 'spiny-dogfish', 'atlantic-deep-sea-red-crab', 'golden-tilefish', 'blueline-tilefish', 'skate', 'thorny-skate', 'smooth-skate', 'barndoor-skate', 'american-lobster', 'jonah-crab'
     ]);
 
     const CONSERVATION_EQUIVALENCY_SPECIES = new Set([
@@ -127,6 +127,126 @@ const SpeciesPolicyAdvisor = (function () {
             if (clam) {
                 clam.dataAsOf = dataAsOf();
                 return clam;
+            }
+        }
+
+        if (typeof getSummerFlounder648PolicyProfile === 'function') {
+            const sf = getSummerFlounder648PolicyProfile(speciesId);
+            if (sf) {
+                sf.dataAsOf = dataAsOf();
+                return sf;
+            }
+        }
+
+        if (typeof getScup648PolicyProfile === 'function') {
+            const scup = getScup648PolicyProfile(speciesId);
+            if (scup) {
+                scup.dataAsOf = dataAsOf();
+                return scup;
+            }
+        }
+
+        if (typeof getBsb648PolicyProfile === 'function') {
+            const bsb = getBsb648PolicyProfile(speciesId);
+            if (bsb) {
+                bsb.dataAsOf = dataAsOf();
+                return bsb;
+            }
+        }
+
+        if (typeof getBluefish648PolicyProfile === 'function') {
+            const bf = getBluefish648PolicyProfile(speciesId);
+            if (bf) {
+                bf.dataAsOf = dataAsOf();
+                return bf;
+            }
+        }
+
+        if (typeof getHerring648PolicyProfile === 'function') {
+            const herring = getHerring648PolicyProfile(speciesId);
+            if (herring) {
+                herring.dataAsOf = dataAsOf();
+                return herring;
+            }
+        }
+
+        if (typeof getDogfish648PolicyProfile === 'function') {
+            const dogfish = getDogfish648PolicyProfile(speciesId);
+            if (dogfish) {
+                dogfish.dataAsOf = dataAsOf();
+                return dogfish;
+            }
+        }
+
+        if (typeof getRedCrab648PolicyProfile === 'function') {
+            const redCrab = getRedCrab648PolicyProfile(speciesId);
+            if (redCrab) {
+                redCrab.dataAsOf = dataAsOf();
+                return redCrab;
+            }
+        }
+
+        if (typeof getTilefish648PolicyProfile === 'function') {
+            const tilefish = getTilefish648PolicyProfile(speciesId);
+            if (tilefish) {
+                tilefish.dataAsOf = dataAsOf();
+                return tilefish;
+            }
+        }
+
+        if (typeof getSkate648PolicyProfile === 'function') {
+            const skate = getSkate648PolicyProfile(speciesId);
+            if (skate) {
+                skate.dataAsOf = dataAsOf();
+                return skate;
+            }
+        }
+
+        if (typeof getLobster697PolicyProfile === 'function') {
+            const lobster = getLobster697PolicyProfile(speciesId);
+            if (lobster) {
+                lobster.dataAsOf = dataAsOf();
+                return lobster;
+            }
+        }
+
+        if (typeof getProhib697PolicyProfile === 'function') {
+            const prohib697 = getProhib697PolicyProfile(speciesId);
+            if (prohib697) {
+                prohib697.dataAsOf = dataAsOf();
+                return prohib697;
+            }
+        }
+
+        if (typeof getDolphin622PolicyProfile === 'function') {
+            const dolphin = getDolphin622PolicyProfile(speciesId);
+            if (dolphin) {
+                dolphin.dataAsOf = dataAsOf();
+                return dolphin;
+            }
+        }
+
+        if (typeof getCmp622PolicyProfile === 'function') {
+            const cmp = getCmp622PolicyProfile(speciesId);
+            if (cmp) {
+                cmp.dataAsOf = dataAsOf();
+                return cmp;
+            }
+        }
+
+        if (typeof getForage648PolicyProfile === 'function') {
+            const forage = getForage648PolicyProfile(speciesId);
+            if (forage) {
+                forage.dataAsOf = dataAsOf();
+                return forage;
+            }
+        }
+
+        if (typeof getMps24PolicyProfile === 'function') {
+            const mps = getMps24PolicyProfile(speciesId);
+            if (mps) {
+                mps.dataAsOf = dataAsOf();
+                return mps;
             }
         }
 

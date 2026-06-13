@@ -56,6 +56,7 @@ function getSpeciesPossessionCount(speciesData) {
     if (!speciesData) return null;
     const fields = [
         speciesData.possessionAmount,
+        speciesData.combinedForageLb,
         speciesData.numberOfFish,
         speciesData.numberOfSharks,
         speciesData['possession-amount'],
@@ -80,7 +81,10 @@ function normalizeSpeciesAssessmentData(speciesId, species, speciesData) {
     if (data.permitType && !data['permit-type']) {
         data['permit-type'] = data.permitType;
     }
-    if (data.permitType && (data['has-permit'] === undefined || data['has-permit'] === '')) {
+    if (data['permit-type'] && !data.permitType) {
+        data.permitType = data['permit-type'];
+    }
+    if ((data.permitType || data['permit-type']) && (data['has-permit'] === undefined || data['has-permit'] === '')) {
         data['has-permit'] = 'yes';
     }
     return data;
@@ -262,19 +266,49 @@ function checkPossessionViolations(speciesId, species, speciesData) {
     try {
         if (speciesId === 'summer-flounder') {
             violations.push(...checkSummerFlounderPossession(species, speciesData));
+        } else if (speciesId === 'scup') {
+            violations.push(...checkScupPossession(species, speciesData));
+        } else if (speciesId === 'black-sea-bass') {
+            violations.push(...checkBsbPossession(species, speciesData));
+        } else if (speciesId === 'atlantic-herring') {
+            violations.push(...checkHerringPossession(species, speciesData));
+        } else if (speciesId === 'spiny-dogfish') {
+            violations.push(...checkDogfishPossession(species, speciesData));
+        } else if (speciesId === 'atlantic-deep-sea-red-crab') {
+            violations.push(...checkRedCrabPossession(species, speciesData));
+        } else if (speciesId === 'golden-tilefish' || speciesId === 'blueline-tilefish') {
+            violations.push(...checkTilefishPossession(speciesId, species, speciesData));
+        } else if (['skate', 'thorny-skate', 'smooth-skate', 'barndoor-skate'].includes(speciesId)) {
+            violations.push(...checkSkate648Possession(speciesId, species, speciesData));
+        } else if (speciesId === 'american-lobster' || speciesId === 'jonah-crab') {
+            violations.push(...checkLobster697Possession(speciesId, species, speciesData));
+        } else if (speciesId === 'weakfish' || speciesId === 'striped-bass' || speciesId === 'red-drum' ||
+            speciesId === 'atlantic-sturgeon' || speciesId === 'shortnose-sturgeon') {
+            violations.push(...checkProhib697Possession(speciesId, species, speciesData));
+        } else if (speciesId === 'mahi-mahi' || speciesId === 'tigerfish') {
+            violations.push(...checkDolphin622Possession(speciesId, species, speciesData));
+        } else if (speciesId === 'king-mackerel' || speciesId === 'spanish-mackerel') {
+            violations.push(...checkCmp622Possession(speciesId, species, speciesData));
+        } else if (typeof isForage648Species === 'function' && isForage648Species(speciesId)) {
+            violations.push(...checkForage648Possession(speciesId, species, speciesData));
         } else if (speciesId === 'atlantic-sea-scallop') {
             violations.push(...checkScallopPossession(species, speciesData));
         } else if (speciesId === 'bluefin-tuna') {
             violations.push(...checkBluefinTunaPossession(species, speciesData));
         } else if (speciesId === 'atlantic-cod' || speciesId === 'haddock') {
             violations.push(...checkGroundfishPossession(speciesId, species, speciesData));
-        } else if (isMultispecies(speciesId)) {
+        } else if (typeof isMultispecies === 'function' && isMultispecies(speciesId)) {
             violations.push(...checkMultispeciesGroupedPossession(speciesId, species, speciesData));
         }
 
         const hasDedicatedPossessionCheck = [
-            'summer-flounder', 'atlantic-sea-scallop', 'bluefin-tuna', 'atlantic-cod', 'haddock'
-        ].includes(speciesId);
+            'summer-flounder', 'scup', 'black-sea-bass', 'atlantic-herring', 'spiny-dogfish', 'atlantic-deep-sea-red-crab',
+            'golden-tilefish', 'blueline-tilefish', 'skate', 'thorny-skate', 'smooth-skate', 'barndoor-skate',
+            'american-lobster', 'jonah-crab', 'weakfish', 'striped-bass', 'red-drum', 'atlantic-sturgeon', 'shortnose-sturgeon',
+            'mahi-mahi', 'tigerfish', 'king-mackerel', 'spanish-mackerel',
+            'atlantic-sea-scallop', 'bluefin-tuna', 'atlantic-cod', 'haddock'
+        ].includes(speciesId) ||
+            (typeof isForage648Species === 'function' && isForage648Species(speciesId));
         if (species.regulations?.possession && !hasDedicatedPossessionCheck) {
             violations.push(...checkRegulationPossessionLimits(speciesId, species, speciesData));
         }
@@ -465,14 +499,280 @@ function checkSummerFlounderPossession(species, speciesData) {
         if (limit !== null && speciesData.possessionAmount > limit) {
             violations.push(`Summer flounder possession exceeds limit: ${speciesData.possessionAmount} lbs vs ${limit} lbs limit (${cfr})`);
         }
-    } else if (permitType === 'recreational') {
-        const recLimit = regs.possession['recreational'].limit.count;
-        if (speciesData.possessionAmount > recLimit) {
-            const cfr = regs.possession['recreational'].cfr;
-            violations.push(`Recreational possession exceeds limit: ${speciesData.possessionAmount} fish vs ${recLimit} fish limit${cfr ? ` (${cfr})` : ''}`);
-        }
+    } else if (permitType === 'recreational' || permitType === 'charter-headboat') {
+        // Federal recreational/charter limits waived — state conservation equivalency
+        return violations;
     }
     
+    return violations;
+}
+
+function checkScupPossession(species, speciesData) {
+    const violations = [];
+    const permitType = speciesData['permit-type'];
+    const amount = speciesData.possessionAmount;
+
+    if (typeof getScup648PossessionLimit !== 'function' || amount == null) {
+        return violations;
+    }
+
+    const lim = getScup648PossessionLimit(permitType, speciesData);
+
+    if (lim.prohibited && amount > 0) {
+        violations.push(`Scup possession prohibited: ${lim.message || 'season closed'} (50 CFR 648.121)`);
+        return violations;
+    }
+
+    if (lim.count != null && amount > lim.count) {
+        violations.push(`Scup possession exceeds limit: ${amount} vs ${lim.count} ${lim.unit || 'lbs'} (50 CFR 648.121)`);
+    }
+
+    return violations;
+}
+
+function checkBsbPossession(species, speciesData) {
+    const violations = [];
+    const permitType = speciesData['permit-type'];
+
+    if (permitType === 'recreational' || permitType === 'charter-headboat') {
+        return violations;
+    }
+
+    if (typeof bsb648RequiresTrawlMesh === 'function' && bsb648RequiresTrawlMesh(speciesData)) {
+        const mesh = speciesData.meshSize || speciesData.meshSizeCompliance
+            || speciesData['mesh-size'] || speciesData['mesh-compliant'];
+        const isCompliant = mesh === 'compliant-mesh' || mesh === 'yes';
+        if (!isCompliant) {
+            const date = speciesData.dateOfCatch || speciesData.dateOfLanding;
+            const d = date ? new Date(date) : new Date();
+            const threshold = typeof bsb648TrawlMeshThreshold === 'function'
+                ? bsb648TrawlMeshThreshold(d.getMonth() + 1)
+                : null;
+            violations.push(
+                `Black sea bass trawl possession exceeds ${threshold} lb without 4.5″ diamond mesh (50 CFR 648.140)`
+            );
+        }
+    }
+
+    return violations;
+}
+
+function checkHerringPossession(species, speciesData) {
+    const violations = [];
+    const permitType = speciesData['permit-type'] || speciesData.permitType;
+    const amount = speciesData.possessionAmount;
+
+    if (typeof getHerring648PossessionLimit !== 'function' || amount == null || !permitType) {
+        return violations;
+    }
+
+    const lim = getHerring648PossessionLimit(permitType, speciesData);
+
+    if (lim.prohibited && amount > 0) {
+        violations.push(`Atlantic herring possession prohibited: ${lim.message || 'area or fishery closed'} (50 CFR 648.201)`);
+        return violations;
+    }
+
+    if (lim.count != null && amount > lim.count) {
+        violations.push(`Atlantic herring possession exceeds limit: ${amount} vs ${lim.count} ${lim.unit || 'lbs'} (50 CFR 648.201)`);
+    }
+
+    return violations;
+}
+
+function checkLobster697Possession(speciesId, species, speciesData) {
+    const violations = [];
+    const permitType = speciesData['permit-type'] || speciesData.permitType;
+    const amount = speciesData.possessionAmount ?? speciesData.numberOfFish;
+
+    if (typeof getLobster697PossessionLimit !== 'function' || amount == null || !permitType) {
+        return violations;
+    }
+
+    const lim = getLobster697PossessionLimit(speciesId, permitType, speciesData);
+
+    if (lim.count != null && amount > lim.count) {
+        const label = speciesId === 'jonah-crab' ? 'Jonah crab' : 'Lobster';
+        violations.push(`${label} possession exceeds limit: ${amount} vs ${lim.count} ${lim.unit || ''} (50 CFR 697.7)`);
+    }
+
+    return violations;
+}
+
+function checkProhib697Possession(speciesId, species, speciesData) {
+    const violations = [];
+    const permitType = speciesData['permit-type'] || speciesData.permitType;
+    const amount = getSpeciesPossessionCount(speciesData);
+
+    if (typeof getProhib697PossessionLimit !== 'function') {
+        return violations;
+    }
+
+    const lim = getProhib697PossessionLimit(speciesId, permitType, speciesData);
+
+    if (lim.prohibited && amount != null && amount > 0) {
+        violations.push(`${species.name || speciesId} possession prohibited: ${lim.notes || 'not permitted'} (50 CFR 697.7)`);
+        return violations;
+    }
+
+    if (speciesId === 'striped-bass') {
+        const area = speciesData.fishingArea || speciesData['fishing-area'];
+        if ((area === 'eez' || area === 'federal-waters') && amount != null && amount > 0) {
+            violations.push(`Striped bass possession prohibited in the EEZ outside Block Island Sound transit corridor (50 CFR 697.7)`);
+        }
+    }
+
+    if (speciesId === 'red-drum') {
+        const area = speciesData.fishingArea || speciesData['fishing-area'];
+        if (area === 'prohibited-south' && amount != null && amount > 0) {
+            violations.push(`Red drum possession prohibited in EEZ south of NJ/NY line (50 CFR 697.7)`);
+        }
+        if (permitType === 'recreational' && area !== 'state-waters' && amount != null && amount > 0) {
+            violations.push(`Recreational red drum prohibited in federal waters (50 CFR 697.7)`);
+        }
+    }
+
+    if (lim.count != null && amount != null && amount > lim.count) {
+        violations.push(`Weakfish possession exceeds limit: ${amount} vs ${lim.count} ${lim.unit || 'lbs'} (50 CFR 697.7)`);
+    }
+
+    return violations;
+}
+
+function checkDolphin622Possession(speciesId, species, speciesData) {
+    const violations = [];
+    const permitType = speciesData['permit-type'] || speciesData.permitType;
+    const amount = getSpeciesPossessionCount(speciesData);
+
+    if (typeof getDolphin622PossessionLimit !== 'function' || amount == null || !permitType) {
+        return violations;
+    }
+
+    const lim = getDolphin622PossessionLimit(speciesId, permitType, speciesData);
+
+    if (lim.count != null && amount > lim.count) {
+        const label = speciesId === 'tigerfish' ? 'Wahoo' : 'Dolphin';
+        violations.push(`${label} possession exceeds limit: ${amount} vs ${lim.count} ${lim.unit || ''} (50 CFR 622.278)`);
+    }
+
+    if (speciesId === 'mahi-mahi' && lim.vesselMax != null && amount != null && amount > lim.vesselMax) {
+        violations.push(`Dolphin vessel limit exceeded: ${amount} vs ${lim.vesselMax} per vessel per day (50 CFR 622.278)`);
+    }
+
+    return violations;
+}
+
+function checkCmp622Possession(speciesId, species, speciesData) {
+    const violations = [];
+    const permitType = speciesData['permit-type'] || speciesData.permitType;
+    const amount = getSpeciesPossessionCount(speciesData);
+
+    if (typeof getCmp622PossessionLimit !== 'function' || amount == null || !permitType) {
+        return violations;
+    }
+
+    const lim = getCmp622PossessionLimit(speciesId, permitType, speciesData);
+
+    if (lim.count != null && amount > lim.count) {
+        const label = speciesId === 'king-mackerel' ? 'King mackerel' : 'Spanish mackerel';
+        violations.push(`${label} possession exceeds limit: ${amount} vs ${lim.count} ${lim.unit || ''} (50 CFR 622.382)`);
+    }
+
+    return violations;
+}
+
+function checkForage648Possession(speciesId, species, speciesData) {
+    const violations = [];
+    const permitType = speciesData['permit-type'] || speciesData.permitType;
+    const amount = speciesData.combinedForageLb ?? speciesData.possessionAmount ?? getSpeciesPossessionCount(speciesData);
+
+    if (typeof getForage648PossessionLimit !== 'function' || amount == null || permitType !== 'commercial') {
+        return violations;
+    }
+
+    const lim = getForage648PossessionLimit(permitType, speciesData);
+
+    if (lim.count != null && amount > lim.count) {
+        violations.push(`Mid-Atlantic forage combined possession exceeds limit: ${amount} vs ${lim.count} ${lim.unit || 'lbs'} (50 CFR 648.94)`);
+    }
+
+    return violations;
+}
+
+function checkTilefishPossession(speciesId, species, speciesData) {
+    const violations = [];
+    const permitType = speciesData['permit-type'] || speciesData.permitType;
+    const amount = getSpeciesPossessionCount(speciesData);
+
+    if (typeof getTilefish648PossessionLimit !== 'function' || amount == null || !permitType) {
+        return violations;
+    }
+
+    const lim = getTilefish648PossessionLimit(speciesId, permitType, speciesData);
+
+    if (lim.count != null && amount > lim.count) {
+        violations.push(`Tilefish possession exceeds limit: ${amount} vs ${lim.count} ${lim.unit || 'lbs'} (50 CFR 648.290)`);
+    }
+
+    return violations;
+}
+
+function checkSkate648Possession(speciesId, species, speciesData) {
+    const violations = [];
+    const permitType = speciesData['permit-type'] || speciesData.permitType;
+    const amount = speciesData.possessionAmount;
+
+    if (typeof getSkate648PossessionLimit !== 'function' || amount == null || !permitType) {
+        return violations;
+    }
+
+    const lim = getSkate648PossessionLimit(speciesId, permitType, speciesData);
+
+    if (lim.prohibited && amount > 0) {
+        violations.push(`Skate possession prohibited: ${lim.message || 'species or fishery rule'} (50 CFR 648.322)`);
+        return violations;
+    }
+
+    if (lim.count != null && amount > lim.count) {
+        violations.push(`Skate possession exceeds limit: ${amount} vs ${lim.count} ${lim.unit || 'lbs'} (50 CFR 648.322)`);
+    }
+
+    return violations;
+}
+
+function checkDogfishPossession(species, speciesData) {
+    const violations = [];
+    const permitType = speciesData['permit-type'] || speciesData.permitType;
+    const amount = speciesData.possessionAmount;
+
+    if (typeof getDogfish648PossessionLimit !== 'function' || amount == null || !permitType) {
+        return violations;
+    }
+
+    const lim = getDogfish648PossessionLimit(permitType, speciesData);
+
+    if (lim.count != null && amount > lim.count) {
+        violations.push(`Spiny dogfish possession exceeds limit: ${amount} vs ${lim.count} ${lim.unit || 'lbs'} (50 CFR 648.230)`);
+    }
+
+    return violations;
+}
+
+function checkRedCrabPossession(species, speciesData) {
+    const violations = [];
+    const permitType = speciesData['permit-type'] || speciesData.permitType;
+    const amount = speciesData.possessionAmount;
+
+    if (typeof getRedCrab648PossessionLimit !== 'function' || amount == null || !permitType) {
+        return violations;
+    }
+
+    const lim = getRedCrab648PossessionLimit(permitType, speciesData);
+
+    if (lim.count != null && amount > lim.count) {
+        violations.push(`Atlantic deep sea red crab possession exceeds limit: ${amount} vs ${lim.count} ${lim.unit || 'lbs'} (50 CFR 648.260)`);
+    }
+
     return violations;
 }
 
