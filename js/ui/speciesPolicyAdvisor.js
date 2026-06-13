@@ -372,20 +372,173 @@ const SpeciesPolicyAdvisor = (function () {
         `;
     }
 
+    const STEP_BULLET_PATTERNS = {
+        permits: /permit|operator|moratorium|limited access|open access|endorsement|not regulated|HMS|Angling Category|sector|ACE|DAS|LOA|IFQ|quota/i,
+        possession: /possession|limit|\blb\b|per person|per trip|recreational|commercial|combined|prohibited|retention|unlimited|not to exceed|on board|EEZ|fish per|bag|quota|ACE|trip limit/i,
+        'size-gear': /minimum size|mesh|gear|fork length|carcass|head and fins|TED|≤|≥|″|inch|CFL|curved|state bag|state size|season|size limit|head-on|gillnet|trawl/i,
+        'vessel-requirements': /VMS|observer|transfer at sea|reporting|TDD|declar|at-sea/i,
+        'dynamic-assessment': /closed|area|transit|reserve|RGA|GRA|zone|EEZ|management unit|chart|corridor|coordinates|closure|TED|observer|sector|common pool|multispecies/i
+    };
+
+    const META_BULLET = /^(Data in FIN|Policy verified against|Source:|No detailed federal summary|Check 50 CFR)/i;
+
+    function isDedicatedPolicyProfile(profile) {
+        return profile?.badgeClass === 'policy-complex'
+            || profile?.badgeClass === 'policy-prohibited'
+            || profile?.badgeClass === 'policy-verified'
+            || profile?.level === 'complex'
+            || profile?.level === 'prohibited';
+    }
+
+    function hasLocationChecklist(speciesId) {
+        return typeof LOCATION_CHECKLIST_BY_SPECIES !== 'undefined'
+            && !!LOCATION_CHECKLIST_BY_SPECIES[speciesId];
+    }
+
+    function extractPermitBulletsFromSpecies(species) {
+        const items = [];
+        const permits = species?.regulations?.permits;
+        if (!permits) return items;
+        Object.entries(permits).forEach(([key, permit]) => {
+            if (!permit) return;
+            if (permit.required === true) {
+                items.push(`${permit.name || key} required${permit.cfr ? ` (${permit.cfr})` : ''}`);
+            } else if (key === 'recreational' && permit.required === false) {
+                items.push('Recreational: No federal permit required');
+            }
+            if (permit.notes && !/check current/i.test(permit.notes)) {
+                items.push(String(permit.notes).replace(/\s+/g, ' ').slice(0, 160));
+            }
+        });
+        return items;
+    }
+
+    function extractSizeGearBulletsFromSpecies(species) {
+        const items = [];
+        const size = species?.regulations?.size;
+        if (size) {
+            if (size.minimum != null && size.minimum !== undefined) {
+                items.push(`Minimum size: ${size.minimum} ${size.unit || 'inches'}${size.cfr ? ` (${size.cfr})` : ''}`);
+            } else if (size.notes && !/check current/i.test(size.notes)) {
+                items.push(String(size.notes).replace(/\s+/g, ' ').slice(0, 160));
+            }
+        }
+        const gear = species?.regulations?.gear;
+        if (gear) {
+            Object.values(gear).forEach(g => {
+                if (g?.notes && !/check current/i.test(g.notes)) {
+                    items.push(String(g.notes).replace(/\s+/g, ' ').slice(0, 160));
+                }
+            });
+        }
+        return items;
+    }
+
+    function actionableBullets(profile) {
+        return (profile?.bullets || []).filter(b => !META_BULLET.test(String(b).trim()));
+    }
+
+    function filterBulletsByStep(bullets, stepName) {
+        const pattern = STEP_BULLET_PATTERNS[stepName];
+        if (!pattern || !bullets?.length) return [];
+        return bullets.filter(b => pattern.test(b));
+    }
+
+    function getFallbackBulletsForStep(speciesId, stepName, species, profile, actionable) {
+        switch (stepName) {
+            case 'permits': {
+                const permitItems = extractPermitBulletsFromSpecies(species);
+                if (permitItems.length) return permitItems;
+                if (profile.level === 'prohibited') {
+                    const banned = filterBulletsByStep(actionable, 'possession');
+                    if (banned.length) return banned.slice(0, 2);
+                    return profile.headline ? [profile.headline] : ['Federal EEZ retention is prohibited — permit does not authorize possession.'];
+                }
+                if (profile.headline && STEP_BULLET_PATTERNS.permits.test(profile.headline)) {
+                    return [profile.headline];
+                }
+                if (isDedicatedPolicyProfile(profile) && actionable.length) {
+                    return actionable.slice(0, 2);
+                }
+                return [];
+            }
+            case 'possession': {
+                if (profile.level === 'prohibited') {
+                    const banned = filterBulletsByStep(actionable, 'possession');
+                    return banned.length ? banned : actionable.slice(0, 3);
+                }
+                if (profile.headline && STEP_BULLET_PATTERNS.possession.test(profile.headline)) {
+                    return [profile.headline, ...filterBulletsByStep(actionable, 'possession')].slice(0, 4);
+                }
+                return actionable.slice(0, 3);
+            }
+            case 'size-gear': {
+                const sizeItems = extractSizeGearBulletsFromSpecies(species);
+                if (sizeItems.length) return sizeItems;
+                const matched = filterBulletsByStep(actionable, 'size-gear');
+                if (matched.length) return matched;
+                if (profile.conservationEquivalency || CONSERVATION_EQUIVALENCY_SPECIES.has(speciesId)) {
+                    return actionable.filter(b => /state|conservation equivalency|size|season/i.test(b)).slice(0, 2);
+                }
+                return [];
+            }
+            case 'vessel-requirements':
+                return filterBulletsByStep(actionable, 'vessel-requirements');
+            case 'dynamic-assessment': {
+                if (!hasLocationChecklist(speciesId)) return [];
+                const area = filterBulletsByStep(actionable, 'dynamic-assessment');
+                if (area.length) return area;
+                if (profile.headline) return [profile.headline];
+                return isDedicatedPolicyProfile(profile) ? actionable.slice(0, 2) : [];
+            }
+            default:
+                return [];
+        }
+    }
+
+    function getBulletsForStep(speciesId, stepName) {
+        const species = typeof SPECIES_DATA !== 'undefined' ? SPECIES_DATA[speciesId] : null;
+        if (!species) return [];
+        const profile = getProfile(speciesId, species);
+        const actionable = actionableBullets(profile);
+        const matched = filterBulletsByStep(actionable, stepName);
+        if (matched.length) return matched;
+        return getFallbackBulletsForStep(speciesId, stepName, species, profile, actionable);
+    }
+
+    function appendPolicyQuickReference(requirements, stepName, speciesIds) {
+        if (!speciesIds?.length || !requirements) return;
+        speciesIds.forEach(speciesId => {
+            if (typeof isMultispecies === 'function' && isMultispecies(speciesId)) return;
+            const species = SPECIES_DATA?.[speciesId];
+            if (!species) return;
+            const items = getBulletsForStep(speciesId, stepName);
+            if (items.length === 0) return;
+            const profile = getProfile(speciesId, species);
+            const title = profile?.badgeLabel
+                ? `${species.name} — ${profile.badgeLabel}`
+                : `${species.name} — Federal Policy`;
+            requirements.push({ title, items: [...items] });
+            if (stepName === 'possession' && profile?.complianceNote) {
+                requirements.push({
+                    title: `${species.name} — Inspector Note`,
+                    items: [profile.complianceNote]
+                });
+            }
+        });
+    }
+
+    function renderPolicyContextBlock(speciesId, stepName) {
+        const species = SPECIES_DATA?.[speciesId];
+        if (!species) return '';
+        const items = getBulletsForStep(speciesId, stepName);
+        if (items.length === 0) return '';
+        const list = items.map(b => `<li>${escapeHtml(b)}</li>`).join('');
+        return `<div class="policy-step-context"><ul class="policy-bullets">${list}</ul></div>`;
+    }
+
     function renderSelectedPanel(speciesIds) {
-        if (!speciesIds?.length) return '';
-        const cards = speciesIds.map(id => {
-            const species = typeof SPECIES_DATA !== 'undefined' ? SPECIES_DATA[id] : null;
-            if (!species) return '';
-            return renderPanelHtml(id, species);
-        }).filter(Boolean).join('');
-        return `
-            <div class="species-policy-panel">
-                <h4 class="policy-panel-title">Federal policy at a glance</h4>
-                <p class="policy-panel-intro">Selected species — what current FIN data says about compliance. Record amounts in assessment for a formal violation list.</p>
-                ${cards}
-            </div>
-        `;
+        return '';
     }
 
     function escapeHtml(str) {
@@ -402,6 +555,9 @@ const SpeciesPolicyAdvisor = (function () {
 
     return {
         getProfile,
+        getBulletsForStep,
+        appendPolicyQuickReference,
+        renderPolicyContextBlock,
         renderBadgeHtml,
         renderSelectedPanel,
         dataAsOf

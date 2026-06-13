@@ -241,11 +241,15 @@ class AssessmentSteps {
             section.className = 'step-section grouped-assessment';
             section.id = 'grouped-dynamic-assessment';
             
+            const quickRef = this.generateQuickReference('dynamic-assessment');
+
             const html = `
                 <div class="grouped-header">
                     <h2>Species Assessment</h2>
                     <p class="grouped-subtitle">Answer the following questions for each selected species</p>
                 </div>
+                
+                ${quickRef}
                 
                 <div class="dynamic-questions-container" id="dynamic-questions-container">
                     <!-- Questions will be rendered here -->

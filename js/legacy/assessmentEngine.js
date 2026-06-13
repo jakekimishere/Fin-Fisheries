@@ -547,6 +547,11 @@ function updateSelectedSpeciesDisplay() {
             return `<span class="selected-species-tag">${species.name}</span>`;
         }).join('');
     }
+
+    const policyPanel = document.getElementById('species-policy-panel');
+    if (policyPanel) {
+        policyPanel.remove();
+    }
     
     if (continueBtn) {
         continueBtn.disabled = false;
@@ -1224,6 +1229,10 @@ function generateQuickReference(stepName) {
         }
     }
     
+    if (typeof SpeciesPolicyAdvisor !== 'undefined' && SpeciesPolicyAdvisor.appendPolicyQuickReference) {
+        SpeciesPolicyAdvisor.appendPolicyQuickReference(requirements, stepName, selectedSpecies);
+    }
+
     if (requirements.length === 0) {
         return '';
     }

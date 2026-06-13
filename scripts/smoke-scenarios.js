@@ -47,6 +47,7 @@ function loadSandbox() {
     sandbox.SPECIES_DATA = loadSpeciesData(sandbox);
     load('js/validation/assessmentViolations.js');
     load('js/validation/speciesViolationChecks.js');
+    load('js/ui/speciesPolicyAdvisor.js');
     return sandbox;
 }
 
@@ -679,6 +680,29 @@ function main() {
         assert('forage combined over 1700 lb', forageOver.some(m => /exceeds limit/i.test(m)), forageOver.join('; '));
 
         assert('MPS24 policy profile salmon', typeof sb.getMps24PolicyProfile === 'function' && sb.getMps24PolicyProfile('atlantic-salmon')?.level === 'prohibited');
+
+        const advisor = sb.SpeciesPolicyAdvisor;
+        assert('species selection panel hidden', advisor.renderSelectedPanel(['anchovies', 'bluefin-tuna']) === '');
+        const missingPermits = [];
+        const missingPossession = [];
+        const missingSizeGear = [];
+        const missingLocation = [];
+        Object.keys(SPECIES_DATA).forEach(speciesId => {
+            if (speciesId === 'northeast-multispecies') return;
+            const species = SPECIES_DATA[speciesId];
+            const profile = advisor.getProfile(speciesId, species);
+            if (!profile.bullets.length) return;
+            if (!advisor.getBulletsForStep(speciesId, 'permits').length) missingPermits.push(speciesId);
+            if (!advisor.getBulletsForStep(speciesId, 'possession').length) missingPossession.push(speciesId);
+            if (!advisor.getBulletsForStep(speciesId, 'size-gear').length) missingSizeGear.push(speciesId);
+        });
+        Object.keys(sb.LOCATION_CHECKLIST_BY_SPECIES || {}).forEach(speciesId => {
+            if (!advisor.getBulletsForStep(speciesId, 'dynamic-assessment').length) missingLocation.push(speciesId);
+        });
+        assert('all species permits step policy', missingPermits.length === 0, missingPermits.join(', '));
+        assert('all species possession step policy', missingPossession.length === 0, missingPossession.join(', '));
+        assert('all species size-gear step policy', missingSizeGear.length === 0, missingSizeGear.join(', '));
+        assert('all location checklist species have area policy', missingLocation.length === 0, missingLocation.join(', '));
 
         // Grouped assessment path (speciesViolationChecks)
         const sf = SPECIES_DATA['summer-flounder'];
