@@ -14,6 +14,16 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>FIN - Fisheries Inspection Navigator</title>
+    <script>
+        /* GitHub Pages project site — ensure relative assets resolve under /Fin-Fisheries/ */
+        (function () {
+            if (location.hostname.endsWith('github.io')) {
+                var base = document.createElement('base');
+                base.href = '/Fin-Fisheries/';
+                document.head.appendChild(base);
+            }
+        })();
+    </script>
     <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="manifest.json">
 </head>

@@ -15,19 +15,24 @@ Offline-capable web app for Northeast fisheries and Atlantic HMS compliance asse
 
 ## Live app (GitHub Pages)
 
-**URL:** [https://jakekimishere.github.io/Fin-Fisheries/](https://jakekimishere.github.io/Fin-Fisheries/)
+**This is the app URL (not the GitHub repo page):**
 
-Use that exact path (repo name is case-sensitive: `Fin-Fisheries`).
+**https://jakekimishere.github.io/Fin-Fisheries/**
 
-### If you see a 404
+Bookmark that link. The repo at `github.com/jakekimishere/Fin-Fisheries` shows code — it does not run the app.
 
-1. Repo must be **Public** (**Settings → General**).
-2. **Actions** tab → wait for **Deploy to GitHub Pages** to finish (green check). This creates/updates the `gh-pages` branch.
-3. **Settings → Pages** → **Build and deployment**:
-   - **Source:** Deploy from a branch
-   - **Branch:** `gh-pages` → **/ (root)** → **Save**
-4. Wait 2–5 minutes, then open **https://jakekimishere.github.io/Fin-Fisheries/** (use Incognito if you previously used a custom domain).
-5. Leave **Custom domain** empty until you own the domain and DNS is configured.
+Repo name is **case-sensitive**: `Fin-Fisheries` (capital F).
+
+### If you see a blank page, 404, or “site not loaded”
+
+1. Use the **github.io** URL above — not `github.com/.../Fin-Fisheries`.
+2. **Settings → Pages** (on the repo): **Source** = Deploy from a branch → **Branch** = `gh-pages` → **/ (root)** → Save.
+3. **Actions** tab: latest **Deploy to GitHub Pages** must be green (runs on every push to `main`).
+4. Wait 2–5 minutes after a deploy, then open in **Incognito** or hard refresh (**Ctrl+Shift+R** / **Cmd+Shift+R**).
+5. If still broken: DevTools → Application → Service Workers → **Unregister**, then reload (stale offline cache).
+6. Repo must be **Public** (Settings → General → Danger Zone is not “Private”).
+
+See `docs/GITHUB_PAGES.md` for full setup.
 
 Local testing: open `index.html` directly or use any static file server.
 
