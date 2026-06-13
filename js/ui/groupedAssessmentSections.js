@@ -1,6 +1,13 @@
 /**
  * Grouped assessment UI sections.
  */
+function speciesPolicyContextHtml(speciesId, stepName) {
+    if (typeof SpeciesPolicyAdvisor === 'undefined' || !SpeciesPolicyAdvisor.renderPolicyContextBlock) {
+        return '';
+    }
+    return SpeciesPolicyAdvisor.renderPolicyContextBlock(speciesId, stepName);
+}
+
 function createGroupedPermitsSection(container) {
     const section = document.createElement('section');
     section.className = 'step-section grouped-assessment';
@@ -57,6 +64,7 @@ function createGroupedPermitsSection(container) {
         html += `
             <div class="species-permit-group" data-species="${speciesId}">
                 <h3>${speciesName} Permits</h3>
+                ${speciesPolicyContextHtml(speciesId, 'permits')}
                 <p class="question">Does the vessel possess a valid federal ${speciesName.toLowerCase()} permit?</p>
                 <div class="choice-group small">
                     <button class="choice-btn" data-species="${speciesId}" data-field="has-permit" data-value="yes" onclick="selectGroupedChoice('${speciesId}', this)">
@@ -164,6 +172,7 @@ function createGroupedPossessionSection(container) {
         html += `
             <div class="species-possession-group" data-species="${speciesId}">
                 <h3>${speciesName} Possession</h3>
+                ${speciesPolicyContextHtml(speciesId, 'possession')}
                 <div id="${speciesId}-possession-inputs-grouped">
                     <!-- Will be populated based on species -->
                 </div>
@@ -239,6 +248,7 @@ function createGroupedSizeGearSection(container) {
         html += `
             <div class="species-size-gear-group" data-species="${speciesId}">
                 <h3>${speciesName}</h3>
+                ${speciesPolicyContextHtml(speciesId, 'size-gear')}
                 
                 <!-- Size Compliance -->
                 <div class="size-section">

@@ -72,6 +72,12 @@ class QuestionRenderer {
                         intro.textContent = questionData.sectionIntro;
                         sectionDiv.appendChild(intro);
                     }
+                    if (typeof SpeciesPolicyAdvisor !== 'undefined' && SpeciesPolicyAdvisor.renderPolicyContextBlock) {
+                        const policyHtml = SpeciesPolicyAdvisor.renderPolicyContextBlock(speciesId, 'dynamic-assessment');
+                        if (policyHtml) {
+                            sectionDiv.insertAdjacentHTML('beforeend', policyHtml);
+                        }
+                    }
                     container.appendChild(sectionDiv);
                     locationHeadersShown.add(headerKey);
                 }
@@ -85,6 +91,27 @@ class QuestionRenderer {
 
         // Set up event listeners for dependencies
         this.setupDependencyListeners(container);
+    }
+
+    /**
+     * Map question metadata to assessment step for inline policy context
+     */
+    getPolicyStepForQuestion(questionData) {
+        const sectionToStep = {
+            'location-checklist': 'dynamic-assessment',
+            permits: 'permits',
+            possession: 'possession',
+            'size-gear': 'size-gear',
+            'vessel-requirements': 'vessel-requirements'
+        };
+        if (questionData.section && sectionToStep[questionData.section]) {
+            return sectionToStep[questionData.section];
+        }
+        const validSteps = ['permits', 'possession', 'size-gear', 'vessel-requirements', 'dynamic-assessment'];
+        if (questionData.stepName && validSteps.includes(questionData.stepName)) {
+            return questionData.stepName;
+        }
+        return null;
     }
 
     /**
@@ -237,6 +264,19 @@ class QuestionRenderer {
         header.appendChild(speciesLabel);
 
         questionDiv.appendChild(header);
+
+        const policyStep = this.getPolicyStepForQuestion(questionData);
+        if (
+            policyStep
+            && questionData.section !== 'location-checklist'
+            && typeof SpeciesPolicyAdvisor !== 'undefined'
+            && SpeciesPolicyAdvisor.renderPolicyContextBlock
+        ) {
+            const policyHtml = SpeciesPolicyAdvisor.renderPolicyContextBlock(speciesId, policyStep);
+            if (policyHtml) {
+                questionDiv.insertAdjacentHTML('beforeend', policyHtml);
+            }
+        }
 
         // Question body based on type
         const body = this.renderQuestionBody(speciesId, questionKey, questionData, species);
