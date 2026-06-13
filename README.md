@@ -55,7 +55,7 @@ FIN is a **Progressive Web App** — install it like an app for offline use afte
 
 | Path | Purpose |
 |------|---------|
-| `species-data.js` | Regulation data and assessment questions (**primary maintenance file**) |
+| `species-data/` | Regulation data by fishery (**primary maintenance files**) |
 | `js/config/regulationMeta.js` | `dataLastUpdated` and app version |
 | `js/legacy/assessmentEngine.js` | Report generation, violations, grouped UI (being migrated) |
 | `app/main.js` | Application entry point |
@@ -66,7 +66,7 @@ FIN is a **Progressive Web App** — install it like an app for offline use afte
 
 When NOAA publishes changes:
 
-1. Edit `species-data.js` (and date/group configs if needed).
+1. Edit the relevant file under `species-data/` (and date/group configs if needed).
 2. Set `REGULATION_META.dataLastUpdated` in `js/config/regulationMeta.js`.
 3. Sync `regulation-updates.json`.
 4. Follow the full checklist in **[docs/REGULATION_UPDATES.md](docs/REGULATION_UPDATES.md)**.

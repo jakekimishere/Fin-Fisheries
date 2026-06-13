@@ -2,12 +2,30 @@
  * Application script inventory — keep in sync with index.html load order.
  * Used by service-worker.js (importScripts) for offline precaching.
  */
-const APP_CACHE_NAME = 'fin-fisheries-v11';
+const APP_CACHE_NAME = 'fin-fisheries-v12';
+
+/** Must match scripts/load-species-data.js SPECIES_DATA_FILES */
+const SPECIES_DATA_URLS = [
+    './species-data/01-648-core.js',
+    './species-data/02-635-hms.js',
+    './species-data/03-648-midatlantic.js',
+    './species-data/04-648-northeast.js',
+    './species-data/05-648-small-pelagic.js',
+    './species-data/06-648-pelagic-mollusks.js',
+    './species-data/07-648-zooplankton.js',
+    './species-data/08-648-micro.js',
+    './species-data/09-648-butterfish.js',
+    './species-data/10-635-billfish-general.js',
+    './species-data/11-misc-placeholders.js',
+    './species-data/12-648-groundfish.js',
+    './species-data/13-648-late-species.js',
+    './species-data/14-init.js'
+];
 
 const APP_SCRIPT_URLS = [
     './fish-images.js',
     './js/config/regulationMeta.js',
-    './species-data.js',
+    ...SPECIES_DATA_URLS,
     './update-checker.js',
     './REGULATION_DATES_CONFIG.js',
     './GROUND_FISH_TRIP_LIMITS_CONFIG.js',
@@ -20,11 +38,13 @@ const APP_SCRIPT_URLS = [
     './js/utils/navigation.js',
     './js/config/multispeciesFlow.js',
     './js/validation/assessmentViolations.js',
+    './js/validation/speciesViolationChecks.js',
     './js/validation/violationChecker.js',
     './js/validation/validators.js',
     './js/ui/speciesGrid.js',
     './js/ui/questionRenderer.js',
     './js/ui/assessmentSteps.js',
+    './js/ui/groupedAssessmentSections.js',
     './js/ui/reportBuilder.js',
     './js/ui/reportGenerator.js',
     './js/legacy/assessmentEngine.js',

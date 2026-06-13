@@ -1,13 +1,13 @@
 /**
  * Single source of truth for regulation data version and app metadata.
- * When NOAA rules change: update dataLastUpdated here, then species-data.js.
+ * When NOAA rules change: update dataLastUpdated here, then species-data/*.js.
  */
 const REGULATION_META = {
     appVersion: '1.0.0',
     dataLastUpdated: '2026-05-21',
     region: 'northeast',
     dataFiles: [
-        'species-data.js',
+        'species-data/',
         'REGULATION_DATES_CONFIG.js',
         'FISHERY_QUOTA_STATUS_CONFIG.js',
         'GROUND_FISH_TRIP_LIMITS_CONFIG.js',

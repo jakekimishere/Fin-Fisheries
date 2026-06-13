@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://fin-fisheries.local/schemas/species-entry.json",
+  "title": "FIN Species Entry",
+  "type": "object",
+  "required": ["name", "regulations"],
+  "additionalProperties": true,
+  "properties": {
+    "name": { "type": "string", "minLength": 1 },
+    "commonName": { "type": "string" },
+    "image": {},
+    "imagePath": { "type": ["string", "null"] },
+    "color": { "type": "string" },
+    "prohibited": { "type": "boolean" },
+    "regulations": {
+      "type": "object",
+      "required": ["possession"],
+      "properties": {
+        "permits": { "type": "object" },
+        "possession": {
+          "type": "object",
+          "minProperties": 1
+        },
+        "size": { "type": "object" },
+        "gear": { "type": "object" },
+        "assessmentQuestions": { "type": "object" },
+        "dataSources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "url": { "type": "string", "pattern": "^https://" },
+              "effective": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

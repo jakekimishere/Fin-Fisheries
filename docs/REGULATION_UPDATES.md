@@ -27,7 +27,7 @@ The footer, homepage badge, and update checker read `DATA_LAST_UPDATED` from thi
 
 | File | When to edit |
 |------|----------------|
-| `species-data.js` | Limits, permits, sizes, gear, `assessmentQuestions`, CFR notes |
+| `species-data/*.js` | Limits, permits, sizes, gear, `assessmentQuestions`, CFR notes |
 | `REGULATION_DATES_CONFIG.js` | Closures, seasons, month-based rules |
 | `SPECIES_GROUPS_CONFIG.js` | Combined possession (e.g. shark groups) |
 | `DATA_VERIFICATION.md` | New species or major HMS section (optional but recommended) |
@@ -41,7 +41,7 @@ The footer, homepage badge, and update checker read `DATA_LAST_UPDATED` from thi
 
 ### 4. Verify in the app
 
-- [ ] Run `node scripts/validate-species-data.js` (checks structure, groups, key limits)
+- [ ] Run `npm run test` (species data, schema, violations, smoke scenarios)
 - [ ] Hard refresh (Ctrl+F5) or bump `APP_CACHE_NAME` in `js/config/appBundle.js` if testing offline
 - [ ] Run through affected species in browser (dynamic path if `assessmentQuestions` exist)
 - [ ] Confirm footer / homepage date matches `dataLastUpdated`
@@ -73,7 +73,7 @@ The footer, homepage badge, and update checker read `DATA_LAST_UPDATED` from thi
 
 ## Emergency fix (wrong limit in the field)
 
-1. Patch `species-data.js` (smallest possible diff)
+1. Patch the smallest `species-data/*.js` module (smallest possible diff)
 2. Set `dataLastUpdated` to today in `regulationMeta.js`
 3. Deploy immediately
 4. Document source URL in `regulation-updates.json` `changes[]`
