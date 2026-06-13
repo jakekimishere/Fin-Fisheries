@@ -9,18 +9,21 @@ const vm = require('vm');
 
 const root = path.join(__dirname, '..');
 
+const { loadSpeciesData } = require('./load-species-data');
+
 function loadSandbox() {
-    const sandbox = { console };
+    const sandbox = { console, window: null };
+    sandbox.window = sandbox;
     const load = (rel) => {
         const filePath = path.join(root, rel);
         vm.runInNewContext(fs.readFileSync(filePath, 'utf8'), sandbox, { filename: filePath });
     };
     load('REGULATION_DATES_CONFIG.js');
     load('FISHERY_QUOTA_STATUS_CONFIG.js');
-    const speciesPath = path.join(root, 'species-data.js');
-    const wrapped = `(function() {\n${fs.readFileSync(speciesPath, 'utf8')}\nreturn SPECIES_DATA;\n})()`;
-    sandbox.SPECIES_DATA = vm.runInNewContext(wrapped, sandbox, { filename: speciesPath });
+    load('GROUND_FISH_TRIP_LIMITS_CONFIG.js');
+    sandbox.SPECIES_DATA = loadSpeciesData(sandbox);
     load('js/validation/assessmentViolations.js');
+    load('js/validation/speciesViolationChecks.js');
     return sandbox;
 }
 
@@ -36,7 +39,8 @@ function main() {
     console.log('Smoke scenarios...\n');
 
     try {
-        const { AssessmentViolations: AV, SPECIES_DATA, getCommercialPossessionLimit, getHerringAreaLimitLb } = loadSandbox();
+        const sb = loadSandbox();
+        const { AssessmentViolations: AV, SPECIES_DATA, getCommercialPossessionLimit, getHerringAreaLimitLb, checkSpeciesViolations } = sb;
 
         // Prohibited: Atlantic angel shark
         const angel = SPECIES_DATA['atlantic-angel-shark'];
@@ -88,6 +92,26 @@ function main() {
 
         const purse = getCommercialPossessionLimit('bluefin-tuna', 'commercial-purse-seine', {});
         assert('BFT purse seine closed', purse.prohibited && purse.count === 0);
+
+        // Grouped assessment path (speciesViolationChecks)
+        const sf = SPECIES_DATA['summer-flounder'];
+        const sfV = checkSpeciesViolations('summer-flounder', sf, {
+            'has-permit': 'yes',
+            'permit-type': 'recreational',
+            possessionAmount: 10
+        });
+        assert('grouped summer flounder over recreational bag', sfV.some(m => /exceeds limit/i.test(m)), sfV.join('; '));
+
+        sb.assessmentData = { vessel: { multispecies: { classification: 'common-pool' } }, species: {} };
+        const cod = SPECIES_DATA['atlantic-cod'];
+        const codV = checkSpeciesViolations('atlantic-cod', cod, {
+            'has-permit': 'yes',
+            'permit-type': 'commercial',
+            possessionAmount: 999,
+            fishingArea: 'gulf-of-maine',
+            dasCategory: 'category-a'
+        });
+        assert('grouped cod GOM trip limit', codV.some(m => /trip limit/i.test(m)), codV.join('; '));
 
     } catch (e) {
         errors.push(e.message);

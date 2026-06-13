@@ -12,26 +12,27 @@
 - [x] `regulationMeta.js` for `dataLastUpdated`
 - [x] `appBundle.js` + service worker precache aligned with `index.html`
 - [x] Combined limit check decoupled from species loop order (`checkAllViolations`)
+- [x] **`species-data/`** — split by fishery (14 modules + README)
+- [x] **`js/validation/speciesViolationChecks.js`** — grouped + species-specific violations
+- [x] **`js/ui/groupedAssessmentSections.js`** — permits, possession, size/gear, vessel UI
+- [x] **`js/ui/reportBuilder.js`** — full report HTML
+- [x] **`scripts/validate-species-schema.js`** — JSON Schema structure checks
 
 ## Remaining in `assessmentEngine.js` (migrate incrementally)
 
 | Function / area | Target module | Priority |
 |-----------------|---------------|----------|
-| `createGroupedPermitsSection` | `js/ui/assessmentSteps.js` | Medium |
-| `createGroupedPossessionSection` | `js/ui/assessmentSteps.js` | Medium |
-| `createGroupedSizeGearSection` | `js/ui/assessmentSteps.js` | Medium |
-| `createGroupedVesselRequirementsSection` | `js/ui/assessmentSteps.js` | Low |
-| `generateReport` | `js/ui/reportGenerator.js` | High (largest) |
-| `checkSpeciesViolations` | `js/validation/violationChecker.js` (new) | High |
-| `generateQuickReference` | `js/ui/quickReference.js` (new) | Low |
+| `generateQuickReference` | `js/ui/quickReference.js` (new) | Medium |
+| `populateGrouped*` / `selectGroupedChoice` | `js/ui/groupedAssessmentHelpers.js` | Medium |
+| `generateReport` wrapper | thin delegate only | Low |
 | Favorites helpers | `js/ui/speciesGrid.js` | Low |
 
-## Do not migrate yet
+## Regulation data
 
-- `species-data.js` — stays as data; consider splitting by fishery **only** when edit conflicts become painful (e.g. `species-data/hms.js` imported into index).
+Edit files under **`species-data/`** (see `species-data/README.md`). Run `npm run validate` before deploy.
 
 ## Rule for new features
 
-1. Add regulation data to `species-data.js` (or config JS).
+1. Add regulation data to the appropriate `species-data/*.js` file (or config JS).
 2. Add UI/validation in `js/ui` or `js/validation`.
 3. Only touch `assessmentEngine.js` if you must extend an existing legacy function — prefer delegation from modules.

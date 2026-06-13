@@ -8,7 +8,7 @@
 index.html
     │
     ├── js/config/regulationMeta.js     ← data version (update when NOAA rules change)
-    ├── species-data.js                 ← regulations + assessment questions
+    ├── species-data/*.js              ← regulations + assessment questions (by fishery)
     ├── REGULATION_DATES_CONFIG.js      ← seasonal / closure dates
     ├── SPECIES_GROUPS_CONFIG.js        ← combined possession groups
     │
@@ -16,7 +16,10 @@ index.html
     ├── js/core/stateBridge.js          ← binds AppState ↔ window globals
     │
     ├── js/ui/*                         ← species grid, steps, questions, report wrapper
-    ├── js/legacy/assessmentEngine.js   ← grouped UI builders, violations, report HTML
+    ├── js/validation/assessmentViolations.js
+    ├── js/validation/speciesViolationChecks.js
+    ├── js/ui/groupedAssessmentSections.js
+    ├── js/legacy/assessmentEngine.js   ← quick reference, grouped helpers, report orchestration
     └── app/main.js                     ← entry point / orchestrator
 ```
 
@@ -67,7 +70,7 @@ Intentionally retained until incremental migration:
 
 See **[docs/REGULATION_UPDATES.md](docs/REGULATION_UPDATES.md)** — primary maintenance workflow.
 
-Quick rule: edit `species-data.js` + `REGULATION_META.dataLastUpdated` in `js/config/regulationMeta.js`, then sync `regulation-updates.json`.
+Quick rule: edit `species-data/` + `REGULATION_META.dataLastUpdated` in `js/config/regulationMeta.js`, then sync `regulation-updates.json`.
 
 ## Migration status
 

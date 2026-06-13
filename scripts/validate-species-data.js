@@ -29,18 +29,17 @@ function main() {
     const errors = [];
     const warnings = [];
 
-    const speciesPath = path.join(root, 'species-data.js');
-    const speciesCode = fs.readFileSync(speciesPath, 'utf8');
-    const speciesWrapped = `(function() {\n${speciesCode}\nreturn SPECIES_DATA;\n})()`;
+    const { loadSpeciesData } = require('./load-species-data');
+
     let SPECIES_DATA;
     try {
-        SPECIES_DATA = vm.runInNewContext(speciesWrapped, { console }, { filename: speciesPath });
+        SPECIES_DATA = loadSpeciesData({ console });
     } catch (err) {
-        console.error('Failed to execute species-data.js:', err.message);
+        console.error('Failed to load species data modules:', err.message);
         process.exit(1);
     }
     if (!SPECIES_DATA || typeof SPECIES_DATA !== 'object') {
-        console.error('Failed to load SPECIES_DATA from species-data.js');
+        console.error('Failed to load SPECIES_DATA from species-data/*.js');
         process.exit(1);
     }
 

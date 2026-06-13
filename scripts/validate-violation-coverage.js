@@ -13,18 +13,20 @@ function loadFile(relativePath) {
     return fs.readFileSync(path.join(root, relativePath), 'utf8');
 }
 
+const { loadSpeciesData } = require('./load-species-data');
+
 function main() {
     const errors = [];
     const warnings = [];
 
-    const speciesPath = path.join(root, 'species-data.js');
-    const speciesCode = fs.readFileSync(speciesPath, 'utf8');
-    const speciesWrapped = `(function() {\n${speciesCode}\nreturn SPECIES_DATA;\n})()`;
-    const sandbox = { console };
+    const sandbox = { console, window: null };
+    sandbox.window = sandbox;
     vm.runInNewContext(loadFile('REGULATION_DATES_CONFIG.js'), sandbox, { filename: 'REGULATION_DATES_CONFIG.js' });
     vm.runInNewContext(loadFile('FISHERY_QUOTA_STATUS_CONFIG.js'), sandbox, { filename: 'FISHERY_QUOTA_STATUS_CONFIG.js' });
-    const SPECIES_DATA = vm.runInNewContext(speciesWrapped, sandbox, { filename: speciesPath });
+    vm.runInNewContext(loadFile('GROUND_FISH_TRIP_LIMITS_CONFIG.js'), sandbox, { filename: 'GROUND_FISH_TRIP_LIMITS_CONFIG.js' });
+    const SPECIES_DATA = loadSpeciesData(sandbox);
     vm.runInNewContext(loadFile('js/validation/assessmentViolations.js'), sandbox, { filename: 'assessmentViolations.js' });
+    vm.runInNewContext(loadFile('js/validation/speciesViolationChecks.js'), sandbox, { filename: 'speciesViolationChecks.js' });
     const AV = sandbox.AssessmentViolations;
 
     if (!SPECIES_DATA || !AV) {
