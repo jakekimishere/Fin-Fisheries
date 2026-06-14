@@ -29,13 +29,36 @@
             }
         })();
     </script>
+    <script>
+        /* Apply saved theme before paint to avoid flash */
+        (function () {
+            var stored = localStorage.getItem('fin-theme');
+            var dark = stored === 'dark' || (!stored && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+        })();
+    </script>
     <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
     <div class="container">
         <header>
-            <button type="button" class="header-badge" id="fin-home-btn" onclick="goHome()" title="Return to home" aria-label="Return to home">FIN</button>
+            <div class="header-toolbar">
+                <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
+                    <span class="theme-icon theme-icon-moon" aria-hidden="true">☾</span>
+                    <span class="theme-icon theme-icon-sun" aria-hidden="true">☀</span>
+                </button>
+                <button type="button" class="header-brand" id="fin-home-btn" onclick="goHome()" title="Return to home" aria-label="Return to home">
+                    <svg class="fin-logo" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="24" cy="24" r="2.5" fill="currentColor"/>
+                        <path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" d="M24 5v5M24 38v5M5 24h5M38 24h5"/>
+                        <path fill="currentColor" d="M11 29c5-7 17-7 22 0-9-3-17-3-22 0z"/>
+                        <path fill="currentColor" d="M33 29l5 2.5-5 2.5z"/>
+                    </svg>
+                    <span class="fin-wordmark">FIN</span>
+                </button>
+            </div>
             <h1>Fisheries Inspection Navigator</h1>
             <p class="subtitle">Personal Project - Not Affiliated with USCG</p>
         </header>
@@ -254,6 +277,7 @@
 
     <!-- UI modules -->
     <script src="js/ui/speciesPolicyAdvisor.js"></script>
+    <script src="js/ui/themeManager.js"></script>
     <script src="js/ui/speciesGrid.js"></script>
     <script src="js/ui/questionRenderer.js"></script>
     <script src="js/ui/assessmentSteps.js"></script>

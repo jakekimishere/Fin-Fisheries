@@ -45,6 +45,8 @@
     --radius-lg: 14px;
     --font-sans: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     --focus-ring: rgba(8, 145, 178, 0.4);
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.2s ease;
 
     /* Legacy aliases — existing rules keep working */
     --navy-dark: var(--brand-900);
@@ -111,6 +113,95 @@ header::after {
     background: linear-gradient(90deg, var(--accent-600), var(--accent-400), var(--accent-600));
 }
 
+.header-toolbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    min-height: 44px;
+}
+
+.theme-toggle {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: var(--radius-sm);
+    color: var(--text-on-dark);
+    cursor: pointer;
+    font-size: 1.15rem;
+    line-height: 1;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: var(--accent-400);
+    outline: none;
+}
+
+.theme-icon-sun {
+    display: none;
+}
+
+html[data-theme="dark"] .theme-icon-moon {
+    display: none;
+}
+
+html[data-theme="dark"] .theme-icon-sun {
+    display: block;
+}
+
+.header-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 6px 16px 6px 10px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    color: var(--text-on-dark);
+    font-family: inherit;
+    transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.header-brand:hover,
+.header-brand:focus-visible {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: var(--accent-400);
+    outline: 2px solid var(--accent-400);
+    outline-offset: 2px;
+}
+
+.header-brand:active {
+    transform: scale(0.98);
+}
+
+.fin-logo {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    color: var(--accent-400);
+}
+
+.fin-wordmark {
+    font-weight: 700;
+    font-size: 0.88rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+/* Legacy class — keep for any cached HTML */
 .header-badge {
     display: inline-block;
     background: var(--accent-500);
@@ -1482,6 +1573,7 @@ h2 {
 
 .btn-primary:focus-visible,
 .btn-secondary:focus-visible,
+.header-brand:focus-visible,
 .header-badge:focus-visible {
     outline: 3px solid var(--focus-ring);
     outline-offset: 2px;
@@ -1942,20 +2034,8 @@ footer p {
     }
 }
 
-/* Responsive */
+/* Responsive — base mobile rules merged into mobile assessment block below */
 @media (max-width: 600px) {
-    main {
-        padding: 20px;
-    }
-    
-    header {
-        padding: 20px;
-    }
-    
-    header h1 {
-        font-size: 1.4rem;
-    }
-    
     .choice-group.small {
         flex-direction: column;
     }
@@ -1967,10 +2047,6 @@ footer p {
     
     .report-label {
         flex: none;
-    }
-    
-    .nav-buttons {
-        flex-direction: column;
     }
 }
 
@@ -2271,4 +2347,274 @@ footer p {
     font-size: 14px;
     color: var(--navy-dark);
     font-weight: 500;
+}
+
+/* —— Dark mode (bridge / night) —— */
+html[data-theme="dark"] {
+    --brand-900: #040810;
+    --brand-800: #0a1628;
+    --brand-700: #12243d;
+    --brand-600: #1a3a5c;
+    --brand-500: #234b73;
+    --accent-600: #0891b2;
+    --accent-500: #22b8d3;
+    --accent-400: #67e8f9;
+    --accent-100: #164e63;
+    --accent-50: #0c2d3a;
+
+    --surface-body: #050a12;
+    --surface-app: #0f172a;
+    --surface-subtle: #1e293b;
+    --surface-muted: #1a2332;
+
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --text-on-dark: #f8fafc;
+
+    --border-default: #334155;
+    --border-strong: #475569;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.5);
+
+    --success: #34d399;
+    --success-bg: #064e3b;
+    --danger: #fb7185;
+    --danger-bg: #4c0519;
+    --warning: #fbbf24;
+    --warning-bg: #451a03;
+
+    --slate-50: #1e293b;
+    --slate-700: #cbd5e1;
+    --focus-ring: rgba(34, 211, 238, 0.35);
+}
+
+html[data-theme="dark"] .quick-reference-header {
+    background: rgba(15, 23, 42, 0.65);
+}
+
+html[data-theme="dark"] .quick-reference-content {
+    background: rgba(15, 23, 42, 0.85);
+}
+
+html[data-theme="dark"] .quick-reference-list li {
+    color: var(--text-primary);
+}
+
+html[data-theme="dark"] .question-choice-btn.selected {
+    background: var(--accent-600);
+    border-color: var(--accent-400);
+    color: var(--text-on-dark);
+}
+
+html[data-theme="dark"] .question-choice-btn.selected .choice-title {
+    color: var(--text-on-dark);
+}
+
+html[data-theme="dark"] .personal-project-notice {
+    border-color: #92400e;
+}
+
+html[data-theme="dark"] .assessment-date-input,
+html[data-theme="dark"] .species-search-input,
+html[data-theme="dark"] .form-group input,
+html[data-theme="dark"] .form-group select,
+html[data-theme="dark"] .question-input {
+    background: var(--surface-subtle);
+    color: var(--text-primary);
+}
+
+/* —— Mobile: tighter assessment flow —— */
+@media (max-width: 600px) {
+    main {
+        padding: 14px 14px 20px;
+    }
+
+    header {
+        padding: 16px 14px 18px;
+    }
+
+    header h1 {
+        font-size: 1.25rem;
+        line-height: 1.25;
+    }
+
+    .subtitle {
+        font-size: 0.85rem;
+    }
+
+    .header-toolbar {
+        margin-bottom: 12px;
+        min-height: 40px;
+    }
+
+    .fin-logo {
+        width: 32px;
+        height: 32px;
+    }
+
+    .theme-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
+    .progress-container {
+        padding: 10px 14px;
+        gap: 10px;
+    }
+
+    .grouped-header {
+        margin-bottom: 18px;
+        padding-bottom: 12px;
+    }
+
+    .grouped-header h2 {
+        font-size: 1.15rem;
+    }
+
+    .grouped-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .species-permit-group,
+    .species-possession-group,
+    .species-size-gear-group {
+        padding: 14px 14px;
+        margin-bottom: 16px;
+    }
+
+    .species-permit-group h3,
+    .species-possession-group h3,
+    .species-size-gear-group h3 {
+        font-size: 1.05rem;
+        margin-bottom: 10px;
+    }
+
+    .selected-species-display-top {
+        padding: 14px;
+        margin-bottom: 16px;
+    }
+
+    .selected-species-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .selected-species-header .btn-primary {
+        width: 100%;
+    }
+
+    .species-grid {
+        gap: 12px;
+        margin: 16px 0;
+    }
+
+    .species-card {
+        padding: 10px;
+    }
+
+    .choice-btn {
+        padding: 12px 14px;
+        gap: 10px;
+    }
+
+    .choice-group {
+        gap: 8px;
+        margin-bottom: 18px;
+    }
+
+    .choice-group.small .choice-btn {
+        min-width: 0;
+        padding: 10px 12px;
+    }
+
+    .assessment-question {
+        padding: 14px;
+        margin-bottom: 14px;
+    }
+
+    .location-checklist-section {
+        margin: 20px 0 10px;
+        padding: 12px 14px;
+    }
+
+    .policy-step-context {
+        margin: 8px 0 10px;
+        padding: 10px 12px;
+        font-size: 0.88rem;
+    }
+
+    .quick-reference-box {
+        margin-bottom: 16px;
+    }
+
+    .quick-reference-header {
+        padding: 12px 14px;
+    }
+
+    .quick-reference-content {
+        padding: 14px;
+    }
+
+    .nav-buttons {
+        gap: 10px;
+        margin-top: 20px;
+        flex-direction: column;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        padding: 12px 18px;
+        font-size: 0.95rem;
+    }
+
+    .question {
+        font-size: 1rem;
+        margin-bottom: 12px;
+    }
+
+    .info-note {
+        padding: 10px 12px;
+        margin-bottom: 14px;
+        font-size: 0.85rem;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+        margin-bottom: 14px;
+    }
+
+    .regional-fishery-card {
+        padding: 22px 18px;
+    }
+
+    .homepage-update-notice {
+        padding: 12px 14px;
+        margin-bottom: 20px;
+    }
+
+    .personal-project-notice {
+        padding: 12px 14px;
+        margin-bottom: 16px;
+        font-size: 0.88rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .species-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px;
+    }
+
+    .fin-wordmark {
+        font-size: 0.8rem;
+    }
+
+    .header-brand {
+        padding: 5px 12px 5px 8px;
+    }
 }
