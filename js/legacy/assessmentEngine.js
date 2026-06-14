@@ -702,16 +702,18 @@ function showStep(step) {
         // Generate grouped assessment steps
         if (selectedSpecies.length > 0) {
             generateGroupedAssessmentSteps();
-            if (hasMultispecies && (typeof MultispeciesFlow === 'undefined' || MultispeciesFlow.vesselClassificationStepNeeded())) {
-                showGroupedStep('vessel-classification');
+            const useDynamic = shouldUseDynamicAssessmentQuestions();
+            let initialStep = 'permits';
+            if (hasMultispecies
+                && (typeof MultispeciesFlow === 'undefined' || MultispeciesFlow.vesselClassificationStepNeeded())) {
+                initialStep = 'vessel-classification';
             } else if (hasMultispecies && typeof MultispeciesFlow !== 'undefined') {
                 MultispeciesFlow.applyDefaultVesselClassification();
-                showGroupedStep('permits');
-            } else if (shouldUseDynamicAssessmentQuestions()) {
-                showGroupedStep('dynamic-assessment');
-            } else {
-                showGroupedStep('permits');
+                initialStep = useDynamic ? 'dynamic-assessment' : 'permits';
+            } else if (useDynamic) {
+                initialStep = 'dynamic-assessment';
             }
+            showGroupedStep(initialStep);
         }
     } else if (step >= 2 && step < getReportStepNumber()) {
         const stepOrder = getAssessmentStepOrder();
@@ -1766,11 +1768,29 @@ function showGroupedStep(stepName) {
         section.style.display = 'none';
     });
     
-    // Show the requested step
-    const section = document.getElementById(`grouped-${stepName}`);
+    // Show the requested step (fallback if DOM id missing — e.g. dynamic vs grouped mismatch)
+    let section = document.getElementById(`grouped-${stepName}`);
+    if (!section) {
+        const order = typeof getAssessmentStepOrder === 'function'
+            ? getAssessmentStepOrder()
+            : ['permits', 'possession', 'size-gear', 'vessel-requirements'];
+        for (const name of order) {
+            const candidate = document.getElementById(`grouped-${name}`);
+            if (candidate) {
+                section = candidate;
+                console.warn(`Assessment step "${stepName}" not found; showing "${candidate.id}".`);
+                break;
+            }
+        }
+        if (!section) {
+            section = document.querySelector('#assessment-sections .grouped-assessment');
+        }
+    }
     if (section) {
         section.classList.add('active');
         section.style.display = 'block';
+    } else {
+        console.error('No assessment step sections found after generation.');
     }
 }
 

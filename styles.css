@@ -352,7 +352,7 @@ header h1 {
     margin: 0 0 10px 0;
     border: none;
     padding: 0;
-    color: var(--navy);
+    color: var(--text-primary);
 }
 
 .grouped-subtitle {
@@ -376,7 +376,7 @@ header h1 {
 .species-permit-group h3,
 .species-possession-group h3,
 .species-size-gear-group h3 {
-    color: var(--navy);
+    color: var(--text-primary);
     margin: 0 0 15px 0;
     font-size: 1.2rem;
 }
@@ -759,10 +759,10 @@ main {
     min-width: 200px;
     padding: 12px 16px;
     font-size: 16px;
-    border: 2px solid var(--slate-300);
+    border: 2px solid var(--border-default);
     border-radius: 6px;
-    background: white;
-    color: var(--slate-700);
+    background: var(--surface-app);
+    color: var(--text-primary);
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -775,8 +775,8 @@ main {
 
 .date-display {
     padding: 10px 16px;
-    background: var(--navy);
-    color: white;
+    background: var(--accent-600);
+    color: var(--text-on-dark);
     border-radius: 6px;
     font-weight: 600;
     font-size: 14px;
@@ -891,8 +891,8 @@ main {
     position: absolute;
     top: 8px;
     right: 8px;
-    background: rgba(255, 255, 255, 0.95);
-    border: 2px solid var(--gold);
+    background: var(--surface-app);
+    border: 2px solid var(--accent-500);
     border-radius: 50%;
     width: 32px;
     height: 32px;
@@ -901,13 +901,16 @@ main {
     justify-content: center;
     cursor: pointer;
     font-size: 18px;
+    color: var(--accent-600);
     z-index: 10;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-sm);
 }
 
 .favorite-button:hover {
     background: var(--accent-50);
+    border-color: var(--accent-400);
+    color: var(--accent-500);
     transform: scale(1.08);
     box-shadow: var(--shadow-md);
 }
@@ -1878,24 +1881,25 @@ footer p {
     margin: 15px 0;
     padding: 20px;
     text-align: left;
-    background: var(--white);
-    border: 3px solid #e5e7eb;
+    background: var(--surface-app);
+    border: 3px solid var(--border-default);
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
+    color: var(--text-primary);
 }
 
 .vessel-class-btn:hover {
-    border-color: var(--navy);
-    box-shadow: 0 4px 12px rgba(26, 39, 68, 0.1);
+    border-color: var(--accent-500);
+    box-shadow: var(--shadow-md);
     transform: translateY(-2px);
 }
 
 .vessel-class-btn.selected {
-    border-color: var(--navy);
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    color: var(--white);
-    box-shadow: 0 6px 20px rgba(26, 39, 68, 0.3);
+    border-color: var(--accent-400);
+    background: linear-gradient(135deg, var(--accent-600) 0%, var(--accent-500) 100%);
+    color: var(--text-on-dark);
+    box-shadow: var(--shadow-md);
 }
 
 .choice-header {
@@ -1933,9 +1937,9 @@ footer p {
 
 /* Multispecies Group Styles */
 .multispecies-group {
-    background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%);
-    color: var(--white);
-    border: 2px solid var(--gold);
+    background: linear-gradient(135deg, var(--brand-800) 0%, var(--brand-700) 100%);
+    color: var(--text-on-dark);
+    border: 2px solid var(--accent-400);
     border-radius: 12px;
     padding: 20px;
     margin: 20px 0;
@@ -2456,6 +2460,68 @@ html[data-theme="dark"] .policy-advisory {
 
 html[data-theme="dark"] .policy-complex {
     color: #fcd34d;
+}
+
+html[data-theme="dark"] .choice-btn {
+    background: var(--surface-subtle);
+    border-color: var(--border-default);
+    color: var(--text-primary);
+}
+
+html[data-theme="dark"] .choice-btn:hover {
+    border-color: var(--accent-400);
+    background: var(--surface-muted);
+}
+
+html[data-theme="dark"] .choice-btn.selected {
+    border-color: var(--accent-400);
+    background: #134e4a;
+    color: var(--text-primary);
+}
+
+html[data-theme="dark"] .choice-btn.selected .choice-label,
+html[data-theme="dark"] .choice-btn.selected .choice-title {
+    color: var(--text-on-dark);
+}
+
+html[data-theme="dark"] .choice-btn.selected .choice-icon {
+    background: var(--accent-600);
+    color: var(--text-on-dark);
+}
+
+html[data-theme="dark"] .favorites-section {
+    background: #0c4a5e;
+    border-color: var(--accent-400);
+}
+
+html[data-theme="dark"] .favorites-header h3,
+html[data-theme="dark"] .all-species-header h3 {
+    color: var(--text-primary);
+    border-bottom-color: var(--accent-400);
+}
+
+html[data-theme="dark"] .favorite-button {
+    background: var(--surface-subtle);
+    border-color: var(--accent-400);
+    color: var(--accent-400);
+}
+
+html[data-theme="dark"] .favorite-button:hover {
+    background: var(--surface-muted);
+    color: var(--accent-400);
+}
+
+html[data-theme="dark"] .assessment-date-container {
+    background: var(--surface-subtle);
+    border-color: var(--border-default);
+}
+
+html[data-theme="dark"] .date-label {
+    color: var(--text-primary);
+}
+
+html[data-theme="dark"] .date-help-text {
+    color: var(--text-secondary);
 }
 
 html[data-theme="dark"] .assessment-date-input,
