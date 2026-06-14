@@ -2,7 +2,7 @@
  * Application script inventory — keep in sync with index.html load order.
  * Used by service-worker.js (importScripts) for offline precaching.
  */
-const APP_CACHE_NAME = 'fin-fisheries-v38';
+const APP_CACHE_NAME = 'fin-fisheries-v39';
 
 /** Must match scripts/load-species-data.js SPECIES_DATA_FILES */
 const SPECIES_DATA_URLS = [
@@ -67,6 +67,7 @@ const APP_SCRIPT_URLS = [
     './js/validation/violationChecker.js',
     './js/validation/validators.js',
     './js/ui/speciesPolicyAdvisor.js',
+    './js/ui/themeManager.js',
     './js/ui/speciesGrid.js',
     './js/ui/questionRenderer.js',
     './js/ui/assessmentSteps.js',
@@ -85,7 +86,8 @@ const APP_STATIC_URLS = [
     './regulation-updates.json',
     './sw-register.js',
     './icon-192.png',
-    './icon-512.png'
+    './icon-512.png',
+    './assets/fin-logo.svg'
 ];
 
 const APP_CACHE_URLS = [...APP_STATIC_URLS, ...APP_SCRIPT_URLS];

@@ -99,6 +99,10 @@ document.addEventListener('DOMContentLoaded', () => {
         updateFooterDate();
     }
 
+    if (typeof ThemeManager !== 'undefined') {
+        ThemeManager.init();
+    }
+
     appState.setStep(-1);
 
     if (navigation && navigation.showStep) {
