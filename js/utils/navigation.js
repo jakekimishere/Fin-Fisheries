@@ -39,12 +39,28 @@ class Navigation {
 
     scrollToAssessment() {
         requestAnimationFrame(() => {
-            const target = document.querySelector('.grouped-assessment[style*="block"]')
+            const target = document.querySelector('.grouped-assessment.active')
+                || document.querySelector('.grouped-assessment[style*="block"]')
                 || document.getElementById('assessment-sections');
             if (target) {
                 target.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
+    }
+
+    /** First grouped assessment screen after species selection (respects multispecies + dynamic flow). */
+    resolveInitialAssessmentStep(hasMultispecies, useDynamicQuestions) {
+        if (hasMultispecies
+            && (typeof MultispeciesFlow === 'undefined' || MultispeciesFlow.vesselClassificationStepNeeded())) {
+            return 'vessel-classification';
+        }
+        if (hasMultispecies && typeof MultispeciesFlow !== 'undefined') {
+            MultispeciesFlow.applyDefaultVesselClassification();
+        }
+        if (useDynamicQuestions) {
+            return 'dynamic-assessment';
+        }
+        return 'permits';
     }
 
     // Show a specific step
@@ -108,16 +124,8 @@ class Navigation {
                     typeof window.assessmentSteps.shouldUseDynamicQuestions === 'function' &&
                     window.assessmentSteps.shouldUseDynamicQuestions();
                 
-                if (hasMultispecies && (typeof MultispeciesFlow === 'undefined' || MultispeciesFlow.vesselClassificationStepNeeded())) {
-                    this.showGroupedStep('vessel-classification');
-                } else if (hasMultispecies && typeof MultispeciesFlow !== 'undefined') {
-                    MultispeciesFlow.applyDefaultVesselClassification();
-                    this.showGroupedStep('permits');
-                } else if (useDynamicQuestions) {
-                    this.showGroupedStep('dynamic-assessment');
-                } else {
-                    this.showGroupedStep('permits');
-                }
+                const initialStep = this.resolveInitialAssessmentStep(hasMultispecies, useDynamicQuestions);
+                this.showGroupedStep(initialStep);
                 this.scrollToAssessment();
             }
         } else if (typeof getReportStepNumber === 'function' && step >= 2 && step < getReportStepNumber()) {
@@ -198,9 +206,28 @@ class Navigation {
             rememberGroupedStep(stepName);
         }
 
-        const stepElement = document.getElementById(`grouped-${stepName}`);
+        let stepElement = document.getElementById(`grouped-${stepName}`);
+        if (!stepElement) {
+            const order = typeof getAssessmentStepOrder === 'function'
+                ? getAssessmentStepOrder()
+                : ['permits', 'possession', 'size-gear', 'vessel-requirements'];
+            for (const name of order) {
+                const candidate = document.getElementById(`grouped-${name}`);
+                if (candidate) {
+                    stepElement = candidate;
+                    console.warn(`Assessment step "${stepName}" not found; showing "${candidate.id}".`);
+                    break;
+                }
+            }
+            if (!stepElement) {
+                stepElement = document.querySelector('#assessment-sections .grouped-assessment');
+            }
+        }
         if (stepElement) {
+            stepElement.classList.add('active');
             stepElement.style.display = 'block';
+        } else {
+            console.error('No assessment step sections found after generation.');
         }
 
         // Update quick reference if available
