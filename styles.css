@@ -481,12 +481,12 @@ header h1 {
 
 .update-notice-text {
     flex: 1;
-    color: var(--navy);
+    color: var(--text-primary);
     font-size: 0.95rem;
 }
 
 .update-notice-text strong {
-    color: var(--navy);
+    color: var(--text-primary);
 }
 
 .homepage-content {
@@ -535,7 +535,7 @@ header h1 {
 }
 
 .regional-fishery-card h3 {
-    color: var(--navy);
+    color: var(--text-primary);
     font-size: 1.5rem;
     margin: 0 0 10px 0;
     font-weight: 600;
@@ -553,7 +553,7 @@ header h1 {
     top: 20px;
     right: 20px;
     font-size: 1.5rem;
-    color: var(--navy);
+    color: var(--accent-500);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -1289,7 +1289,7 @@ main {
 }
 
 h2 {
-    color: var(--brand-800);
+    color: var(--text-primary);
     font-size: 1.35rem;
     font-weight: 700;
     letter-spacing: -0.02em;
@@ -1311,7 +1311,7 @@ h2 {
     padding: 12px 15px;
     margin-bottom: 20px;
     font-size: 0.9rem;
-    color: var(--navy);
+    color: var(--text-primary);
     border-radius: 0 6px 6px 0;
 }
 
@@ -2389,6 +2389,14 @@ html[data-theme="dark"] {
     --slate-50: #1e293b;
     --slate-700: #cbd5e1;
     --focus-ring: rgba(34, 211, 238, 0.35);
+
+    /* Legacy aliases — light text on dark surfaces */
+    --navy-dark: var(--text-on-dark);
+    --navy: var(--text-primary);
+    --navy-light: var(--text-secondary);
+    --blue-light-muted: #134e4a;
+    --blue-muted: var(--accent-400);
+    --gray: var(--text-secondary);
 }
 
 html[data-theme="dark"] .quick-reference-header {
@@ -2413,8 +2421,41 @@ html[data-theme="dark"] .question-choice-btn.selected .choice-title {
     color: var(--text-on-dark);
 }
 
+html[data-theme="dark"] .homepage-update-notice {
+    background: #0c4a5e;
+    border-color: var(--accent-400);
+}
+
 html[data-theme="dark"] .personal-project-notice {
-    border-color: #92400e;
+    background: #422006;
+    border-color: #b45309;
+    color: #fef3c7;
+}
+
+html[data-theme="dark"] .personal-project-notice strong {
+    color: #fcd34d;
+}
+
+html[data-theme="dark"] .info-note {
+    background: #134e4a;
+    border-left-color: var(--accent-400);
+    color: var(--text-primary);
+}
+
+html[data-theme="dark"] .regional-fishery-card:hover:not(.unavailable) {
+    background: linear-gradient(180deg, var(--surface-app) 0%, #134e4a 100%);
+}
+
+html[data-theme="dark"] .btn-secondary:hover {
+    color: var(--text-primary);
+}
+
+html[data-theme="dark"] .policy-advisory {
+    color: var(--text-primary);
+}
+
+html[data-theme="dark"] .policy-complex {
+    color: #fcd34d;
 }
 
 html[data-theme="dark"] .assessment-date-input,
