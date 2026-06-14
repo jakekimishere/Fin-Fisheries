@@ -1,4 +1,4 @@
-# Publish site to gh-pages on every push to main.
+# Publish site to gh-pages on every push to main (after tests pass).
 # Requires: Settings → Pages → Deploy from branch → gh-pages / (root)
 name: Deploy to GitHub Pages
 
@@ -15,7 +15,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Validate and smoke test
+        run: npm test
+
   deploy:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

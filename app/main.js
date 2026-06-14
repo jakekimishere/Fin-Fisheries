@@ -115,6 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
         window.showStep = function(step) {
             navigation.showStep(step);
         };
+        window.showGroupedStep = function(stepName) {
+            navigation.showGroupedStep(stepName);
+        };
     }
 
     if (validators && navigation) {
