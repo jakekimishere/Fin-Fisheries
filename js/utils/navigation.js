@@ -48,6 +48,41 @@ class Navigation {
         });
     }
 
+    hideAssessmentLoadError() {
+        const panel = document.getElementById('assessment-load-error');
+        if (panel) {
+            panel.hidden = true;
+        }
+    }
+
+    showAssessmentLoadError(message) {
+        this.hideSpeciesSelection();
+        const assessmentSections = document.getElementById('assessment-sections');
+        if (assessmentSections) {
+            assessmentSections.style.display = 'block';
+        }
+        document.querySelectorAll('.grouped-assessment').forEach(el => {
+            el.classList.remove('active');
+            el.style.display = 'none';
+        });
+
+        const panel = document.getElementById('assessment-load-error');
+        if (panel) {
+            const textEl = panel.querySelector('.assessment-load-error-text');
+            if (textEl) {
+                textEl.textContent = message;
+            }
+            panel.hidden = false;
+        }
+
+        const msg = message || 'Assessment could not load. Try selecting fewer species or refresh the page.';
+        if (typeof Helpers !== 'undefined' && Helpers.showErrorMessage) {
+            Helpers.showErrorMessage(msg);
+        } else if (typeof showErrorMessage === 'function') {
+            showErrorMessage(msg);
+        }
+    }
+
     /** First grouped assessment screen after species selection (respects multispecies + dynamic flow). */
     resolveInitialAssessmentStep(hasMultispecies, useDynamicQuestions) {
         if (hasMultispecies
@@ -94,6 +129,7 @@ class Navigation {
             const homepage = document.getElementById('step-homepage');
             if (homepage) homepage.classList.add('active');
         } else if (step === 0) {
+            this.hideAssessmentLoadError();
             this.showSpeciesSelection();
             document.querySelectorAll('.grouped-assessment').forEach(el => {
                 el.classList.remove('active');
@@ -110,23 +146,39 @@ class Navigation {
             }
         } else if (step === 1) {
             this.hideSpeciesSelection();
-            // Step 1 (vessel info) removed - skip directly to assessment
-            // Generate grouped assessment steps
-            if (this.state.selectedSpecies.length > 0) {
-                if (typeof window.assessmentSteps !== 'undefined' && window.assessmentSteps.generate) {
-                    window.assessmentSteps.generate();
-                } else if (typeof generateGroupedAssessmentSteps === 'function') {
-                    generateGroupedAssessmentSteps();
+            this.hideAssessmentLoadError();
+            try {
+                if (this.state.selectedSpecies.length > 0) {
+                    if (typeof window.assessmentSteps !== 'undefined' && window.assessmentSteps.generate) {
+                        window.assessmentSteps.generate();
+                    } else if (typeof generateGroupedAssessmentSteps === 'function') {
+                        generateGroupedAssessmentSteps();
+                    }
+
+                    const useDynamicQuestions = window.assessmentSteps &&
+                        typeof window.assessmentSteps.shouldUseDynamicQuestions === 'function' &&
+                        window.assessmentSteps.shouldUseDynamicQuestions();
+
+                    const initialStep = this.resolveInitialAssessmentStep(hasMultispecies, useDynamicQuestions);
+                    this.showGroupedStep(initialStep);
+
+                    const visibleStep = document.querySelector(
+                        '#assessment-sections .grouped-assessment.active, #assessment-sections .grouped-assessment[style*="block"]'
+                    );
+                    if (!visibleStep) {
+                        this.showAssessmentLoadError(
+                            'Assessment could not load. Try selecting fewer species, refresh the page, or go back to species selection.'
+                        );
+                    } else {
+                        this.hideAssessmentLoadError();
+                        this.scrollToAssessment();
+                    }
                 }
-                
-                // Check if we should use dynamic questions
-                const useDynamicQuestions = window.assessmentSteps && 
-                    typeof window.assessmentSteps.shouldUseDynamicQuestions === 'function' &&
-                    window.assessmentSteps.shouldUseDynamicQuestions();
-                
-                const initialStep = this.resolveInitialAssessmentStep(hasMultispecies, useDynamicQuestions);
-                this.showGroupedStep(initialStep);
-                this.scrollToAssessment();
+            } catch (error) {
+                console.error('Error starting assessment:', error);
+                this.showAssessmentLoadError(
+                    'Assessment failed to load. Please refresh or go back to species selection.'
+                );
             }
         } else if (typeof getReportStepNumber === 'function' && step >= 2 && step < getReportStepNumber()) {
             this.hideSpeciesSelection();
@@ -226,8 +278,12 @@ class Navigation {
         if (stepElement) {
             stepElement.classList.add('active');
             stepElement.style.display = 'block';
+            this.hideAssessmentLoadError();
         } else {
             console.error('No assessment step sections found after generation.');
+            this.showAssessmentLoadError(
+                'Assessment could not load. Try selecting fewer species or go back to species selection.'
+            );
         }
 
         // Update quick reference if available

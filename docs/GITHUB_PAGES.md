@@ -46,10 +46,12 @@ Repo home → ⚙️ next to About → Website → paste the github.io URL.
 
 ## How deploy works
 
-Every push to `main` runs the deploy workflow:
+Every push to `main`:
 
-1. Uploads the full site as a Pages artifact and deploys via GitHub Actions.
-2. Syncs the `gh-pages` branch (for branch-based Pages or backup).
+1. **CI** runs validation, smoke tests, and browser checks (`.github/workflows/ci.yml`).
+2. **Deploy** runs tests again, then publishes to `gh-pages` (`.github/workflows/deploy-pages.yml`).
+
+See **`docs/RELEASE.md`** for the full release checklist.
 
 Verify the live site picked up your build:
 
@@ -65,7 +67,7 @@ Compares `APP_CACHE_NAME` in `main` vs `origin/gh-pages`. If they differ, deploy
 
 - Repo is **private** on GitHub Free (see table above).
 - Pages source not configured (see settings above).
-- Wrong URL (must include `/Fin-Fisheries/`).
+- Wrong URL (must include `/FIsheries-Inspection-Navigator/`).
 
 ### Blank page with header but no species list
 

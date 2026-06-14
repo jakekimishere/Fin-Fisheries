@@ -9,7 +9,12 @@
     "validate:violations": "node scripts/validate-violation-coverage.js",
     "validate:schema": "node scripts/validate-species-schema.js",
     "test:smoke": "node scripts/smoke-scenarios.js",
+    "test:e2e": "playwright test",
     "pages:check": "node scripts/check-pages-sync.js",
+    "release:check": "npm test && npm run pages:check",
     "test": "npm run validate && npm run test:smoke"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0"
   }
 }

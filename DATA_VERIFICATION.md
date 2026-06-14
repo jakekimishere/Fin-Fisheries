@@ -1,5 +1,16 @@
 # Data Verification - Public NOAA Information
 
+## Maintenance checklist (when rules change)
+
+1. Edit the relevant `species-data/*.js` or `*_POLICY_CONFIG.js` file.
+2. Update **`js/config/regulationMeta.js`** → `dataLastUpdated` (homepage/footer read this).
+3. Run **`npm test`** — all validation and smoke scenarios must pass.
+4. Bump **`APP_CACHE_NAME`** in `js/config/appBundle.js` so users get fresh assets.
+5. Add a one-line note below (species, source URL, date verified).
+6. Follow **`docs/RELEASE.md`** before pushing to `main`.
+
+**Current data version:** see `REGULATION_META.dataLastUpdated` in `js/config/regulationMeta.js`.
+
 ## Verification Statement
 
 All data included in this application is sourced from **publicly available NOAA (National Oceanic and Atmospheric Administration) regulations** published in the Federal Register and on NOAA Fisheries websites. This information is in the public domain and freely accessible.

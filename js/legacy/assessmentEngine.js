@@ -653,8 +653,15 @@ function selectRegionalFishery(region) {
     // Future: handle other regions here
 }
 
-// Navigation
+// Navigation — delegates to Navigation module when orchestrator has initialized it.
 function showStep(step) {
+    if (window.navigation && typeof window.navigation.showStep === 'function') {
+        return window.navigation.showStep(step);
+    }
+    legacyShowStep(step);
+}
+
+function legacyShowStep(step) {
     document.querySelectorAll('.step-section').forEach(section => {
         section.classList.remove('active');
     });
@@ -1737,6 +1744,13 @@ function populateScallopAdditionalChecks(speciesId, additionalContent) {
 }
 // Show grouped assessment step
 function showGroupedStep(stepName) {
+    if (window.navigation && typeof window.navigation.showGroupedStep === 'function') {
+        return window.navigation.showGroupedStep(stepName);
+    }
+    legacyShowGroupedStep(stepName);
+}
+
+function legacyShowGroupedStep(stepName) {
     if (stepName === 'vessel-requirements' && !vesselRequirementsStepNeeded()) {
         showStep(getReportStepNumber());
         return;
@@ -2240,6 +2254,7 @@ function prevGroupedStep(currentStepName) {
 // Make prevGroupedStep and showStep globally accessible
 window.prevGroupedStep = prevGroupedStep;
 window.showStep = showStep;
+window.showGroupedStep = showGroupedStep;
 
 // Save data from current grouped step
 function saveGroupedStepData(stepName) {

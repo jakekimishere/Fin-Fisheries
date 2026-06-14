@@ -177,6 +177,20 @@
                 <!-- Assessment steps will be dynamically generated for each selected species -->
             </div>
 
+            <div id="assessment-load-error" class="assessment-load-error" hidden role="alert">
+                <div class="assessment-load-error-inner">
+                    <span class="assessment-load-error-icon" aria-hidden="true">⚠️</span>
+                    <div>
+                        <strong>Assessment could not load</strong>
+                        <p class="assessment-load-error-text">Try selecting fewer species, refresh the page, or go back to species selection.</p>
+                    </div>
+                </div>
+                <div class="assessment-load-error-actions">
+                    <button type="button" class="btn-secondary" onclick="showStep(0)">← Back to Species Selection</button>
+                    <button type="button" class="btn-primary" onclick="location.reload()">Refresh Page</button>
+                </div>
+            </div>
+
             <!-- Pre-report violation summary (shown before full report) -->
             <div id="pre-report-overlay" class="pre-report-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="pre-report-title">
                 <div class="pre-report-panel">
@@ -213,6 +227,14 @@
                 </small>
             </p>
         </footer>
+    </div>
+
+    <div id="update-banner" class="update-banner" role="alert" aria-live="polite" hidden>
+        <span class="update-banner-text">A new version of FIN is available.</span>
+        <div class="update-banner-actions">
+            <button type="button" class="btn-primary update-banner-refresh" id="update-banner-refresh">Refresh</button>
+            <button type="button" class="btn-secondary update-banner-dismiss" id="update-banner-dismiss">Later</button>
+        </div>
     </div>
 
     <!-- Core data (regulationMeta must load before update-checker) -->
