@@ -633,7 +633,8 @@ function checkProhib697Possession(speciesId, species, speciesData) {
     }
 
     if (lim.count != null && amount != null && amount > lim.count) {
-        violations.push(`Weakfish possession exceeds limit: ${amount} vs ${lim.count} ${lim.unit || 'lbs'} (50 CFR 697.7)`);
+        const label = species?.name || speciesId;
+        violations.push(`${label} possession exceeds limit: ${amount} vs ${lim.count} ${lim.unit || 'lbs'} (50 CFR 697.7)`);
     }
 
     return violations;
